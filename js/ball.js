@@ -1,7 +1,11 @@
 class Ball{
 
     /**
-     * Constructor, storing orienation and waydata
+     *
+     * @param size ball width and height.
+     * @param ctx context to draw one.
+     * @param x initial x.
+     * @param y initial y.
      */
     constructor(size, ctx, x, y){
         this.x = x;
@@ -14,9 +18,9 @@ class Ball{
     }
 
     /**
-     * This will tell us whether or not this tile is within the original.
      *
-     * @returns
+     * @param x resets x value.
+     * @param y resets y value.
      */
     setPosition(x, y){
         this.ctx.fillStyle = "black";
@@ -27,6 +31,10 @@ class Ball{
         this.y = y;
     }
 
+    /**
+     * Change fill of ball
+     * @param fill
+     */
     setFillStyle(fill) {
         this.fillStyle = fill;
     }

@@ -10,10 +10,9 @@ let paddleWidth;
 let paddleHeight;
 let ballSize;
 
-let movingUp;
-let movingDown;
-
-//POSTS FROM updatePositions METHOD TO UPDATE THE MODELS.
+/**
+ * Gets new position data from server and updates positions of all entities.
+ */
 function updatePositions() {
     $.post("/updatePositions", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
@@ -32,13 +31,15 @@ function updatePositions() {
 $(document).ready(() => {
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
-// Set up the canvas context.
+    // Set up the canvas context.
     ctx = canvas.getContext("2d");
-    movingUp = false;
-    movingDown = false;
+    //initial width of paddle, will be a constant
     paddleWidth = 10;
+    //initial height of paddles, another constant
     paddleHeight = 40;
+    //initial ball size, another constant
     ballSize = 20;
+    //initialize 5 entities.
     playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);

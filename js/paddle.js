@@ -1,7 +1,12 @@
 class Paddle{
 
     /**
-     * Constructor, storing orienation and waydata
+     *
+     * @param x initial x value of the paddle.
+     * @param y initial y value of the paddle.
+     * @param width width of the paddle.
+     * @param height height of the paddle.
+     * @param ctx context to be drawing on.
      */
     constructor(x, y, width, height, ctx) {
         this.x = x;
@@ -14,10 +19,10 @@ class Paddle{
         this.ctx.fillRect(x, y, width, height);
     }
 
+
     /**
-     * This will tell us whether or not this tile is within the original.
      *
-     * @returns
+     * @param y only y position will change.
      */
     setPosition(y){
         this.ctx.fillStyle = "black";
@@ -27,6 +32,10 @@ class Paddle{
         this.y = y;
     }
 
+    /**
+     * Change fill of paddle
+     * @param fill
+     */
     setFillStyle(fill) {
         this.fillStyle = fill;
     }
