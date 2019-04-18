@@ -3,11 +3,15 @@ class Paddle{
     /**
      * Constructor, storing orienation and waydata
      */
-    constructor(width, height, ctx) {
+    constructor(x, y, width, height, ctx) {
+        this.x = x;
+        this.y = y;
         this.width = width;
         this.height = height;
         this.ctx = ctx;
-        this.ctx.fillStyle = "white";
+        this.fillStyle = "white";
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x, y, width, height);
     }
 
     /**
@@ -15,7 +19,14 @@ class Paddle{
      *
      * @returns
      */
-    setPosition(x, y){
-        this.ctx.fillRect(x, y, this.width, this.height);
+    setPosition(y){
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(this.x, y, this.width, this.height);
+    }
+
+    setFillStyle(fill) {
+        this.fillStyle = fill;
     }
 }

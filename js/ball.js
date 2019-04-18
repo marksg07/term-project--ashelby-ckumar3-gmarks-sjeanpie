@@ -3,10 +3,14 @@ class Ball{
     /**
      * Constructor, storing orienation and waydata
      */
-    constructor(size, ctx){
+    constructor(size, ctx, x, y){
+        this.x = x;
+        this.y = y;
         this.size = size;
         this.ctx = ctx;
-        this.ctx.fillStyle = "white";
+        this.fillStyle = "white";
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x, y, size, size);
     }
 
     /**
@@ -15,6 +19,13 @@ class Ball{
      * @returns
      */
     setPosition(x, y){
-        this.ctx.fillRect(x, y, size, size);
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x, y, this.width, this.height);
+    }
+
+    setFillStyle(fill) {
+        this.fillStyle = fill;
     }
 }
