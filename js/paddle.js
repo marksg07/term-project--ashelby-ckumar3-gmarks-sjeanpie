@@ -24,6 +24,7 @@ class Paddle{
         this.ctx.fillRect(this.x, this.y, this.width, this.height);
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.fillRect(this.x, y, this.width, this.height);
+        this.y = y;
     }
 
     setFillStyle(fill) {

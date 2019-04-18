@@ -23,6 +23,8 @@ class Ball{
         this.ctx.fillRect(this.x, this.y, this.width, this.height);
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.fillRect(x, y, this.width, this.height);
+        this.x = x;
+        this.y = y;
     }
 
     setFillStyle(fill) {

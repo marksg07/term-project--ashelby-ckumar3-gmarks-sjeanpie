@@ -10,6 +10,8 @@ let paddleWidth;
 let paddleHeight;
 let ballSize;
 
+let movingUp;
+let movingDown;
 
 //POSTS FROM updatePositions METHOD TO UPDATE THE MODELS.
 function updatePositions() {
@@ -22,13 +24,18 @@ function updatePositions() {
         ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
         ballLeft.setPosition(responseObject.ballRightX, responseObject.ballRightY);
 
+});
 }
+
+
 
 $(document).ready(() => {
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
 // Set up the canvas context.
     ctx = canvas.getContext("2d");
+    movingUp = false;
+    movingDown = false;
     paddleWidth = 10;
     paddleHeight = 40;
     ballSize = 20;
