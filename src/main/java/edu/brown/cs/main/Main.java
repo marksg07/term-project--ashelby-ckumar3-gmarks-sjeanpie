@@ -29,8 +29,14 @@ import com.google.gson.Gson;
 
 public final class Main {
   private static final int DEFAULT_PORT = 4567;
-  private static final List<PongGame> GAME_LIST = new ArrayList<>();
+
   private static final Gson GSON = new Gson();
+
+  // TRASH UNDER HERE
+  private static final List<PongGame> GAME_LIST = new ArrayList<>();
+  private static Integer firstId = null;
+  private static Integer secondId = null;
+  private static PongGame game = null;
 
   /**
    * The initial method called when execution begins.
@@ -104,13 +110,19 @@ public final class Main {
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-      Map<String, Object> variables = ImmutableMap.of("title",
-              "Game");
-      PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
-      PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
+      int id = -1;
+      if(firstId == null) {
+        id = firstId = 0;
+      } else if (secondId == null) {
+        id = secondId = 1;
+        game = new PongGame(400, 300, 150, 40, 10, 20);
+      }
+      /*PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
       GAME_LIST.clear();
       GAME_LIST.add(leftGame);
-      GAME_LIST.add(rightGame);
+      GAME_LIST.add(rightGame);*/
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "Game", "id", id);
       return new ModelAndView(variables, "pong.ftl");
     }
   }
@@ -122,19 +134,37 @@ public final class Main {
 
       QueryParamsMap q = request.queryMap();
       String input = q.value("press");
-      PongGame leftGame = GAME_LIST.get(0);
-      PongGame rightGame = GAME_LIST.get(1);
-      if (input.equals("0")) {
-        leftGame.setP2Input(PongGame.InputType.NONE);
-        rightGame.setP1Input(PongGame.InputType.NONE);
+      Integer id = Integer.parseInt(q.value("id"));
+      if(id < 0) {
+        return "";
+      }
+      PongGame.InputType inp = PongGame.InputType.NONE;
+      if(input.equals("0")) {
+        inp = PongGame.InputType.NONE;
       } else if (input.equals("1")) {
-        leftGame.setP2Input(PongGame.InputType.UP);
-        rightGame.setP1Input(PongGame.InputType.UP);
+        inp = PongGame.InputType.UP;
       } else if (input.equals("-1")) {
-        leftGame.setP2Input(PongGame.InputType.DOWN);
-        rightGame.setP1Input(PongGame.InputType.DOWN);
+        inp = PongGame.InputType.DOWN;
       }
 
+      if(id == 0) {
+        game.setP1Input(inp);
+      } else if (id == 1) {
+        game.setP2Input(inp);
+      }
+
+      int winner = game.tick(0.02);
+      boolean youwin = false;
+      boolean youlose = false;
+      if (winner == 1 || winner == 2) {
+        if(winner == id + 1) {
+          youwin = true;
+        } else {
+          youlose = true;
+        }
+      }
+
+      /*
       Boolean leftEnemyWin = false;
       Boolean rightEnemyWin = false;
       Boolean leftEnemyLose = false;
@@ -156,21 +186,17 @@ public final class Main {
             case 1: rightEnemyLose = true;
           }
       }
-
+      */
 
       Map<String, Object> resp = new HashMap();
       resp.put("title", "Game");
-      resp.put("leftPaddleY", leftGame.getP1PaddleY());
-      resp.put("rightPaddleY", rightGame.getP2PaddleY());
-      resp.put("playerPaddleY", ((int) ((leftGame.getP2PaddleY() + rightGame.getP1PaddleY()) / 2)));
-      resp.put("ballLeftX", leftGame.getBallX());
-      resp.put("ballLeftY", leftGame.getBallY());
-      resp.put("ballRightX", rightGame.getBallX() + 400);
-      resp.put("ballRightY", rightGame.getBallY());
-      resp.put("rightEnemyWin", rightEnemyWin);
-      resp.put("rightEnemyLose", rightEnemyLose);
-      resp.put("leftEnemyWin", leftEnemyWin);
-      resp.put("leftEnemyLose", leftEnemyLose);
+      resp.put("leftPaddleY", game.getP1PaddleY());
+      resp.put("rightPaddleY", game.getP2PaddleY());
+      //resp.put("playerPaddleY", ((int) ((leftGame.getP2PaddleY() + rightGame.getP1PaddleY()) / 2)));
+      resp.put("ballX", game.getBallX() + 200);
+      resp.put("ballY", game.getBallY());
+      resp.put("lose", youlose);
+      resp.put("win", youwin);
 
       return GSON.toJson(resp);
     }

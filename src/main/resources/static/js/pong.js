@@ -17,30 +17,27 @@ let upDown = [0,0];
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
-    const postParameters = {press : pressState()};
+    const postParameters = {press : pressState(), id : myId};
     $.post("/logic", postParameters, responseJSON => {
+        if(responseJSON === "") {
+            return;
+        }
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
         // console.log(responseObject);
         // console.log(responseObject.leftPaddleY);
         // console.log(responseObject.rightPaddleY);
         // console.log(responseObject);
-        oppLeftPaddle.setPosition(responseObject.leftPaddleY);
-        playerPaddle.setPosition(responseObject.playerPaddleY);
-        oppRightPaddle.setPosition(responseObject.rightPaddleY);
-        ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
-        ballRight.setPosition(responseObject.ballRightX, responseObject.ballRightY);
+        leftPaddle.setPosition(responseObject.leftPaddleY);
+        rightPaddle.setPosition(responseObject.rightPaddleY);
+        ball.setPosition(responseObject.ballX, responseObject.ballY);
 
-        if (responseObject.rightEnemyWin || responseObject.leftEnemyWin) {
+        if (responseObject.lose) {
             $("#status").text("Y O U L O S E");
         }
-        if (responseObject.rightEnemyLose) {
-            $("#status").text("R I G H T L O S E");
+        else if (responseObject.win) {
+            $("#status").text("Y O U W I N");
         }
-        if (responseObject.leftEnemyWin) {
-            $("#status").text("L E F T L O S E");
-        }
-
 });
 }
 
@@ -132,11 +129,9 @@ $(document).ready(() => {
     //initialize 5 entities.
     up = false;
     down = false;
-    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
-    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    leftPaddle = new Paddle(canvas.width/4, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    rightPaddle = new Paddle(canvas.width*3/4, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    ball = new Ball(20, ctx, (canvas.width/2)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(even => {checkUp(event);});
     setInterval(updatePositions, 20);

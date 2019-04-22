@@ -120,6 +120,10 @@ public class PongGame implements Cloneable {
     }
     // do paddle movements, then done
     movePaddles(seconds);
+    if (p1Dead)
+      return 2;
+    if (p2Dead)
+      return 1;
     return 0;
   }
 

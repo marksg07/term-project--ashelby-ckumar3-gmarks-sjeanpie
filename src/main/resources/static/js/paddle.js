@@ -26,7 +26,7 @@ class Paddle{
      */
     setPosition(y){
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        this.ctx.fillRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2);
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.fillRect(this.x, y, this.width, this.height);
         this.y = y;
