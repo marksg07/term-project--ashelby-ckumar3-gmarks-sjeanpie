@@ -6,6 +6,8 @@ public class PongGame implements Cloneable {
   private double maxX, maxY;
   private double paddleVel, paddleRadius;
   private double ballRadius; // NOTE: We call it a "ball" but it's gonna be a square
+  private double startVel;
+  private boolean p1Dead, p2Dead;
 
   public enum InputType {
     NONE,
@@ -21,6 +23,9 @@ public class PongGame implements Cloneable {
     ballX = maxX / 2;
     ballY = maxY / 2;
     double initDirection = Math.random() * Math.PI * 2;
+    if ((initDirection + Math.PI / 4) % Math.PI >= Math.PI / 2) {
+      initDirection += Math.PI / 2;
+    }
     ballVelX = startVel * Math.cos(initDirection);
     ballVelY = startVel * Math.sin(initDirection);
     p1PaddleY = maxY / 2;
@@ -30,6 +35,9 @@ public class PongGame implements Cloneable {
     p1Input = InputType.NONE;
     p2Input = InputType.NONE;
     this.ballRadius = ballRadius;
+    this.startVel = startVel;
+    p1Dead = false;
+    p2Dead = false;
   }
 
   @Override
@@ -53,81 +61,112 @@ public class PongGame implements Cloneable {
   public int tick(double seconds) {
     assert (ballX >= ballRadius && ballX <= maxX - ballRadius
             && ballY >= ballRadius && ballY <= maxY - ballRadius);
-    Collision collision = getNextCollision(seconds);
-    while (collision.type != CollisionType.NONE) {
-      seconds -= collision.time;
-      assert (seconds >= 0);
-      assert (collision.time >= 0);
-      // First, move paddles to where they should be when collision occurs
-      movePaddles(collision.time);
+    if(!(p1Dead || p2Dead)) {
+      Collision collision = getNextCollision(seconds);
+      while (collision.type != CollisionType.NONE) {
+        seconds -= collision.time;
+        assert (seconds >= 0);
+        assert (collision.time >= 0);
+        // First, move paddles to where they should be when collision occurs
+        movePaddles(collision.time);
 
-      // now handle each type of collision
-      switch (collision.type) {
-        case UP:
-          ballY = ballRadius;
-          ballX += ballVelX * collision.time;
-          ballVelY = -ballVelY; // XXX add randomness
-          break;
-        case DOWN:
-          ballY = maxY - ballRadius;
-          ballX += ballVelX * collision.time;
-          ballVelY = -ballVelY;
-          break;
-        case LEFT:
-          ballX = ballRadius;
-          ballY += ballVelY * collision.time;
-          ballVelX = -ballVelX;
-          // check if we hit the paddle. If not, ded
-          if(ballY + ballRadius < p1PaddleY - paddleRadius
-                  || ballY - ballRadius > p1PaddleY + paddleRadius) {
-            return 2;
-          }
-          break;
-        case RIGHT:
-          ballX = maxX - ballRadius;
-          ballY += ballVelY * collision.time;
-          ballVelX = -ballVelX;
-          // check if we hit the paddle. If not, ded
-          if(ballY + ballRadius < p2PaddleY - paddleRadius
-                  || ballY - ballRadius > p2PaddleY + paddleRadius) {
-            return 1;
-          }
-          break;
-        default:
-          assert(false);
+        // now handle each type of collision
+        switch (collision.type) {
+          case UP:
+            ballY = ballRadius;
+            ballX += ballVelX * collision.time;
+            ballVelY = -ballVelY; // XXX add randomness
+            break;
+          case DOWN:
+            ballY = maxY - ballRadius;
+            ballX += ballVelX * collision.time;
+            ballVelY = -ballVelY;
+            break;
+          case LEFT:
+            ballX = ballRadius;
+            ballY += ballVelY * collision.time;
+            ballVelX = -ballVelX;
+            // check if we hit the paddle. If not, ded
+            if (ballY + ballRadius < p1PaddleY - paddleRadius
+                    || ballY - ballRadius > p1PaddleY + paddleRadius) {
+              p1Dead = true;
+              return 0;
+            }
+            break;
+          case RIGHT:
+            ballX = maxX - ballRadius;
+            ballY += ballVelY * collision.time;
+            ballVelX = -ballVelX;
+            // check if we hit the paddle. If not, ded
+            if (ballY + ballRadius < p2PaddleY - paddleRadius
+                    || ballY - ballRadius > p2PaddleY + paddleRadius) {
+              p2Dead = true;
+              return 0;
+            }
+            break;
+          default:
+            assert (false);
+        }
+
+        addRandomness(0.2);
+
+        // once handled, we repeat the collision test with updated X, Y, vX, vY, pX, pY
+        collision = getNextCollision(seconds);
       }
 
-      // once handled, we repeat the collision test with updated X, Y, vX, vY, pX, pY
-      collision = getNextCollision(seconds);
+      // done solving collisions
+      ballX = ballX + ballVelX * seconds;
+      ballY = ballY + ballVelY * seconds;
     }
-
-    // done solving collisions
-    ballX = ballX + ballVelX * seconds;
-    ballY = ballY + ballVelY * seconds;
     // do paddle movements, then done
     movePaddles(seconds);
     return 0;
   }
 
+  private void addRandomness(double frac) {
+    boolean invalid = true;
+    double newVelX = 0, newVelY = 0;
+    while (invalid) {
+      double initDirection = Math.random() * Math.PI * 2;
+      newVelX = ballVelX + startVel * frac * Math.cos(initDirection);
+      newVelY = ballVelY + startVel * frac * Math.sin(initDirection);
+      invalid = false;
+      if((newVelX > 0) != (ballVelX > 0) || (newVelY > 0) != (ballVelY > 0)) {
+        invalid = true;
+      } else if (newVelX * newVelX + newVelY * newVelY < (startVel * startVel) * 64./81
+      || newVelX * newVelX + newVelY * newVelY > (startVel * startVel) * 100./81) {
+        invalid = true;
+      } else if (Math.abs(newVelX) < startVel / 3.) {
+        invalid = true;
+      }
+    }
+    ballVelX = newVelX;
+    ballVelY = newVelY;
+  }
+
   private void movePaddles(double time) {
-    if (p1Input == InputType.DOWN) {
-      p1PaddleY += time * paddleVel;
-      if (p1PaddleY > maxY)
-        p1PaddleY = maxY;
-    } else if (p1Input == InputType.UP) {
-      p1PaddleY -= time * paddleVel;
-      if (p1PaddleY < 0)
-        p1PaddleY = 0;
+    if (!p1Dead) {
+      if (p1Input == InputType.DOWN) {
+        p1PaddleY += time * paddleVel;
+        if (p1PaddleY > maxY)
+          p1PaddleY = maxY;
+      } else if (p1Input == InputType.UP) {
+        p1PaddleY -= time * paddleVel;
+        if (p1PaddleY < 0)
+          p1PaddleY = 0;
+      }
     }
 
-    if (p2Input == InputType.DOWN) {
-      p2PaddleY += time * paddleVel;
-      if (p2PaddleY > maxY)
-        p2PaddleY = maxY;
-    } else if (p2Input == InputType.UP) {
-      p2PaddleY -= time * paddleVel;
-      if (p2PaddleY < 0)
-        p2PaddleY = 0;
+    if(!p2Dead) {
+      if (p2Input == InputType.DOWN) {
+        p2PaddleY += time * paddleVel;
+        if (p2PaddleY > maxY)
+          p2PaddleY = maxY;
+      } else if (p2Input == InputType.UP) {
+        p2PaddleY -= time * paddleVel;
+        if (p2PaddleY < 0)
+          p2PaddleY = 0;
+      }
     }
   }
 
