@@ -10,7 +10,8 @@ let paddleWidth;
 let paddleHeight;
 let ballSize;
 let up = false;
-let down false;
+let down = false;
+
 let playersRemaining;
 /**
  * Gets new position data from server and updates positions of all entities.
@@ -54,15 +55,13 @@ function checkPressed(e) {
  * checks for inputs and updates paddle coords, will send to back end in future
  * @param e
  */
-function checkInputs(e) {
+function guessUpdate(e) {
     if (up) {
         playerPaddle.setPosition(y-1);
-        up = false;
         return;
     }
     if (down) {
         playerPaddle.setPosition(y+1);
-        down = false;
         return;
     }
     return;
