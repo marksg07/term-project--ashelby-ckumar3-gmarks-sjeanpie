@@ -9,18 +9,17 @@ let ballRight;
 let paddleWidth;
 let paddleHeight;
 let ballSize;
-
-let upTimePressed;
-let downTimePressed;
-let totalUpTime;
-let totalDownTime;
-let up;
-let down;
+let up = false;
+let down false;
+let playersRemaining;
 /**
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
-    $.post("/updatePositions", responseJSON => {
+    const postParameters = {upPressed: up,
+        downPressed: down};
+
+    $.post("/updatePositions", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
         oppLeftPaddle.setPosition(responseObject.leftPaddleY);
@@ -29,6 +28,9 @@ function updatePositions() {
         ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
         ballLeft.setPosition(responseObject.ballRightX, responseObject.ballRightY);
 
+        up = false;
+        down = false;
+
 });
 }
 
@@ -36,39 +38,36 @@ function updatePositions() {
  * tracks time when up/down is pressed.
  * @param e
  */
-function startTime(e) {
+function checkPressed(e) {
     if (e.which == 38) {
         up = true;
-        upTimePressed = e.timeStamp;
         return;
     }
     if (e.which == 40) {
         down = true;
-        downTimePressed = e.timeStamp;
         return;
     }
     return;
 }
 
 /**
- * adds total time pressed of each key
+ * checks for inputs and updates paddle coords, will send to back end in future
  * @param e
  */
-function endTime(e) {
+function checkInputs(e) {
     if (up) {
-        let timePressed = e.timeStamp - upTimePressed;
-        totalUpTime += timePressed;
-        upTimePressed = 0;
+        playerPaddle.setPosition(y-1);
+        up = false;
         return;
     }
     if (down) {
-        let timePressed = e.timeStamp - downTimePressed;
-        totalDownTime += timePressed;
-        downTimePressed = 0;
+        playerPaddle.setPosition(y+1);
+        down = false;
         return;
     }
     return;
 }
+
 
 $(document).ready(() => {
     // Setting up the canvas.  Already has a width and height.
@@ -82,8 +81,6 @@ $(document).ready(() => {
     //initial ball size, another constant
     ballSize = 20;
     //initialize 5 entities.
-    totalUpTime = 0;
-    totalDownTime = 0;
     up = false;
     down = false;
     playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
@@ -91,6 +88,6 @@ $(document).ready(() => {
     oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
-    canvas.addEventListener("onkeydown", startTime, false);
-    canvas.addEventListener("onkeyup", endTime, false);
+    canvas.addEventListener("onkeydown", checkPressed, false);
+    canvas.setInterval(updatePositions, 20);
 });
