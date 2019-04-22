@@ -10,6 +10,10 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
+import spark.*;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +49,7 @@ public final class Main {
 
   private static FreeMarkerEngine createEngine() {
     Configuration config = new Configuration();
-    File templates = new File("src/main/resources/template");
+    File templates = new File("src/main/resources/spark/template/freemarker");
     try {
       config.setDirectoryForTemplateLoading(templates);
     } catch (IOException ioe) {
@@ -61,6 +65,7 @@ public final class Main {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
+    Spark.get("/game", new GameStartHandler(), freeMarker);
     Server serv = new MainServer();
     serv.run();
   }
@@ -80,6 +85,18 @@ public final class Main {
         pw.println("</pre>");
       }
       res.body(stacktrace.toString());
+    }
+  }
+
+  /**
+   * Handles the initial request to the server.
+   */
+  private static class GameStartHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "Game");
+      return new ModelAndView(variables, "pong.ftl");
     }
   }
 }

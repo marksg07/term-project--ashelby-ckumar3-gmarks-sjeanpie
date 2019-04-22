@@ -1,0 +1,12 @@
+<#assign content>
+    <div class="wrapper">
+        <div class="sidebar">
+            <p>P O N G  F O L K S</p>
+        </div>
+        <div class="pong-board">
+            <canvas id="pong-canvas" width="800" height="300">
+            </canvas>
+        </div>
+    </div>
+</#assign>
+<#include "main.ftl">

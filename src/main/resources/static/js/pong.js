@@ -11,7 +11,6 @@ let paddleHeight;
 let ballSize;
 let up = false;
 let down = false;
-
 let playersRemaining;
 /**
  * Gets new position data from server and updates positions of all entities.
@@ -32,7 +31,7 @@ function updatePositions() {
         up = false;
         down = false;
 
-});
+    });
 }
 
 /**
@@ -55,13 +54,15 @@ function checkPressed(e) {
  * checks for inputs and updates paddle coords, will send to back end in future
  * @param e
  */
-function guessUpdate(e) {
+function checkInputs(e) {
     if (up) {
         playerPaddle.setPosition(y-1);
+        up = false;
         return;
     }
     if (down) {
         playerPaddle.setPosition(y+1);
+        down = false;
         return;
     }
     return;
@@ -73,6 +74,8 @@ $(document).ready(() => {
     canvas = $('#pong-canvas')[0];
     // Set up the canvas context.
     ctx = canvas.getContext("2d");
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     //initial width of paddle, will be a constant
     paddleWidth = 10;
     //initial height of paddles, another constant
@@ -82,11 +85,11 @@ $(document).ready(() => {
     //initialize 5 entities.
     up = false;
     down = false;
-    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
-    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
-    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
+    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     canvas.addEventListener("onkeydown", checkPressed, false);
-    canvas.setInterval(updatePositions, 20);
+    // setInterval(updatePositions, 20);
 });
