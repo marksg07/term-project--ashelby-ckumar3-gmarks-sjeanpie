@@ -11,20 +11,19 @@ let paddleHeight;
 let ballSize;
 let up = false;
 let down = false;
-let pressState = 0;
 let playersRemaining;
 let upDown = [0,0];
 /**
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
-    console.log(pressState);
-    const postParameters = {press : pressState};
-    up = false;
-    down = false;
+    const postParameters = {press : pressState()};
     $.post("/logic", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
+        console.log(responseObject.playerPaddleY);
+        console.log(responseObject.leftPaddleY);
+        console.log(responseObject.rightPaddleY);
         // console.log(responseObject);
         oppLeftPaddle.setPosition(responseObject.leftPaddleY);
         playerPaddle.setPosition(responseObject.playerPaddleY);
@@ -42,11 +41,17 @@ function updatePositions() {
  */
 function checkPressed(e) {
     if (e.which === 38) {
-        upDown[0] = 1;
+        upDown[0] = 2;
+        if (upDown[1] === 2){
+            upDown[1] = 1;
+        }
         return;
     }
     if (e.which === 40) {
-        upDown[1] = 1;
+        upDown[1] = 2;
+        if (upDown[0] === 2){
+            upDown[0] = 1;
+        }
         return;
     }
     return;
@@ -65,6 +70,19 @@ function checkUp(e) {
         return;
     }
     return;
+}
+
+/**
+ * gets pressState
+ */
+function pressState() {
+    if (upDown[0] > upDown[1]) {
+        return 1;
+    } else if (upDown[0] < upDown[1]) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 
