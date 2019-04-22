@@ -9,11 +9,16 @@ let ballRight;
 let paddleWidth;
 let paddleHeight;
 let ballSize;
-
+let up = false;
+let down false;
+let playersRemaining;
 /**
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
+    const postParameters = {upPressed: up,
+        downPressed: down};
+
     $.post("/updatePositions", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
@@ -23,9 +28,45 @@ function updatePositions() {
         ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
         ballLeft.setPosition(responseObject.ballRightX, responseObject.ballRightY);
 
+        up = false;
+        down = false;
+
 });
 }
 
+/**
+ * tracks time when up/down is pressed.
+ * @param e
+ */
+function checkPressed(e) {
+    if (e.which == 38) {
+        up = true;
+        return;
+    }
+    if (e.which == 40) {
+        down = true;
+        return;
+    }
+    return;
+}
+
+/**
+ * checks for inputs and updates paddle coords, will send to back end in future
+ * @param e
+ */
+function checkInputs(e) {
+    if (up) {
+        playerPaddle.setPosition(y-1);
+        up = false;
+        return;
+    }
+    if (down) {
+        playerPaddle.setPosition(y+1);
+        down = false;
+        return;
+    }
+    return;
+}
 
 
 $(document).ready(() => {
@@ -40,9 +81,13 @@ $(document).ready(() => {
     //initial ball size, another constant
     ballSize = 20;
     //initialize 5 entities.
+    up = false;
+    down = false;
     playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWdith, paddleHeight, ctx);
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    canvas.addEventListener("onkeydown", checkPressed, false);
+    canvas.setInterval(updatePositions, 20);
 });
