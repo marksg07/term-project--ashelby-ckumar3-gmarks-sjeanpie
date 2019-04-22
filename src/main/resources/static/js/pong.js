@@ -131,5 +131,5 @@ $(document).ready(() => {
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(even => {checkUp(event);});
-    setInterval(updatePositions, .005);
+    setInterval(updatePositions, 20);
 });

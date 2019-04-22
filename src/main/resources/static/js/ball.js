@@ -24,7 +24,7 @@ class Ball{
      */
     setPosition(x, y){
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x - 2, this.y - 2, this.size + 4, this.size + 4);
+        this.ctx.fillRect(this.x - 1, this.y - 1, this.size + 2, this.size + 2);
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.fillRect(x, y, this.size, this.size);
         this.x = x;

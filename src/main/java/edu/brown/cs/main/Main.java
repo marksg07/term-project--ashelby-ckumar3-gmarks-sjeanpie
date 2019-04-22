@@ -106,8 +106,8 @@ public final class Main {
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
               "Game");
-      PongGame leftGame = new PongGame(400, 300, 2, 40, 10, 3);
-      PongGame rightGame = new PongGame(400, 300, 2, 40, 10, 3);
+      PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
+      PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
       GAME_LIST.add(leftGame);
       GAME_LIST.add(rightGame);
       return new ModelAndView(variables, "pong.ftl");
@@ -122,18 +122,22 @@ public final class Main {
       String input = q.value("press");
       PongGame leftGame = GAME_LIST.get(0);
       PongGame rightGame = GAME_LIST.get(1);
-      if (input == "0") {
+      if (input.equals("0")) {
         leftGame.setP2Input(PongGame.InputType.NONE);
         rightGame.setP1Input(PongGame.InputType.NONE);
-      } else if (input == "1") {
+      } else if (input.equals("1")) {
         leftGame.setP2Input(PongGame.InputType.UP);
         rightGame.setP1Input(PongGame.InputType.UP);
-      } else if (input == "-1") {
+      } else if (input.equals("-1")) {
         leftGame.setP2Input(PongGame.InputType.DOWN);
         rightGame.setP1Input(PongGame.InputType.DOWN);
       }
-      leftGame.tick(.2);
-      rightGame.tick(.2);
+      Boolean leftEnemyWin = false;
+      Boolean rightEnemyWin = false;
+      Boolean centerWin = false;
+
+      leftGame.tick(.02);
+      rightGame.tick(.02);
 
 
       Map<String, Object> resp = new HashMap();
