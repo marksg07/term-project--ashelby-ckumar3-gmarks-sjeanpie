@@ -90,7 +90,7 @@ public class PongGame implements Cloneable {
             if (ballY + ballRadius < p1PaddleY - paddleRadius
                     || ballY - ballRadius > p1PaddleY + paddleRadius) {
               p1Dead = true;
-              return 0;
+              return 2;
             }
             break;
           case RIGHT:
@@ -101,7 +101,7 @@ public class PongGame implements Cloneable {
             if (ballY + ballRadius < p2PaddleY - paddleRadius
                     || ballY - ballRadius > p2PaddleY + paddleRadius) {
               p2Dead = true;
-              return 0;
+              return 1;
             }
             break;
           default:
