@@ -108,11 +108,13 @@ public final class Main {
               "Game");
       PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
       PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
+      GAME_LIST.clear();
       GAME_LIST.add(leftGame);
       GAME_LIST.add(rightGame);
       return new ModelAndView(variables, "pong.ftl");
     }
   }
+
 
   private static class GameLogicHandler implements Route {
     @Override
@@ -132,12 +134,28 @@ public final class Main {
         leftGame.setP2Input(PongGame.InputType.DOWN);
         rightGame.setP1Input(PongGame.InputType.DOWN);
       }
+
       Boolean leftEnemyWin = false;
       Boolean rightEnemyWin = false;
-      Boolean centerWin = false;
+      Boolean leftEnemyLose = false;
+      Boolean rightEnemyLose = false;
 
-      leftGame.tick(.02);
-      rightGame.tick(.02);
+
+      if (!(leftEnemyLose || leftEnemyWin)) {
+        Integer leftState = leftGame.tick(.02);
+        switch (leftState) {
+          case 2: leftEnemyLose = true;
+          case 1: leftEnemyWin = true;
+        }
+      }
+
+      if (!(rightEnemyLose || rightEnemyWin)) {
+        Integer rightState = rightGame.tick(.02);
+          switch (rightState) {
+            case 2: rightEnemyWin = true;
+            case 1: rightEnemyLose = true;
+          }
+      }
 
 
       Map<String, Object> resp = new HashMap();
@@ -149,6 +167,10 @@ public final class Main {
       resp.put("ballLeftY", leftGame.getBallY());
       resp.put("ballRightX", rightGame.getBallX() + 400);
       resp.put("ballRightY", rightGame.getBallY());
+      resp.put("rightEnemyWin", rightEnemyWin);
+      resp.put("rightEnemyLose", rightEnemyLose);
+      resp.put("leftEnemyWin", leftEnemyWin);
+      resp.put("leftEnemyLose", leftEnemyLose);
 
       return GSON.toJson(resp);
     }

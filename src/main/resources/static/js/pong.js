@@ -17,12 +17,11 @@ let upDown = [0,0];
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
-    console.log(pressState());
     const postParameters = {press : pressState()};
     $.post("/logic", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
-        // console.log(responseObject.playerPaddleY);
+        // console.log(responseObject);
         // console.log(responseObject.leftPaddleY);
         // console.log(responseObject.rightPaddleY);
         // console.log(responseObject);
@@ -32,6 +31,15 @@ function updatePositions() {
         ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
         ballRight.setPosition(responseObject.ballRightX, responseObject.ballRightY);
 
+        if (responseObject.rightEnemyWin || responseObject.leftEnemyWin) {
+            $("#status").text("Y O U L O S E");
+        }
+        if (responseObject.rightEnemyLose) {
+            $("#status").text("R I G H T L O S E");
+        }
+        if (responseObject.leftEnemyWin) {
+            $("#status").text("L E F T L O S E");
+        }
 
 });
 }
