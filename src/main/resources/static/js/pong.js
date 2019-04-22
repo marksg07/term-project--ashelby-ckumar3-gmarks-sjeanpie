@@ -17,13 +17,14 @@ let upDown = [0,0];
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
+    console.log(pressState());
     const postParameters = {press : pressState()};
     $.post("/logic", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
-        console.log(responseObject.playerPaddleY);
-        console.log(responseObject.leftPaddleY);
-        console.log(responseObject.rightPaddleY);
+        // console.log(responseObject.playerPaddleY);
+        // console.log(responseObject.leftPaddleY);
+        // console.log(responseObject.rightPaddleY);
         // console.log(responseObject);
         oppLeftPaddle.setPosition(responseObject.leftPaddleY);
         playerPaddle.setPosition(responseObject.playerPaddleY);
@@ -40,14 +41,14 @@ function updatePositions() {
  * @param e
  */
 function checkPressed(e) {
-    if (e.which === 38) {
+    if ((e.which === 38) || (e.which === 87)) {
         upDown[0] = 2;
         if (upDown[1] === 2){
             upDown[1] = 1;
         }
         return;
     }
-    if (e.which === 40) {
+    if ((e.which === 40) || (e.which === 83)) {
         upDown[1] = 2;
         if (upDown[0] === 2){
             upDown[0] = 1;
@@ -61,11 +62,11 @@ function checkPressed(e) {
  * turns off keypress indicator
  */
 function checkUp(e) {
-    if (e.which === 38) {
+    if ((e.which === 38) || (e.which === 87)) {
         upDown[0] = 0;
         return;
     }
-    if (e.which === 40) {
+    if ((e.which === 40) || (e.which === 83)) {
         upDown[1] = 0;
         return;
     }
