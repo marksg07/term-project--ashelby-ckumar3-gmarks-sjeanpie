@@ -9,6 +9,7 @@ import joptsimple.OptionSet;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
+import spark.Route;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import com.google.gson.Gson;
 
 public final class Main {
@@ -76,6 +78,7 @@ public final class Main {
     FreeMarkerEngine freeMarker = createEngine();
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.post("/logic", new GameLogicHandler());
+    Spark.get("/home", new HomePageHandler());
     Server serv = new MainServer();
     serv.run();
   }
@@ -97,6 +100,19 @@ public final class Main {
       res.body(stacktrace.toString());
     }
   }
+  
+  private static class HomePageHandler implements TemplateViewRoute, Route {
+	  @Override
+	  public ModelAndView handle(Request request, Response response) throws Exception {
+		  Map<String, Object> variables = ImmutableMap.of("title",
+      "P O N G B R O S");
+		//code to have starting webpage that allows for user login
+		// finding a match/going into a lobby
+		// looking up users
+		// starting up the server should call this before game start handler  
+		  return new ModelAndView(variables, "pong.ftl");
+	  }
+  }
 
   /**
    * Handles the initial request to the server.
@@ -105,7 +121,7 @@ public final class Main {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-              "Game");
+              "P O N G B R O S");
       PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
       PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
       GAME_LIST.clear();
