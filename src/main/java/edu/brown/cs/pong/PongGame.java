@@ -136,6 +136,7 @@ public class PongGame implements Cloneable {
               return 1;
             }
             break;
+            
           default:
             assert (false);
         }
