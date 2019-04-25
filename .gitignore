@@ -13,7 +13,8 @@ hs_err_pid*
 
 # ME!
 
-.idea
+.idea/*
+.idea/
 *~
 
 

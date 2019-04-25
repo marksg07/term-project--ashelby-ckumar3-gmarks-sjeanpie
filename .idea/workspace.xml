@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad037d69-2a88-4c35-9702-0d0a5c0fd1bd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/main.ftl" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/main.ftl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/.hold" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/pong.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/pong.js" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/edu/brown/cs/pong/PongGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/edu/brown/cs/pong/PongGame.java" afterDir="false" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +20,9 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/pong.js">
           <provider selected="true" editor-type-id="text-editor">
 <<<<<<< HEAD
@@ -53,30 +57,43 @@
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
+=======
+        <entry file="file://$PROJECT_DIR$/../.idea/vcs.xml">
           <provider selected="true" editor-type-id="text-editor" />
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/ball.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2088">
-              <caret line="355" column="14" selection-start-line="355" selection-start-column="14" selection-end-line="355" selection-end-column="14" />
+            <state relative-caret-position="468">
+              <caret line="26" column="78" selection-start-line="26" selection-start-column="78" selection-end-line="26" selection-end-column="78" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/ball.js">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/paddle.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="468">
+              <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="28" selection-end-column="67" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/paddle.js">
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/spark/template/freemarker/main.ftl">
           <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/jquery-2.1.1.js">
+          <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
 <<<<<<< HEAD
             <state relative-caret-position="561">
               <caret line="39" column="13" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="13" />
@@ -84,11 +101,19 @@
             <state relative-caret-position="390">
               <caret line="26" column="19" lean-forward="true" selection-start-line="26" selection-start-column="19" selection-end-line="28" selection-end-column="67" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+            <state relative-caret-position="165204">
+              <caret line="9190" selection-start-line="9190" selection-end-line="9190" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+              </folding>
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/server/BRServer.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -100,11 +125,18 @@
             <state relative-caret-position="60">
               <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/static/css/pong.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1728">
+              <caret line="96" column="1" selection-start-line="96" selection-start-column="1" selection-end-line="96" selection-end-column="1" />
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/server/PongServer.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -112,18 +144,32 @@
               <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
 =======
         <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/jquery-2.1.1.js">
+=======
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/pong/PongGame.java">
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="753">
-              <caret line="9190" lean-forward="true" selection-start-line="9190" selection-end-line="9190" />
+            <state relative-caret-position="-1825">
+              <caret line="108" column="13" lean-forward="true" selection-start-line="108" selection-start-column="13" selection-end-line="108" selection-end-column="13" />
+=======
+        <entry file="file://$PROJECT_DIR$/../src/main/java/edu/brown/cs/main/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1800">
+              <caret line="129" column="41" selection-start-line="129" selection-start-column="41" selection-end-line="129" selection-end-column="41" />
               <folding>
-                <element signature="n#!!doc" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
+<<<<<<< HEAD
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -135,10 +181,41 @@
             <state relative-caret-position="240">
               <caret line="89" column="14" selection-start-line="89" selection-start-column="14" selection-end-line="89" selection-end-column="14" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+        <entry file="file://$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="26" selection-start-line="4" selection-start-column="26" selection-end-line="4" selection-end-column="26" />
+=======
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../src/main/java/edu/brown/cs/pong/PongGame.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="259">
+              <caret line="132" column="22" selection-start-line="132" selection-start-column="22" selection-end-line="132" selection-end-column="22" />
+              <folding>
+                <element signature="e#6539#6540#0" expanded="true" />
+                <element signature="e#6666#6667#0" expanded="true" />
+                <element signature="e#6777#6778#0" expanded="true" />
+                <element signature="e#6892#6893#0" expanded="true" />
+                <element signature="e#7019#7020#0" expanded="true" />
+                <element signature="e#7145#7146#0" expanded="true" />
+                <element signature="e#7280#7281#0" expanded="true" />
+                <element signature="e#7411#7412#0" expanded="true" />
+                <element signature="e#7537#7538#0" expanded="true" />
+                <element signature="e#7680#7681#0" expanded="true" />
+                <element signature="e#7791#7792#0" expanded="true" />
+                <element signature="e#7922#7923#0" expanded="true" />
+                <element signature="e#8053#8054#0" expanded="true" />
+                <element signature="e#8214#8215#0" expanded="true" />
+                <element signature="e#8375#8376#0" expanded="true" />
+              </folding>
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
 <<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/pong/PongGame.java">
@@ -146,23 +223,44 @@
             <state relative-caret-position="34">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
 =======
+=======
+<<<<<<< HEAD
+      <file pinned="false" current-in-tab="true">
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="575">
-              <caret line="96" column="56" lean-forward="true" selection-start-line="96" selection-start-column="56" selection-end-line="96" selection-end-column="56" />
+            <state relative-caret-position="566">
+              <caret line="110" column="24" selection-start-line="110" selection-start-column="24" selection-end-line="110" selection-end-column="24" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+=======
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/spark/template/freemarker/pong.ftl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="54">
+              <caret line="3" column="33" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/pong.js">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="45">
               <caret line="3" column="33" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+<<<<<<< HEAD
+            <state relative-caret-position="481">
+              <caret line="40" column="23" selection-start-line="40" selection-start-column="23" selection-end-line="40" selection-end-column="23" />
+=======
+            <state relative-caret-position="253">
+              <caret line="31" column="43" selection-start-line="31" selection-start-column="43" selection-end-line="31" selection-end-column="43" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
             </state>
           </provider>
         </entry>
@@ -181,21 +279,25 @@
       <find>totalUp</find>
       <find>paddleWidth</find>
       <find>sidebar</find>
+      <find>pong-canvas</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/content.ftl" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java" />
         <option value="$PROJECT_DIR$/src/main/resources/static/js/jquery-2.1.1.js" />
         <option value="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/main.ftl" />
-        <option value="$PROJECT_DIR$/src/main/resources/static/js/pong.js" />
         <option value="$PROJECT_DIR$/src/main/resources/static/css/pong.css" />
+        <option value="$PROJECT_DIR$/src/main/resources/static/js/ball.js" />
         <option value="$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl" />
+        <option value="$PROJECT_DIR$/src/main/resources/static/js/pong.js" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/static/js/pong.js" />
+        <option value="$PROJECT_DIR$/../src/main/java/edu/brown/cs/pong/PongGame.java" />
       </list>
     </option>
   </component>
@@ -217,6 +319,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+<<<<<<< HEAD
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -354,7 +457,10 @@
           <select />
         </subPane>
       </pane>
+=======
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
       <pane id="PackagesPane" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -362,10 +468,17 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
 <<<<<<< HEAD
+<<<<<<< HEAD
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555955269093" />
 =======
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555956605657" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555966443347" />
+=======
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555963366952" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
     <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -393,22 +506,34 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1555945058323</updated>
+<<<<<<< HEAD
       <workItem from="1555945063986" duration="6624000" />
+=======
+      <workItem from="1555945063986" duration="2720000" />
+      <workItem from="1555963497037" duration="2677000" />
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="6624000" />
 =======
     <option name="totallyTimeSpent" value="5191000" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+=======
+    <option name="totallyTimeSpent" value="13026000" />
+=======
+    <option name="totallyTimeSpent" value="13154000" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
+    <frame x="67" y="27" width="1853" height="1053" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.24964234" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25235197" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -428,6 +553,7 @@
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="12" />
+      <window_info anchor="bottom" id="Messages" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -474,6 +600,7 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
+<<<<<<< HEAD
 <<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/pong/PongGame.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -526,6 +653,9 @@
           <caret line="10" column="39" lean-forward="true" selection-start-line="10" selection-start-column="39" selection-end-line="10" selection-end-column="39" />
 =======
     <entry file="file://$PROJECT_DIR$/.idea/checkstyle-idea.xml">
+=======
+    <entry file="file://$PROJECT_DIR$/../.idea/checkstyle-idea.xml">
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
           <caret line="15" column="10" selection-start-line="15" selection-start-column="10" selection-end-line="15" selection-end-column="10" />
@@ -533,76 +663,139 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/pong.js">
+    <entry file="file://$PROJECT_DIR$/../.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <state relative-caret-position="264">
           <caret line="78" column="22" lean-forward="true" selection-start-line="78" selection-start-column="22" selection-end-line="78" selection-end-column="22" />
 =======
         <state relative-caret-position="665">
           <caret line="94" column="3" lean-forward="true" selection-start-line="94" selection-start-column="3" selection-end-line="94" selection-end-column="3" />
+=======
+        <state relative-caret-position="2268">
+          <caret line="360" column="14" selection-start-line="360" selection-start-column="14" selection-end-line="360" selection-end-column="14" />
+>>>>>>> ed9662640f01822360f5255b8de97e1d85fb2d4b
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+    <entry file="file://$PROJECT_DIR$/../.idea/vcs.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/ball.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2088">
-          <caret line="355" column="14" selection-start-line="355" selection-start-column="14" selection-end-line="355" selection-end-column="14" />
+        <state relative-caret-position="468">
+          <caret line="26" column="78" selection-start-line="26" selection-start-column="78" selection-end-line="26" selection-end-column="78" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/ball.js">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/paddle.js">
+=======
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/paddle.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="19" lean-forward="true" selection-start-line="26" selection-start-column="19" selection-end-line="28" selection-end-column="67" />
+        <state relative-caret-position="468">
+          <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="28" selection-end-column="67" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/css/pong.css">
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/spark/template/freemarker/main.ftl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="89" column="14" selection-start-line="89" selection-start-column="14" selection-end-line="89" selection-end-column="14" />
+        <state relative-caret-position="72">
+          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/jquery-2.1.1.js">
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/jquery-2.1.1.js">
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="753">
-          <caret line="9190" lean-forward="true" selection-start-line="9190" selection-end-line="9190" />
+        <state relative-caret-position="165204">
+          <caret line="9190" selection-start-line="9190" selection-end-line="9190" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/spark/template/freemarker/main.ftl">
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/static/css/pong.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
+        <state relative-caret-position="1728">
+          <caret line="96" column="1" selection-start-line="96" selection-start-column="1" selection-end-line="96" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java">
+    <entry file="file://$PROJECT_DIR$/../src/main/java/edu/brown/cs/main/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="575">
-          <caret line="96" column="56" lean-forward="true" selection-start-line="96" selection-start-column="56" selection-end-line="96" selection-end-column="56" />
+        <state relative-caret-position="1800">
+          <caret line="129" column="41" selection-start-line="129" selection-start-column="41" selection-end-line="129" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl">
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/spark/template/freemarker/pong.ftl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
+        <state relative-caret-position="54">
           <caret line="3" column="33" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
 >>>>>>> 8b1e9e715797e82bd3f1d06fa372002949fc7ef4
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/main/resources/static/js/pong.js">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="-1825">
+          <caret line="108" column="13" lean-forward="true" selection-start-line="108" selection-start-column="13" selection-end-line="108" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/spark/template/freemarker/pong.ftl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="26" selection-start-line="4" selection-start-column="26" selection-end-line="4" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/pong.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="481">
+          <caret line="40" column="23" selection-start-line="40" selection-start-column="23" selection-end-line="40" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/brown/cs/main/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="566">
+          <caret line="110" column="24" selection-start-line="110" selection-start-column="24" selection-end-line="110" selection-end-column="24" />
+=======
+        <state relative-caret-position="253">
+          <caret line="31" column="43" selection-start-line="31" selection-start-column="43" selection-end-line="31" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/main/java/edu/brown/cs/pong/PongGame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="132" column="22" selection-start-line="132" selection-start-column="22" selection-end-line="132" selection-end-column="22" />
+>>>>>>> 114a0d48347df01626792a406ea83c011773802c
+          <folding>
+            <element signature="e#6539#6540#0" expanded="true" />
+            <element signature="e#6666#6667#0" expanded="true" />
+            <element signature="e#6777#6778#0" expanded="true" />
+            <element signature="e#6892#6893#0" expanded="true" />
+            <element signature="e#7019#7020#0" expanded="true" />
+            <element signature="e#7145#7146#0" expanded="true" />
+            <element signature="e#7280#7281#0" expanded="true" />
+            <element signature="e#7411#7412#0" expanded="true" />
+            <element signature="e#7537#7538#0" expanded="true" />
+            <element signature="e#7680#7681#0" expanded="true" />
+            <element signature="e#7791#7792#0" expanded="true" />
+            <element signature="e#7922#7923#0" expanded="true" />
+            <element signature="e#8053#8054#0" expanded="true" />
+            <element signature="e#8214#8215#0" expanded="true" />
+            <element signature="e#8375#8376#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

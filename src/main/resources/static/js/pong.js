@@ -12,24 +12,34 @@ let ballSize;
 let up = false;
 let down = false;
 let playersRemaining;
+let upDown = [0,0];
 /**
  * Gets new position data from server and updates positions of all entities.
  */
 function updatePositions() {
-    const postParameters = {upPressed: up,
-        downPressed: down};
-
-    $.post("/updatePositions", postParameters, responseJSON => {
+    const postParameters = {press : pressState()};
+    $.post("/logic", postParameters, responseJSON => {
         //Parse the JSON response into a JavaScript object.
         const responseObject = JSON.parse(responseJSON);
+        // console.log(responseObject);
+        // console.log(responseObject.leftPaddleY);
+        // console.log(responseObject.rightPaddleY);
+        // console.log(responseObject);
         oppLeftPaddle.setPosition(responseObject.leftPaddleY);
         playerPaddle.setPosition(responseObject.playerPaddleY);
         oppRightPaddle.setPosition(responseObject.rightPaddleY);
         ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
-        ballLeft.setPosition(responseObject.ballRightX, responseObject.ballRightY);
+        ballRight.setPosition(responseObject.ballRightX, responseObject.ballRightY);
 
-        up = false;
-        down = false;
+        if (responseObject.rightEnemyWin || responseObject.leftEnemyWin) {
+            $("#status").text("Y O U L O S E");
+        }
+        if (responseObject.rightEnemyLose) {
+            $("#status").text("R I G H T L O S E");
+        }
+        if (responseObject.leftEnemyWin) {
+            $("#status").text("L E F T L O S E");
+        }
 
     });
 }
@@ -39,16 +49,51 @@ function updatePositions() {
  * @param e
  */
 function checkPressed(e) {
-    if (e.which == 38) {
-        up = true;
+    if ((e.which === 38) || (e.which === 87)) {
+        upDown[0] = 2;
+        if (upDown[1] === 2){
+            upDown[1] = 1;
+        }
         return;
     }
-    if (e.which == 40) {
-        down = true;
+    if ((e.which === 40) || (e.which === 83)) {
+        upDown[1] = 2;
+        if (upDown[0] === 2){
+            upDown[0] = 1;
+        }
         return;
     }
     return;
 }
+
+/**
+ * turns off keypress indicator
+ */
+function checkUp(e) {
+    if ((e.which === 38) || (e.which === 87)) {
+        upDown[0] = 0;
+        return;
+    }
+    if ((e.which === 40) || (e.which === 83)) {
+        upDown[1] = 0;
+        return;
+    }
+    return;
+}
+
+/**
+ * gets pressState
+ */
+function pressState() {
+    if (upDown[0] > upDown[1]) {
+        return 1;
+    } else if (upDown[0] < upDown[1]) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 
 /**
  * checks for inputs and updates paddle coords, will send to back end in future
@@ -67,6 +112,8 @@ function checkInputs(e) {
     }
     return;
 }
+
+
 
 
 $(document).ready(() => {
@@ -90,6 +137,7 @@ $(document).ready(() => {
     oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
-    canvas.addEventListener("onkeydown", checkPressed, false);
-    // setInterval(updatePositions, 20);
+    $(document).keydown(event => {checkPressed(event);});
+    $(document).keyup(even => {checkUp(event);});
+    setInterval(updatePositions, 20);
 });
