@@ -88,11 +88,13 @@ public final class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
     MainServer serv = new MainServer();
+
     serv.run();
     PongWebSocketHandler.setServer(serv);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
+    Spark.get("/home", new HomePageHandler());
   }
 
   /**
@@ -113,15 +115,24 @@ public final class Main {
     }
   }
   
+<<<<<<< HEAD
   private static class HomePageHandler implements TemplateViewRoute {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
 		  Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S");
+=======
+  private static class HomePageHandler implements TemplateViewRoute, Route {
+	  @Override
+	  public ModelAndView handle(Request request, Response response) throws Exception {
+		  Map<String, Object> variables = ImmutableMap.of("title",
+      "P O N G B R O S");
+>>>>>>> New route for start page and
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
 		// looking up users
 		// starting up the server should call this before game start handler  
+<<<<<<< HEAD
 		  return new ModelAndView(variables, "home.ftl");
 	  }
   }
@@ -135,6 +146,12 @@ public final class Main {
 	    }
 	  }
   
+=======
+		  return new ModelAndView(variables, "pong.ftl");
+	  }
+  }
+
+>>>>>>> New route for start page and
   /**
    * Handles the initial request to the server.
    */
