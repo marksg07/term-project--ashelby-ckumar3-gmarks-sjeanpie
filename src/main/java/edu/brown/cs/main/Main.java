@@ -2,6 +2,7 @@ package edu.brown.cs.main;
 
 import edu.brown.cs.pong.PongGame;
 import edu.brown.cs.server.MainServer;
+import edu.brown.cs.server.PongWebSocketHandler;
 import edu.brown.cs.server.Server;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
@@ -80,10 +81,13 @@ public final class Main {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
-    Spark.get("/game", new GameStartHandler(), freeMarker);
-    Spark.post("/logic", new GameLogicHandler());
-    Server serv = new MainServer();
+    MainServer serv = new MainServer();
     serv.run();
+    PongWebSocketHandler.setServer(serv);
+    Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
+    Spark.get("/game", new GameStartHandler(), freeMarker);
+
+
   }
 
   /**
@@ -110,7 +114,7 @@ public final class Main {
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-      int id = -1;
+      /*int id = -1;
       if(firstId == null) {
         id = firstId = 0;
       } else if (secondId == null) {
@@ -122,83 +126,8 @@ public final class Main {
       GAME_LIST.add(leftGame);
       GAME_LIST.add(rightGame);*/
       Map<String, Object> variables = ImmutableMap.of("title",
-              "Game", "id", id);
+              "Game");
       return new ModelAndView(variables, "pong.ftl");
-    }
-  }
-
-
-  private static class GameLogicHandler implements Route {
-    @Override
-    public Object handle(Request request, Response response) throws Exception {
-
-      QueryParamsMap q = request.queryMap();
-      String input = q.value("press");
-      Integer id = Integer.parseInt(q.value("id"));
-      if(id < 0) {
-        return "";
-      }
-      PongGame.InputType inp = PongGame.InputType.NONE;
-      if(input.equals("0")) {
-        inp = PongGame.InputType.NONE;
-      } else if (input.equals("1")) {
-        inp = PongGame.InputType.UP;
-      } else if (input.equals("-1")) {
-        inp = PongGame.InputType.DOWN;
-      }
-
-      if(id == 0) {
-        game.setP1Input(inp);
-      } else if (id == 1) {
-        game.setP2Input(inp);
-      }
-
-      int winner = game.tick(0.02);
-      boolean youwin = false;
-      boolean youlose = false;
-      if (winner == 1 || winner == 2) {
-        if(winner == id + 1) {
-          youwin = true;
-        } else {
-          youlose = true;
-        }
-      }
-
-      /*
-      Boolean leftEnemyWin = false;
-      Boolean rightEnemyWin = false;
-      Boolean leftEnemyLose = false;
-      Boolean rightEnemyLose = false;
-
-
-      if (!(leftEnemyLose || leftEnemyWin)) {
-        Integer leftState = leftGame.tick(.02);
-        switch (leftState) {
-          case 2: leftEnemyLose = true;
-          case 1: leftEnemyWin = true;
-        }
-      }
-
-      if (!(rightEnemyLose || rightEnemyWin)) {
-        Integer rightState = rightGame.tick(.02);
-          switch (rightState) {
-            case 2: rightEnemyWin = true;
-            case 1: rightEnemyLose = true;
-          }
-      }
-      */
-
-      Map<String, Object> resp = new HashMap();
-      resp.put("title", "Game");
-      resp.put("leftPaddleY", game.getP1PaddleY());
-      resp.put("rightPaddleY", game.getP2PaddleY());
-      //resp.put("playerPaddleY", ((int) ((leftGame.getP2PaddleY() + rightGame.getP1PaddleY()) / 2)));
-      resp.put("ballX", game.getBallX() + 200);
-      resp.put("ballY", game.getBallY());
-      resp.put("lose", youlose);
-      resp.put("win", youwin);
-
-      return GSON.toJson(resp);
     }
   }
 }

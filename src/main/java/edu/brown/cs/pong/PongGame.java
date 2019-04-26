@@ -1,5 +1,12 @@
 package edu.brown.cs.pong;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+import java.lang.reflect.Type;
+
 public class PongGame implements Cloneable {
   private double ballX, ballY, ballVelX, ballVelY;
   private double p1PaddleY, p2PaddleY;
@@ -12,7 +19,19 @@ public class PongGame implements Cloneable {
   public enum InputType {
     NONE,
     UP,
-    DOWN
+    DOWN;
+
+    public static InputType fromInt (int t) {
+      switch (t) {
+        case -1:
+          return DOWN;
+        case 0:
+          return NONE;
+        case 1:
+          return UP;
+      }
+      return null;
+    }
   }
 
   InputType p1Input, p2Input;
@@ -343,5 +362,18 @@ public class PongGame implements Cloneable {
    */
   public void setP2Input(InputType p2Input) {
     this.p2Input = p2Input;
+  }
+
+  public JsonObject getState() {
+    JsonObject obj = new JsonObject();
+    obj.addProperty("ballX", ballX);
+    obj.addProperty("ballY", ballY);
+    obj.addProperty("ballVelX", ballVelX);
+    obj.addProperty("ballVelY", ballVelY);
+    obj.addProperty("p1PaddleY", p1PaddleY);
+    obj.addProperty("p2PaddleY", p2PaddleY);
+    obj.addProperty("p1Dead", p1Dead);
+    obj.addProperty("p2Dead", p2Dead);
+    return obj;
   }
 }

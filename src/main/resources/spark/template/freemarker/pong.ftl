@@ -9,8 +9,5 @@
             </canvas>
         </div>
     </div>
-    <script type="text/javascript">
-        const myId = ${id};
-    </script>
 </#assign>
 <#include "main.ftl">

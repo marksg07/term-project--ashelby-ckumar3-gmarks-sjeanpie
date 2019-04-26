@@ -13,6 +13,8 @@ let up = false;
 let down = false;
 let playersRemaining;
 let upDown = [0,0];
+let myId = Math.random();
+let conn;
 /**
  * Gets new position data from server and updates positions of all entities.
  */
@@ -39,6 +41,19 @@ function updatePositions() {
             $("#status").text("Y O U W I N");
         }
 });
+}
+
+function setGameState(state) {
+    leftPaddle.setPosition(responseObject.leftPaddleY);
+    rightPaddle.setPosition(responseObject.rightPaddleY);
+    ball.setPosition(responseObject.ballX, responseObject.ballY);
+
+    if (responseObject.lose) {
+        $("#status").text("Y O U L O S E");
+    }
+    else if (responseObject.win) {
+        $("#status").text("Y O U W I N");
+    }
 }
 
 /**
