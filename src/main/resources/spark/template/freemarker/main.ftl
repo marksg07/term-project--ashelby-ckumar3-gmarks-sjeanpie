@@ -25,6 +25,7 @@ ${content}
 <script src="js/homepage.js"> </script>
 >>>>>>> more javascript and html for find game button
 <script src="js/pong.js"> </script>
+<script src="js/lobby.js"> </script>
 <script src="js/paddle.js"> </script>
 <script src="js/ball.js"> </script>
 

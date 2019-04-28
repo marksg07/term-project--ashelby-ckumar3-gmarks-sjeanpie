@@ -1,5 +1,3 @@
-let canvas;
-let ctx;
 let playerPaddle;
 let oppRightPaddle;
 let oppLeftPaddle;
@@ -13,12 +11,44 @@ let up = false;
 let down = false;
 let playersRemaining;
 let upDown = [0,0];
+<<<<<<< HEAD
 let myId = Math.random();
 let gameReady = false;
 
 function setGameReady(v) {
     gameReady = v;
 }
+=======
+let gameOver;
+/**
+ * Gets new position data from server and updates positions of all entities.
+ */
+function updatePositions() {
+    const postParameters = {press : pressState()};
+    $.post("/logic", postParameters, responseJSON => {
+        //Parse the JSON response into a JavaScript object.
+        const responseObject = JSON.parse(responseJSON);
+        // console.log(responseObject);
+        // console.log(responseObject.leftPaddleY);
+        // console.log(responseObject.rightPaddleY);
+        // console.log(responseObject);
+        oppLeftPaddle.setPosition(responseObject.leftPaddleY);
+        playerPaddle.setPosition(responseObject.playerPaddleY);
+        oppRightPaddle.setPosition(responseObject.rightPaddleY);
+        ballLeft.setPosition(responseObject.ballLeftX, responseObject.ballLeftY);
+        ballRight.setPosition(responseObject.ballRightX, responseObject.ballRightY);
+
+        if (responseObject.rightEnemyWin || responseObject.leftEnemyWin) {
+            $("#status").text("Y O U L O S E");
+            gameOver = 1;
+        }
+        if (responseObject.rightEnemyLose) {
+            $("#status").text("R I G H T L O S E");
+        }
+        if (responseObject.leftEnemyWin) {
+            $("#status").text("L E F T L O S E");
+        }
+>>>>>>> lobby and homepage
 
 function updateGame(state) {
     console.log(state);
@@ -117,7 +147,43 @@ function checkInputs(e) {
 }
 
 
-
+function executePong() {
+    // Setting up the canvas.  Already has a width and height.
+    canvas = $('#pong-canvas')[0];
+    // Set up the canvas context.
+    ctx = canvas.getContext("2d");
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //initial width of paddle, will be a constant
+    paddleWidth = 10;
+    //initial height of paddles, another constant
+    paddleHeight = 40;
+    //initial ball size, another constant
+    ballSize = 20;
+    //initialize 5 entities.
+    up = false;
+    down = false;
+    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
+    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    $(document).keydown(event => {checkPressed(event);});
+    $(document).keyup(event => {checkUp(event);});
+    let game = setInterval(updatePositions {
+        if (gameOver === 1) {
+            clearInterval(game);
+        }
+    }, 20);
+    /**
+     let updatingLobby = setInterval(updateLobbyCounter
+     {if (players === totalPlayers) {
+        clearInterval(updatingLobby);
+        executePong();
+    }
+    }, 20);
+     */
+}
 /*
 $(document).ready(() => {
     wsSetup();
@@ -142,16 +208,8 @@ $(document).ready(() => {
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     $(document).keydown(event => {checkPressed(event);});
-<<<<<<< HEAD
+
     $(document).keyup(event => {checkUp(event);});
     setInterval(sendInput, 20);
-});
-=======
-    $(document).keyup(even => {checkUp(event);});
-    setInterval(updatePositions, 20);
-<<<<<<< HEAD
 });*/
->>>>>>> more javascript and html for find game button
-=======
-});*/
->>>>>>> more javascript and html for find game button
+
