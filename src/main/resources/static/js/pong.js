@@ -113,7 +113,6 @@ function checkInputs(e) {
     return;
 }
 
-
 function executePong() {
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
