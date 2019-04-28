@@ -44,4 +44,24 @@ public class PongServer implements Server {
     assert (p1Id.equals(id) || p2Id.equals(id));
     return game.getState();
   }
+
+  public String getID(String pNum) {
+    switch (pNum) {
+      case "player1":
+      case "p1":
+      case "1":
+        return p1Id;
+      case "player2":
+      case "p2":
+      case "2":
+        return p2Id;
+      default:
+        System.out.println("BAD GETID");
+        return "BAD ARG";
+    }
+  }
+
+  public PongGame getGame() {
+    return game;
+  }
 }

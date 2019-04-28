@@ -389,4 +389,22 @@ public class PongGame implements Cloneable {
     obj.addProperty("p2Dead", p2Dead);
     return obj;
   }
+
+  /**
+   * Gets p2Dead.
+   *
+   * @return Value of p2Dead.
+   */
+  public boolean isP2Dead() {
+    return p2Dead;
+  }
+
+  /**
+   * Gets p1Dead.
+   *
+   * @return Value of p1Dead.
+   */
+  public boolean isP1Dead() {
+    return p1Dead;
+  }
 }
