@@ -96,6 +96,29 @@ public class BRServer implements Server {
     assert (clientToServers.containsKey(id));
     ServerPair sp = clientToServers.get(id);
     JsonObject obj = new JsonObject();
+
+    String leftDeadID = "";
+    String rightDeadID = "";
+    if (sp.left.getGameState(id).getBoolean("p1Dead")) {
+      leftDeadID = sp.left.getID("1");
+    } else if (sp.left.getGameState(id).getBoolean("p2Dead")) {
+      leftDeadID = sp.left.getID("2");
+    }
+
+    if (sp.right.getGameState(id).getBoolean("p1Dead")) {
+      rightDeadID = sp.right.getID("1");
+    } else if (sp.right.getGameState(id).getBoolean("p2Dead")) {
+      rightDeadID = sp.right.getID("2");
+    }
+
+    if (!leftDeadID.equals("")) {
+      kill(leftDeadID);
+    }
+
+    if (!rightDeadID.equals("")) {
+      kill(rightDeadID);
+    }
+
     obj.add("leftState", sp.left.getGameState(id));
     obj.add("rightState", sp.right.getGameState(id));
     return obj;
@@ -104,6 +127,20 @@ public class BRServer implements Server {
   @Override
   public void receiveMessage(JsonObject obj) {
     // XXX get client id from obj and send obj to correct pongservers
+  }
+
+  private void kill(String playerID) {
+    Integer playerIndex = clients.indexOf(playerID);
+    if (!playerIndex.equals(-1)) {
+      String prevID = clients.get((playerID + (clients.size() - 1)) % clients.size());
+      String nextID = clients.get((playerID + (clients.size() + 1)) % clients.size());
+      // sessions.get(playerID) XXX send a "you're dead" msg
+      sessions.remove(playerID);
+      PongServer newServer = new PongServer(prevID, nextID);
+      clientToServers.get(prevID).right = newServer;
+      clientToServers.get(nextID).left = newServer;
+      clients.remove(playerID);
+    }
   }
 
 }
