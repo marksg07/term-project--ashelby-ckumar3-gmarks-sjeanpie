@@ -118,7 +118,7 @@ function checkInputs(e) {
 
 
 
-
+/*
 $(document).ready(() => {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
@@ -142,6 +142,12 @@ $(document).ready(() => {
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
     $(document).keydown(event => {checkPressed(event);});
+<<<<<<< HEAD
     $(document).keyup(event => {checkUp(event);});
     setInterval(sendInput, 20);
 });
+=======
+    $(document).keyup(even => {checkUp(event);});
+    setInterval(updatePositions, 20);
+});*/
+>>>>>>> more javascript and html for find game button

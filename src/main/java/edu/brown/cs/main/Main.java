@@ -31,8 +31,13 @@ import java.io.StringWriter;
 import com.google.gson.Gson;
 
 public final class Main {
+<<<<<<< HEAD
   private static final int DEFAULT_PORT = 4567;
 
+=======
+  private static final int DEFAULT_PORT = 1111;
+  private static final List<PongGame> GAME_LIST = new ArrayList<>();
+>>>>>>> more javascript and html for find game button
   private static final Gson GSON = new Gson();
 
   // TRASH UNDER HERE
@@ -43,7 +48,6 @@ public final class Main {
 
   /**
    * The initial method called when execution begins.
-   *
    * @param args An array of command line arguments
    */
   public static void main(String[] args) {
@@ -88,6 +92,7 @@ public final class Main {
     PongWebSocketHandler.setServer(serv);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
+    Spark.get("/lobby", new LobbyHandler(), freeMarker);
   }
 
   /**
@@ -108,19 +113,28 @@ public final class Main {
     }
   }
   
-  private static class HomePageHandler implements TemplateViewRoute, Route {
+  private static class HomePageHandler implements TemplateViewRoute {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
 		  Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G B R O S");
+      "P O N G F O L K S");
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
 		// looking up users
 		// starting up the server should call this before game start handler  
-		  return new ModelAndView(variables, "pong.ftl");
+		  return new ModelAndView(variables, "home.ftl");
 	  }
   }
-
+  
+  private static class LobbyHandler implements TemplateViewRoute {
+	    @Override
+	    public ModelAndView handle(Request request, Response response) throws Exception {
+	      Map<String, Object> variables = ImmutableMap.of("title",
+	              "Battle Royale");
+	      return new ModelAndView(variables, "lobby.ftl");
+	    }
+	  }
+  
   /**
    * Handles the initial request to the server.
    */
