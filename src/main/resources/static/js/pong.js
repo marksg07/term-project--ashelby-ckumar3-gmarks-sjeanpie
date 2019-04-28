@@ -115,7 +115,7 @@ function checkInputs(e) {
 
 
 
-
+/*
 $(document).ready(() => {
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
@@ -140,4 +140,4 @@ $(document).ready(() => {
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(even => {checkUp(event);});
     setInterval(updatePositions, 20);
-});
+});*/

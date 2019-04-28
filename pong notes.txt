@@ -1,0 +1,3 @@
+create game vs find game
+---- there are more options with creating a game
+     (how many people there need to be, params, etc)
