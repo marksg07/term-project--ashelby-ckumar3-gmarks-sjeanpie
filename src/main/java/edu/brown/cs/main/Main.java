@@ -32,9 +32,12 @@ import com.google.gson.Gson;
 
 public final class Main {
 <<<<<<< HEAD
+<<<<<<< HEAD
   private static final int DEFAULT_PORT = 4567;
 
 =======
+=======
+>>>>>>> more javascript and html for find game button
   private static final int DEFAULT_PORT = 1111;
   private static final List<PongGame> GAME_LIST = new ArrayList<>();
 >>>>>>> more javascript and html for find game button
@@ -94,7 +97,7 @@ public final class Main {
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
-    Spark.get("/home", new HomePageHandler());
+    Spark.get("/home", new HomePageHandler(), freeMarker);
   }
 
   /**
@@ -116,6 +119,7 @@ public final class Main {
   }
   
 <<<<<<< HEAD
+<<<<<<< HEAD
   private static class HomePageHandler implements TemplateViewRoute {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
@@ -128,10 +132,18 @@ public final class Main {
 		  Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G B R O S");
 >>>>>>> New route for start page and
+=======
+  private static class HomePageHandler implements TemplateViewRoute {
+	  @Override
+	  public ModelAndView handle(Request request, Response response) throws Exception {
+		  Map<String, Object> variables = ImmutableMap.of("title",
+      "P O N G F O L K S");
+>>>>>>> more javascript and html for find game button
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
 		// looking up users
 		// starting up the server should call this before game start handler  
+<<<<<<< HEAD
 <<<<<<< HEAD
 		  return new ModelAndView(variables, "home.ftl");
 	  }
@@ -152,6 +164,21 @@ public final class Main {
   }
 
 >>>>>>> New route for start page and
+=======
+		  return new ModelAndView(variables, "home.ftl");
+	  }
+  }
+  
+  private static class LobbyHandler implements TemplateViewRoute {
+	    @Override
+	    public ModelAndView handle(Request request, Response response) throws Exception {
+	      Map<String, Object> variables = ImmutableMap.of("title",
+	              "Battle Royale");
+	      return new ModelAndView(variables, "lobby.ftl");
+	    }
+	  }
+  
+>>>>>>> more javascript and html for find game button
   /**
    * Handles the initial request to the server.
    */

@@ -149,5 +149,9 @@ $(document).ready(() => {
 =======
     $(document).keyup(even => {checkUp(event);});
     setInterval(updatePositions, 20);
+<<<<<<< HEAD
+});*/
+>>>>>>> more javascript and html for find game button
+=======
 });*/
 >>>>>>> more javascript and html for find game button
