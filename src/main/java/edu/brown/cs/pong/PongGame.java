@@ -1,5 +1,14 @@
 package edu.brown.cs.pong;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.Instant;
+
 public class PongGame implements Cloneable {
   private double ballX, ballY, ballVelX, ballVelY;
   private double p1PaddleY, p2PaddleY;
@@ -7,12 +16,25 @@ public class PongGame implements Cloneable {
   private double paddleVel, paddleRadius;
   private double ballRadius; // NOTE: We call it a "ball" but it's gonna be a square
   private double startVel;
+  private Instant lastUpdate;
   private boolean p1Dead, p2Dead;
 
   public enum InputType {
     NONE,
     UP,
-    DOWN
+    DOWN;
+
+    public static InputType fromInt (int t) {
+      switch (t) {
+        case -1:
+          return DOWN;
+        case 0:
+          return NONE;
+        case 1:
+          return UP;
+      }
+      return null;
+    }
   }
 
   InputType p1Input, p2Input;
@@ -38,6 +60,7 @@ public class PongGame implements Cloneable {
     this.startVel = startVel;
     p1Dead = false;
     p2Dead = false;
+    lastUpdate = Instant.now();
   }
 
   @Override
@@ -51,6 +74,15 @@ public class PongGame implements Cloneable {
     DOWN,
     LEFT,
     RIGHT
+  }
+
+  public int tickToCurrent() {
+    synchronized (lastUpdate) {
+      Instant now = Instant.now();
+      double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
+      lastUpdate = now;
+      return tick(seconds);
+    }
   }
 
   private class Collision {
@@ -120,6 +152,10 @@ public class PongGame implements Cloneable {
     }
     // do paddle movements, then done
     movePaddles(seconds);
+    if (p1Dead)
+      return 2;
+    if (p2Dead)
+      return 1;
     return 0;
   }
 
@@ -339,5 +375,36 @@ public class PongGame implements Cloneable {
    */
   public void setP2Input(InputType p2Input) {
     this.p2Input = p2Input;
+  }
+
+  public JsonObject getState() {
+    JsonObject obj = new JsonObject();
+    obj.addProperty("ballX", ballX);
+    obj.addProperty("ballY", ballY);
+    obj.addProperty("ballVelX", ballVelX);
+    obj.addProperty("ballVelY", ballVelY);
+    obj.addProperty("p1PaddleY", p1PaddleY);
+    obj.addProperty("p2PaddleY", p2PaddleY);
+    obj.addProperty("p1Dead", p1Dead);
+    obj.addProperty("p2Dead", p2Dead);
+    return obj;
+  }
+
+  /**
+   * Gets p2Dead.
+   *
+   * @return Value of p2Dead.
+   */
+  public boolean isP2Dead() {
+    return p2Dead;
+  }
+
+  /**
+   * Gets p1Dead.
+   *
+   * @return Value of p1Dead.
+   */
+  public boolean isP1Dead() {
+    return p1Dead;
   }
 }
