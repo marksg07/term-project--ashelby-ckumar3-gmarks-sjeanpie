@@ -42,13 +42,15 @@ public class MainServer implements Server {
   }
 
   public void addClient(String id, Session session) {
+    System.out.println("yeet");
     sessions.put(id, session);
     clients.add(id);
     if (servers.size() == 0) {
       servers.add(new BRServer()); // XXX actual MM
     }
     servers.get(0).addClient(id, session);
-
+    clientToServer.put(id, servers.get(0));
+    System.out.println("yote");
     /*matchmake(id);
 
 

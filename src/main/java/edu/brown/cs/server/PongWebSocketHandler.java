@@ -13,10 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.*;
 
 /**
  * Packet descriptions:
@@ -58,6 +55,12 @@ public class PongWebSocketHandler {
     }
   }
 
+  @OnWebSocketError
+  public void onError(Throwable cause) {
+    System.out.println("マッチング状況WebSocketセッションでエラーが起こりました。");
+    cause.printStackTrace();
+  }
+
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
     System.out.println("Requesting ident");
@@ -87,11 +90,13 @@ public class PongWebSocketHandler {
         String hash = payload.get("hash").getAsString();
         // TODO LoginManager.verifyLogin(id, hash)
         // sessions.put(id, session);
+        System.out.println("Got SENDID");
         server.addClient(id, session);
         break;
 
       case INPUT:
         Integer input = payload.get("input").getAsInt();
+        System.out.println("Got input " + input);
         server.update(id, input);
         JsonObject data = server.getGameState(id);
         if(data == null) { // client is not in a game
@@ -100,7 +105,8 @@ public class PongWebSocketHandler {
         JsonObject updateObj = new JsonObject();
         updateObj.add("type", new JsonPrimitive(MESSAGE_TYPE.UPDATE.ordinal()));
         JsonObject payloadOut = new JsonObject();
-        payloadOut.add("data", data);
+        payloadOut.add("state", data);
+        updateObj.add("payload", payloadOut);
         session.getRemote().sendString(GSON.toJson(updateObj));
         break;
 

@@ -6,6 +6,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.Instant;
 
 public class PongGame implements Cloneable {
   private double ballX, ballY, ballVelX, ballVelY;
@@ -14,6 +16,7 @@ public class PongGame implements Cloneable {
   private double paddleVel, paddleRadius;
   private double ballRadius; // NOTE: We call it a "ball" but it's gonna be a square
   private double startVel;
+  private Instant lastUpdate;
   private boolean p1Dead, p2Dead;
 
   public enum InputType {
@@ -57,6 +60,7 @@ public class PongGame implements Cloneable {
     this.startVel = startVel;
     p1Dead = false;
     p2Dead = false;
+    lastUpdate = Instant.now();
   }
 
   @Override
@@ -70,6 +74,15 @@ public class PongGame implements Cloneable {
     DOWN,
     LEFT,
     RIGHT
+  }
+
+  public int tickToCurrent() {
+    synchronized (lastUpdate) {
+      Instant now = Instant.now();
+      double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
+      lastUpdate = now;
+      return tick(seconds);
+    }
   }
 
   private class Collision {

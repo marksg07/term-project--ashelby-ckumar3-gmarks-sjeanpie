@@ -21,7 +21,8 @@ public class BRServer implements Server {
   private boolean ready;
 
   public BRServer() {
-    List<String> clients = new ArrayList<>();
+    clients = new ArrayList<>();
+    sessions = new HashMap<>();
     clientToServers = new HashMap<>();
     ready = false;
   }
@@ -31,18 +32,24 @@ public class BRServer implements Server {
   }
 
   public void addClient(String id, Session session) {
+    System.out.println("balss");
     if (ready()) {
       return;
     }
+    System.out.println("balss");
     clients.add(id);
+    System.out.println("balss");
     sessions.put(id, session);
+    System.out.println("balss");
     if (clients.size() == 2) {
+      System.out.println("balss");
       ready = true;
       onFilled();
     }
   }
 
   public void onFilled() {
+    System.out.println("onFilled reached");;
     Collections.shuffle(clients);
     for(String cli : clients) {
       clientToServers.put(cli, new ServerPair());
@@ -96,8 +103,8 @@ public class BRServer implements Server {
     assert (clientToServers.containsKey(id));
     ServerPair sp = clientToServers.get(id);
     JsonObject obj = new JsonObject();
-    obj.add("leftState", sp.left.getGameState(id));
-    obj.add("rightState", sp.right.getGameState(id));
+    obj.add("left", sp.left.getGameState(id));
+    obj.add("right", sp.right.getGameState(id));
     return obj;
   }
 

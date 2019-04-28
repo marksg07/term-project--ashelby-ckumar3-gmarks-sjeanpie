@@ -12,7 +12,7 @@ public class PongServer implements Server {
   public PongServer(String p1, String p2) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(1, 1, 0.4, 0.15, 0.03, 0.3);
+    game = new PongGame(400, 300, 150, 40, 10, 300);
   }
 
   @Override
@@ -36,6 +36,7 @@ public class PongServer implements Server {
       assert(id.equals(p2Id));
       game.setP2Input(PongGame.InputType.fromInt(input));
     }
+    game.tickToCurrent();
   }
 
   @Override
