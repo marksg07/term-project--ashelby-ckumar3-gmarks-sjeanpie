@@ -33,11 +33,14 @@ import com.google.gson.Gson;
 public final class Main {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   private static final int DEFAULT_PORT = 4567;
 
 =======
 =======
 >>>>>>> more javascript and html for find game button
+=======
+>>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
   private static final int DEFAULT_PORT = 1111;
   private static final List<PongGame> GAME_LIST = new ArrayList<>();
 >>>>>>> more javascript and html for find game button
@@ -91,7 +94,6 @@ public final class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
     MainServer serv = new MainServer();
-
     serv.run();
     PongWebSocketHandler.setServer(serv);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
@@ -120,11 +122,15 @@ public final class Main {
   
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
   private static class HomePageHandler implements TemplateViewRoute {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
 		  Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S");
+<<<<<<< HEAD
 =======
   private static class HomePageHandler implements TemplateViewRoute, Route {
 	  @Override
@@ -139,10 +145,13 @@ public final class Main {
 		  Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S");
 >>>>>>> more javascript and html for find game button
+=======
+>>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
 		// looking up users
 		// starting up the server should call this before game start handler  
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 		  return new ModelAndView(variables, "home.ftl");
@@ -165,6 +174,8 @@ public final class Main {
 
 >>>>>>> New route for start page and
 =======
+=======
+>>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
 		  return new ModelAndView(variables, "home.ftl");
 	  }
   }
@@ -178,7 +189,10 @@ public final class Main {
 	    }
 	  }
   
+<<<<<<< HEAD
 >>>>>>> more javascript and html for find game button
+=======
+>>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
   /**
    * Handles the initial request to the server.
    */

@@ -115,7 +115,6 @@ function checkInputs(e) {
     return;
 }
 
-
 function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
