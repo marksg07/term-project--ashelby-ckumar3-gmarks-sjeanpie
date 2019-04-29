@@ -18,6 +18,7 @@ public class PongGame implements Cloneable {
   private double startVel;
   private Instant lastUpdate;
   private boolean p1Dead, p2Dead;
+  private double countdown;
 
   public enum InputType {
     NONE,
@@ -39,7 +40,7 @@ public class PongGame implements Cloneable {
 
   InputType p1Input, p2Input;
 
-  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel) {
+  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown) {
     maxX = sizeX;
     maxY = sizeY;
     ballX = maxX / 2;
@@ -60,7 +61,9 @@ public class PongGame implements Cloneable {
     this.startVel = startVel;
     p1Dead = false;
     p2Dead = false;
-    lastUpdate = Instant.now();
+
+    countdown = startCountdown;
+    lastUpdate = Instant.now().plusNanos((long)(countdown * 1000000000));
   }
 
   @Override
@@ -80,8 +83,12 @@ public class PongGame implements Cloneable {
     synchronized (lastUpdate) {
       Instant now = Instant.now();
       double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
-      lastUpdate = now;
-      return tick(seconds);
+
+      if(seconds > 0) { // countdown still goin
+        lastUpdate = now;
+        return tick(seconds);
+      }
+      return 0;
     }
   }
 
@@ -379,14 +386,21 @@ public class PongGame implements Cloneable {
 
   public JsonObject getState() {
     JsonObject obj = new JsonObject();
-    obj.addProperty("ballX", ballX);
-    obj.addProperty("ballY", ballY);
-    obj.addProperty("ballVelX", ballVelX);
-    obj.addProperty("ballVelY", ballVelY);
-    obj.addProperty("p1PaddleY", p1PaddleY);
-    obj.addProperty("p2PaddleY", p2PaddleY);
-    obj.addProperty("p1Dead", p1Dead);
-    obj.addProperty("p2Dead", p2Dead);
+    Instant now = Instant.now();
+    double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
+    if (seconds > 0) {
+      obj.addProperty("ballX", ballX);
+      obj.addProperty("ballY", ballY);
+      obj.addProperty("ballVelX", ballVelX);
+      obj.addProperty("ballVelY", ballVelY);
+      obj.addProperty("p1PaddleY", p1PaddleY);
+      obj.addProperty("p2PaddleY", p2PaddleY);
+      obj.addProperty("p1Dead", p1Dead);
+      obj.addProperty("p2Dead", p2Dead);
+    } else {
+      // still in CD
+      obj.addProperty("cdSecondsLeft", -seconds);
+    }
     return obj;
   }
 

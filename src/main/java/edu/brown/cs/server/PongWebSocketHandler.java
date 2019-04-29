@@ -23,6 +23,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
  *  server when matchmaking is ready.
  * INPUT: Client->server, contains value of input and ID. Prompted by client periodically.
  * UPDATE: Server->client, contains ID of server and game data. Prompted by client input (XXX).
+ * PLAYERDEAD: Server->client, contains nothing. u dead.
  */
 
 @WebSocket
@@ -36,7 +37,8 @@ public class PongWebSocketHandler {
     SENDID,
     GAMESTART,
     INPUT,
-    UPDATE;
+    UPDATE,
+    PLAYERDEAD;
 
     public static MESSAGE_TYPE fromInt(int t) {
       switch(t) {
@@ -50,6 +52,8 @@ public class PongWebSocketHandler {
           return INPUT;
         case 4:
           return UPDATE;
+        case 5:
+          return PLAYERDEAD;
       }
       return null;
     }

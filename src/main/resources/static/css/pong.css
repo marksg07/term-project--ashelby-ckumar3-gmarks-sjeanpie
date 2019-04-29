@@ -141,6 +141,25 @@ body {
 }
 
 #statusRight {
+
     left: 600px;
+}
+
+#leftCountdown {
+    color: #fffcf4;
+    position: relative;
+    text-align: center;
+    top: -250px;
+    left: -200px;
+    z-index: 500;
+}
+
+#rightCountdown {
+    color: #fffcf4;
+    position: relative;
+    text-align: center;
+    top: -280px;
+    left: 200px;
+    z-index: 500;
 }
 

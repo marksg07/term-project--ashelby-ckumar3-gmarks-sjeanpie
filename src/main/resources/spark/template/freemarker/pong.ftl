@@ -5,10 +5,15 @@
             <p id="status">P L A Y I N G</p>
         </div>
         <div class="pong-board">
-            <canvas id="pong-canvas" width="800" height="300">
-            </canvas>
+            <div style="width: 800px; height: 300px;">
+                <canvas id="pong-canvas" width="800" height="300">
+                </canvas>
+                <p id="leftCountdown"></p>
+                <p id="rightCountdown"></p>
+            </div>
             <p id="statusLeft">P L A Y I N G</p>
             <p id="statusRight">P L A Y I N G</p>
+
         </div>
     </div>
 </#assign>
