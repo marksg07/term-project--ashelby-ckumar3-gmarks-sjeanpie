@@ -30,7 +30,7 @@ import java.io.StringWriter;
 import com.google.gson.Gson;
 
 public final class Main {
-  private static final int DEFAULT_PORT = 1111;
+  private static final int DEFAULT_PORT = 1113;
   private static final List<PongGame> GAME_LIST = new ArrayList<>();
   private static final Gson GSON = new Gson();
 
