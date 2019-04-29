@@ -31,29 +31,13 @@ import java.io.StringWriter;
 import com.google.gson.Gson;
 
 public final class Main {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
   private static final int DEFAULT_PORT = 4567;
-
-=======
-=======
->>>>>>> more javascript and html for find game button
-=======
->>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
-  private static final int DEFAULT_PORT = 1111;
-  private static final List<PongGame> GAME_LIST = new ArrayList<>();
->>>>>>> more javascript and html for find game button
   private static final Gson GSON = new Gson();
-
-  // TRASH UNDER HERE
-  private static final List<PongGame> GAME_LIST = new ArrayList<>();
-  private static Integer firstId = null;
-  private static Integer secondId = null;
-  private static PongGame game = null;
 
   /**
    * The initial method called when execution begins.
+   *
    * @param args An array of command line arguments
    */
   public static void main(String[] args) {
@@ -104,7 +88,6 @@ public final class Main {
 
   /**
    * Display an error page when an exception occurs in the server.
-   *
    */
   private static class ExceptionPrinter implements ExceptionHandler {
     @Override
@@ -119,104 +102,31 @@ public final class Main {
       res.body(stacktrace.toString());
     }
   }
-  
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
+
   private static class HomePageHandler implements TemplateViewRoute {
-	  @Override
-	  public ModelAndView handle(Request request, Response response) throws Exception {
-		  Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S");
-<<<<<<< HEAD
-=======
-  private static class HomePageHandler implements TemplateViewRoute, Route {
-	  @Override
-	  public ModelAndView handle(Request request, Response response) throws Exception {
-		  Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G B R O S");
->>>>>>> New route for start page and
-=======
-  private static class HomePageHandler implements TemplateViewRoute {
-	  @Override
-	  public ModelAndView handle(Request request, Response response) throws Exception {
-		  Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S");
->>>>>>> more javascript and html for find game button
-=======
->>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
-		//code to have starting webpage that allows for user login
-		// finding a match/going into a lobby
-		// looking up users
-		// starting up the server should call this before game start handler  
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-		  return new ModelAndView(variables, "home.ftl");
-	  }
-  }
-  
-  private static class LobbyHandler implements TemplateViewRoute {
-	    @Override
-	    public ModelAndView handle(Request request, Response response) throws Exception {
-	      Map<String, Object> variables = ImmutableMap.of("title",
-	              "Battle Royale");
-	      return new ModelAndView(variables, "lobby.ftl");
-	    }
-	  }
-  
-=======
-		  return new ModelAndView(variables, "pong.ftl");
-	  }
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "P O N G F O L K S");
+      return new ModelAndView(variables, "home.ftl");
+    }
   }
 
->>>>>>> New route for start page and
-=======
-=======
->>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
-		  return new ModelAndView(variables, "home.ftl");
-	  }
-  }
-  
   private static class LobbyHandler implements TemplateViewRoute {
-	    @Override
-	    public ModelAndView handle(Request request, Response response) throws Exception {
-	      Map<String, Object> variables = ImmutableMap.of("title",
-	              "Battle Royale");
-	      return new ModelAndView(variables, "lobby.ftl");
-	    }
-	  }
-  
-<<<<<<< HEAD
->>>>>>> more javascript and html for find game button
-=======
->>>>>>> b91e083017feaf184c7f670c725d3fabb286f8b2
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "Battle Royale");
+      return new ModelAndView(variables, "lobby.ftl");
+    }
+  }
+
   /**
    * Handles the initial request to the server.
    */
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-<<<<<<< HEAD
-      /*int id = -1;
-      if(firstId == null) {
-        id = firstId = 0;
-      } else if (secondId == null) {
-        id = secondId = 1;
-        game = new PongGame(400, 300, 150, 40, 10, 20);
-      }
-      /*PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
-=======
-      Map<String, Object> variables = ImmutableMap.of("title",
-              "P O N G B R O S");
-      PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
-      PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
->>>>>>> New route for start page and
-      GAME_LIST.clear();
-      GAME_LIST.add(leftGame);
-      GAME_LIST.add(rightGame);*/
       Map<String, Object> variables = ImmutableMap.of("title",
               "Game");
       return new ModelAndView(variables, "pong.ftl");
