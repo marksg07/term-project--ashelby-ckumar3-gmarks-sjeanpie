@@ -5,8 +5,14 @@
             </input>
         </form>
         <div class="pong-board">
-            <canvas id="pong-canvas" width="800" height="300" style="border:10px solid #164751;">
-            </canvas>
+            <div style="width: 800px; height: 300px;">
+                <canvas id="pong-canvas" width="800" height="300" style="border:10px solid #164751;">
+                </canvas>
+                <p id="leftCountdown"></p>
+                <p id="rightCountdown"></p>
+            </div>
+            <p id="statusLeft">P L A Y I N G</p>
+            <p id="statusRight">P L A Y I N G</p>
         </div>
     </div>
     <script src="js/jquery-2.1.1.js"></script>

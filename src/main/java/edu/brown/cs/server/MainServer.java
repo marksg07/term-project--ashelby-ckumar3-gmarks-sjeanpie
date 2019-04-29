@@ -29,32 +29,24 @@ public class MainServer implements Server {
     servers = new CopyOnWriteArrayList<>();
   }
 
-  @Override
-  public void run() {
-
-  }
-
-  @Override
-  public void receiveMessage(JsonObject obj) {
-    // XXX add clients, do matchmaking and figure out when to spawn a new
-    // BRServer
-    // XXX also should handle passing obj to correct BRServer if exists
-  }
-
   public void addClient(String id, Session session) {
-    System.out.println("yeet");
     sessions.put(id, session);
     clients.add(id);
-    if (servers.size() == 0) {
-      servers.add(new BRServer()); // XXX actual MM
+    synchronized(servers) {
+      BRServer openServer = null;
+      for (BRServer server : servers) {
+        if (!server.ready()) {
+          openServer = server;
+          break;
+        }
+      }
+      if (openServer == null) {
+        openServer = new BRServer();
+        servers.add(openServer); // XXX actual MM
+      }
+      openServer.addClient(id, session);
+      clientToServer.put(id, openServer);
     }
-    servers.get(0).addClient(id, session);
-    clientToServer.put(id, servers.get(0));
-    System.out.println("yote");
-    /*matchmake(id);
-
-
-    */
   }
 
   @Override
@@ -63,19 +55,6 @@ public class MainServer implements Server {
       clientToServer.get(id).update(id, obj);
     }
   }
-
-  /*public List<Integer> matchmake(String id) {
-    if (servers.size() == 0) {
-      servers.add(new BRServer());
-    }
-    servers.get(0).addClient(id, session);
-    if (servers.get(0).ready()) {
-
-    }
-      List<Integer> serverIDs =
-
-    return Arrays.asList(0, 0);
-  }*/
 
   @Override
   public JsonObject getGameState(String id) {

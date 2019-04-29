@@ -14,36 +14,41 @@ let upDown = [0,0];
 let myId = Math.random();
 let gameReady = false;
 let gameOver;
-
+const leftSec = $("#leftCountdown");
+const rightSec = $("#rightCountdown");
 function setGameReady(v) {
     gameReady = v;
 }
 
 function updateGame(state) {
     console.log(state);
-    oppLeftPaddle.setPosition(state.left.p1PaddleY);
-    oppRightPaddle.setPosition(state.right.p2PaddleY);
-    playerPaddle.setPosition(state.left.p2PaddleY);
-    ballLeft.setPosition(state.left.ballX, state.left.ballY);
-    ballRight.setPosition(state.right.ballX + canvas.width / 2, state.right.ballY);
-    if(state.left.p1Dead) {
-        $("#statusLeft").text("L E F T L O S E");
+    if(state.left.hasOwnProperty("cdSecondsLeft")) {
+        leftSec.show();
+        const secString = state.left.cdSecondsLeft.toFixed(1);
+        leftSec.text(secString);
+    } else {
+        leftSec.hide();
+        oppLeftPaddle.setPosition(state.left.p1PaddleY);
+        playerPaddle.setPosition(state.left.p2PaddleY);
+        ballLeft.setPosition(state.left.ballX, state.left.ballY);
     }
-    else if(state.left.p2Dead) {
-        $("#statusLeft").text("Y O U L O S E");
+
+    if(state.right.hasOwnProperty("cdSecondsLeft")) {
+        rightSec.show();
+        const secString = state.right.cdSecondsLeft.toFixed(1);
+        rightSec.text(secString);
+    } else {
+        rightSec.hide();
+        oppRightPaddle.setPosition(state.right.p2PaddleY);
+        playerPaddle.setPosition(state.right.p1PaddleY);
+        ballRight.setPosition(state.right.ballX + canvas.width / 2, state.right.ballY);
     }
-    if(state.right.p1Dead) {
-        $("#statusRight").text("Y O U L O S E");
-    }
-    if(state.right.p2Dead) {
-        $("#statusRight").text("R I G H T L O S E");
-    }
+
 }
 
 function sendInput() {
-    if(gameReady) {
-        conn.send(JSON.stringify({"type": MESSAGE_TYPE.INPUT, "payload": {"id": myId, "input": pressState()}}));
-    }
+    if(gameReady)
+    conn.send(JSON.stringify({"type": MESSAGE_TYPE.INPUT, "payload": {"id": myId, "input": pressState()}}));
 }
 
 /**
@@ -113,6 +118,10 @@ function checkInputs(e) {
         return;
     }
     return;
+}
+
+function onPlayerDead() {
+    // XXX
 }
 
 function executePong() {

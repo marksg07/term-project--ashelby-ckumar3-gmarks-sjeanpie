@@ -12,6 +12,7 @@ public class BRServer implements Server {
   private static final Gson GSON = new Gson();
   private List<String> clients;
   private Map<String, Session> sessions;
+  static final int MAXPLAYERS = 2;
 
   private class ServerPair {
     PongServer right, left;
@@ -41,7 +42,7 @@ public class BRServer implements Server {
     System.out.println("balss");
     sessions.put(id, session);
     System.out.println("balss");
-    if (clients.size() == 2) {
+    if (clients.size() == MAXPLAYERS) {
       System.out.println("balss");
       ready = true;
       onFilled();
@@ -49,7 +50,7 @@ public class BRServer implements Server {
   }
 
   public void onFilled() {
-    System.out.println("onFilled reached");;
+    System.out.println("onFilled reached");
     Collections.shuffle(clients);
     for(String cli : clients) {
       clientToServers.put(cli, new ServerPair());
@@ -82,11 +83,6 @@ public class BRServer implements Server {
       }
     }
 
-
-  }
-
-  @Override
-  public void run() {
 
   }
 
@@ -131,23 +127,31 @@ public class BRServer implements Server {
     return obj;
   }
 
-  @Override
-  public void receiveMessage(JsonObject obj) {
-    // XXX get client id from obj and send obj to correct pongservers
-  }
-
   private void kill(String playerID) {
     Integer playerIndex = clients.indexOf(playerID);
     if (!playerIndex.equals(-1)) {
       String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
       String nextID = clients.get((playerIndex + (clients.size() + 1)) % clients.size());
-      // sessions.get(playerID) XXX send a "you're dead" msg
+
+      Session deadSession = sessions.get(playerID);
+      JsonObject msg = new JsonObject();
+      msg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
+      msg.add("payload", new JsonObject());
+      try {
+        deadSession.getRemote().sendString(GSON.toJson(msg));
+      } catch (Exception e) {
+        System.out.println("Failed to send PLAYERDEAD");
+      }
       sessions.remove(playerID);
+
+      // make new server for new neighbors
       PongServer newServer = new PongServer(prevID, nextID);
       clientToServers.get(prevID).right = newServer;
       clientToServers.get(nextID).left = newServer;
       clients.remove(playerID);
+      clientToServers.remove(playerID);
     }
+
   }
 
 }
