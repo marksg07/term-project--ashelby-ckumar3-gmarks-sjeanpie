@@ -8,7 +8,10 @@
             <input type="submit"></input>
         </form>
         <div class="centered">
-            <button id = "find-game" class="find_game">Find Game</button>
+            <form action="/game" method="GET">
+                <input type="submit" id="find-game" class="find_game" value="Find Game">
+                </input>
+            </form>
         </div>
     </div>
 </#assign>

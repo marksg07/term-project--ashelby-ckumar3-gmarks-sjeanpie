@@ -150,3 +150,7 @@ function rmWaitingText() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
 }
+
+$(document).ready(() => {
+    executePong();
+});
