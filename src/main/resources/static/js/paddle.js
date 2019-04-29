@@ -16,7 +16,7 @@ class Paddle{
         this.ctx = ctx;
         this.fillStyle = "white";
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, width, height);
+        this.ctx.fillRect(x-(width/2), y-(height/2), width, height);
     }
 
 
@@ -26,9 +26,9 @@ class Paddle{
      */
     setPosition(y){
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2);
+        this.ctx.fillRect(this.x -(this.width/2) - 1, this.y - (this.height/2) - 1, this.width + 2, this.height + 2);
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(this.x, y, this.width, this.height);
+        this.ctx.fillRect(this.x-(this.width/2), y-(this.height/2), this.width, this.height);
         this.y = y;
     }
 

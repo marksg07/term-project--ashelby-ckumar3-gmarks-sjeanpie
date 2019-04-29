@@ -14,7 +14,7 @@ class Ball{
         this.ctx = ctx;
         this.fillStyle = "white";
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, size, size);
+        this.ctx.fillRect(x-(size/2), y-(size/2), size, size);
     }
 
     /**
@@ -24,9 +24,9 @@ class Ball{
      */
     setPosition(x, y){
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x - 1, this.y - 1, this.size + 2, this.size + 2);
+        this.ctx.fillRect(this.x - (this.size/2) -  1, this.y -(this.size/2) - 1, this.size + 2, this.size + 2);
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, this.size, this.size);
+        this.ctx.fillRect(x -(this.size/2), y -(this.size/2), this.size, this.size);
         this.x = x;
         this.y = y;
     }

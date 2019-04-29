@@ -38,6 +38,7 @@ function wsSetup() {
             case MESSAGE_TYPE.GAMESTART:
                 console.log('got gamestart');
                 setGameReady(true);
+                rmWaitingText();
                 break;
             case MESSAGE_TYPE.UPDATE:
                 console.log('got update');

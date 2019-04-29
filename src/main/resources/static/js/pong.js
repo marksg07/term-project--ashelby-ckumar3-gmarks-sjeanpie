@@ -132,20 +132,21 @@ function executePong() {
     //initialize 5 entities.
     up = false;
     down = false;
-    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
-    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    playerPaddle = new Paddle(canvas.width/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
+    oppLeftPaddle = new Paddle(paddleWidth/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
+    oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
+    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
+    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
+    ctx.font = "50px Futura, sans-serif";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
     setInterval(sendInput, 20);
-    /**
-     let updatingLobby = setInterval(updateLobbyCounter
-     {if (players === totalPlayers) {
-        clearInterval(updatingLobby);
-        executePong();
-    }
-    }, 20);
-     */
+}
+
+function rmWaitingText() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
 }

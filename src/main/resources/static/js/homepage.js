@@ -11,5 +11,5 @@ $(document).ready(() => {
     ctx.fillStyle = "white";
 	ctx.fillText("P O N G F O L K S", canvas.width / 4.5, canvas.height/2);
 	ctx.textAlign = "center";
-	$("#find-game").click(generateLobby);
+	$("#find-game").click(executePong);
 });
