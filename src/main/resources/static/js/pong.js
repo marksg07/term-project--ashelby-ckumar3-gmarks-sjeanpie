@@ -122,7 +122,6 @@ function checkInputs(e) {
     return;
 }
 
-
 function onPlayerDead() {
     // XXX
 }
