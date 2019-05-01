@@ -13,6 +13,7 @@
             </div>
             <p id="statusLeft">P L A Y I N G</p>
             <p id="statusRight">P L A Y I N G</p>
+
         </div>
     </div>
     <script src="js/jquery-2.1.1.js"></script>

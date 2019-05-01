@@ -13,6 +13,7 @@ let playersRemaining;
 let upDown = [0,0];
 let myId = Math.random();
 let gameReady = false;
+
 let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
