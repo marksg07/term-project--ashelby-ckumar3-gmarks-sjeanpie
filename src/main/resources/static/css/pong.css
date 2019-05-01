@@ -145,7 +145,13 @@ body {
 
 .title {
     margin-left: 40px;
+}
 
+#statusLeft {
+    left: 200px;
+}
 
+#statusRight {
+    left: 600px;
 }
 

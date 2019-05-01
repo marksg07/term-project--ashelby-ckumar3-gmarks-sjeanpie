@@ -9,8 +9,7 @@ $(document).ready(() => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.font = "50px Futura, sans-serif";
     ctx.fillStyle = "white";
-	ctx.fillText("P O N G F O L K S", canvas.height / 2, canvas.height/2);
+	ctx.fillText("P O N G F O L K S", canvas.width / 4.5, canvas.height/2);
 	ctx.textAlign = "center";
-	
-	$("#find_game").click(paintOnClick);
+	$("#find-game").click(generateLobby);
 });

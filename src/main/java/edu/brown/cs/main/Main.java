@@ -2,15 +2,11 @@ package edu.brown.cs.main;
 
 import edu.brown.cs.pong.PongGame;
 import edu.brown.cs.server.MainServer;
+import edu.brown.cs.server.PongWebSocketHandler;
 import edu.brown.cs.server.Server;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import spark.ExceptionHandler;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
 
@@ -26,11 +22,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 
 import com.google.gson.Gson;
 
 public final class Main {
-  private static final int DEFAULT_PORT = 1113;
+
+  private static final int DEFAULT_PORT = 4501;
   private static final List<PongGame> GAME_LIST = new ArrayList<>();
   private static final Gson GSON = new Gson();
 
@@ -75,12 +73,14 @@ public final class Main {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
-    Spark.get("/game", new GameStartHandler(), freeMarker);
-    Spark.post("/logic", new GameLogicHandler());
-    Spark.get("/home", new HomePageHandler(), freeMarker);
-    Spark.get("/lobby", new LobbyHandler(), freeMarker);
-    Server serv = new MainServer();
+    MainServer serv = new MainServer();
     serv.run();
+    PongWebSocketHandler.setServer(serv);
+    Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
+    Spark.get("/game", new GameStartHandler(), freeMarker);
+    Spark.get("/lobby", new LobbyHandler(), freeMarker);
+    Spark.get("/home", new HomePageHandler(), freeMarker);
+    Spark.post("/login", new LoginHandler());
   }
 
   /**
@@ -100,12 +100,13 @@ public final class Main {
       res.body(stacktrace.toString());
     }
   }
-  
+
   private static class HomePageHandler implements TemplateViewRoute {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
 		  Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S");
+
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
 		// looking up users
@@ -113,6 +114,17 @@ public final class Main {
 		  return new ModelAndView(variables, "home.ftl");
 	  }
   }
+  
+  private static class LoginHandler implements Route {
+	    @Override
+	    public ModelAndView handle(Request req, Response res) throws SQLException {
+	    	QueryParamsMap qm = req.queryMap();
+	        String word = qm.value("username");
+	        //TODO: get password and hash it
+	      return null; //ModelAndView(variables, "play.ftl");
+	    }
+
+	  }
   
   private static class LobbyHandler implements TemplateViewRoute {
 	    @Override
@@ -122,82 +134,16 @@ public final class Main {
 	      return new ModelAndView(variables, "lobby.ftl");
 	    }
 	  }
-  
   /**
    * Handles the initial request to the server.
    */
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
+
       Map<String, Object> variables = ImmutableMap.of("title",
-              "P O N G B R O S");
-      PongGame leftGame = new PongGame(400, 300, 150, 40, 10, 300);
-      PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
-      GAME_LIST.clear();
-      GAME_LIST.add(leftGame);
-      GAME_LIST.add(rightGame);
+              "Game");
       return new ModelAndView(variables, "pong.ftl");
-    }
-  }
-
-
-  private static class GameLogicHandler implements Route {
-    @Override
-    public Object handle(Request request, Response response) throws Exception {
-
-      QueryParamsMap q = request.queryMap();
-      String input = q.value("press");
-      PongGame leftGame = GAME_LIST.get(0);
-      PongGame rightGame = GAME_LIST.get(1);
-      if (input.equals("0")) {
-        leftGame.setP2Input(PongGame.InputType.NONE);
-        rightGame.setP1Input(PongGame.InputType.NONE);
-      } else if (input.equals("1")) {
-        leftGame.setP2Input(PongGame.InputType.UP);
-        rightGame.setP1Input(PongGame.InputType.UP);
-      } else if (input.equals("-1")) {
-        leftGame.setP2Input(PongGame.InputType.DOWN);
-        rightGame.setP1Input(PongGame.InputType.DOWN);
-      }
-
-      Boolean leftEnemyWin = false;
-      Boolean rightEnemyWin = false;
-      Boolean leftEnemyLose = false;
-      Boolean rightEnemyLose = false;
-
-
-      if (!(leftEnemyLose || leftEnemyWin)) {
-        Integer leftState = leftGame.tick(.02);
-        switch (leftState) {
-          case 2: leftEnemyLose = true;
-          case 1: leftEnemyWin = true;
-        }
-      }
-
-      if (!(rightEnemyLose || rightEnemyWin)) {
-        Integer rightState = rightGame.tick(.02);
-          switch (rightState) {
-            case 2: rightEnemyWin = true;
-            case 1: rightEnemyLose = true;
-          }
-      }
-
-
-      Map<String, Object> resp = new HashMap();
-      resp.put("title", "Game");
-      resp.put("leftPaddleY", leftGame.getP1PaddleY());
-      resp.put("rightPaddleY", rightGame.getP2PaddleY());
-      resp.put("playerPaddleY", ((int) ((leftGame.getP2PaddleY() + rightGame.getP1PaddleY()) / 2)));
-      resp.put("ballLeftX", leftGame.getBallX());
-      resp.put("ballLeftY", leftGame.getBallY());
-      resp.put("ballRightX", rightGame.getBallX() + 400);
-      resp.put("ballRightY", rightGame.getBallY());
-      resp.put("rightEnemyWin", rightEnemyWin);
-      resp.put("rightEnemyLose", rightEnemyLose);
-      resp.put("leftEnemyWin", leftEnemyWin);
-      resp.put("leftEnemyLose", leftEnemyLose);
-
-      return GSON.toJson(resp);
     }
   }
 }
