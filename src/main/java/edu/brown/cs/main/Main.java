@@ -10,6 +10,7 @@ import joptsimple.OptionSet;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
+import spark.Route;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
@@ -26,18 +27,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import com.google.gson.Gson;
 
 public final class Main {
+
   private static final int DEFAULT_PORT = 4567;
-
   private static final Gson GSON = new Gson();
-
-  // TRASH UNDER HERE
-  private static final List<PongGame> GAME_LIST = new ArrayList<>();
-  private static Integer firstId = null;
-  private static Integer secondId = null;
-  private static PongGame game = null;
 
   /**
    * The initial method called when execution begins.
@@ -86,13 +82,12 @@ public final class Main {
     PongWebSocketHandler.setServer(serv);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
-
-
+    Spark.get("/lobby", new LobbyHandler(), freeMarker);
+    Spark.get("/home", new HomePageHandler(), freeMarker);
   }
 
   /**
    * Display an error page when an exception occurs in the server.
-   *
    */
   private static class ExceptionPrinter implements ExceptionHandler {
     @Override
@@ -108,23 +103,30 @@ public final class Main {
     }
   }
 
+  private static class HomePageHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "P O N G F O L K S");
+      return new ModelAndView(variables, "home.ftl");
+    }
+  }
+
+  private static class LobbyHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "Battle Royale");
+      return new ModelAndView(variables, "lobby.ftl");
+    }
+  }
+
   /**
    * Handles the initial request to the server.
    */
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-      /*int id = -1;
-      if(firstId == null) {
-        id = firstId = 0;
-      } else if (secondId == null) {
-        id = secondId = 1;
-        game = new PongGame(400, 300, 150, 40, 10, 20);
-      }
-      /*PongGame rightGame = new PongGame(400, 300, 150, 40, 10, 300);
-      GAME_LIST.clear();
-      GAME_LIST.add(leftGame);
-      GAME_LIST.add(rightGame);*/
       Map<String, Object> variables = ImmutableMap.of("title",
               "Game");
       return new ModelAndView(variables, "pong.ftl");

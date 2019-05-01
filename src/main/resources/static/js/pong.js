@@ -1,5 +1,3 @@
-let canvas;
-let ctx;
 let playerPaddle;
 let oppRightPaddle;
 let oppLeftPaddle;
@@ -15,6 +13,7 @@ let playersRemaining;
 let upDown = [0,0];
 let myId = Math.random();
 let gameReady = false;
+let gameOver;
 
 function setGameReady(v) {
     gameReady = v;
@@ -28,7 +27,7 @@ function updateGame(state) {
     ballLeft.setPosition(state.left.ballX, state.left.ballY);
     ballRight.setPosition(state.right.ballX + canvas.width / 2, state.right.ballY);
     if(state.left.p1Dead) {
-        $("#statusLeft").text("Y O U W I N");
+        $("#statusLeft").text("L E F T L O S E");
     }
     else if(state.left.p2Dead) {
         $("#statusLeft").text("Y O U L O S E");
@@ -37,7 +36,7 @@ function updateGame(state) {
         $("#statusRight").text("Y O U L O S E");
     }
     if(state.right.p2Dead) {
-        $("#statusRight").text("Y O U W I N");
+        $("#statusRight").text("R I G H T L O S E");
     }
 }
 
@@ -116,10 +115,7 @@ function checkInputs(e) {
     return;
 }
 
-
-
-
-$(document).ready(() => {
+function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
@@ -136,12 +132,25 @@ $(document).ready(() => {
     //initialize 5 entities.
     up = false;
     down = false;
-    playerPaddle = new Paddle(canvas.width/2, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppLeftPaddle = new Paddle(0, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    oppRightPaddle = new Paddle(canvas.width-paddleWidth, canvas.height/2-(paddleHeight/2), paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
-    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2-(paddleHeight/2));
+    playerPaddle = new Paddle(canvas.width/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
+    oppLeftPaddle = new Paddle(paddleWidth/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
+    oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
+    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
+    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
+    ctx.font = "50px Futura, sans-serif";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
     setInterval(sendInput, 20);
+}
+
+function rmWaitingText() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
+}
+
+$(document).ready(() => {
+    executePong();
 });

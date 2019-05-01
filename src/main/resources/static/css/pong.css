@@ -10,6 +10,26 @@
 
 }
 
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
+
+button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    height: 50px;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
 body {
     font-family: Futura, sans-serif;
 
@@ -84,12 +104,12 @@ body {
 
 .pong-board {
     margin-top: 40px;
-    border: 10px solid #164751;
-    background-color: #fffcf4;
-    height: 300px;
+	padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
     width: 800px;
-
-
 }
 
 #pong-canvas {
@@ -107,6 +127,17 @@ body {
     font-family: Futura, sans-serif;
 
     opacity: 1;
+}
+
+.find_game {
+  background-color: black; 
+  color: white; 
+  border: 2px solid white;
+}
+
+.find_game:hover {
+  background-color: white;
+  color: black;
 }
 
 
