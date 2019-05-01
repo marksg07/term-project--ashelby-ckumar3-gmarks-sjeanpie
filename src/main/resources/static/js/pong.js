@@ -24,11 +24,16 @@ function setGameReady(v) {
 
 function updateGame(state) {
     console.log(state);
+    if(!state.hasOwnProperty("left") && !state.hasOwnProperty("right")) {
+        // i am dead :(
+        return;
+    }
     if(state.left.hasOwnProperty("cdSecondsLeft")) {
         leftSec.show();
         const secString = state.left.cdSecondsLeft.toFixed(1);
         leftSec.text(secString);
     } else {
+        console.log("left game live");
         leftSec.hide();
         oppLeftPaddle.setPosition(state.left.p1PaddleY);
         playerPaddle.setPosition(state.left.p2PaddleY);
@@ -40,6 +45,7 @@ function updateGame(state) {
         const secString = state.right.cdSecondsLeft.toFixed(1);
         rightSec.text(secString);
     } else {
+        console.log("right game live");
         rightSec.hide();
         oppRightPaddle.setPosition(state.right.p2PaddleY);
         playerPaddle.setPosition(state.right.p1PaddleY);
@@ -49,7 +55,6 @@ function updateGame(state) {
 }
 
 function sendInput() {
-    if(gameReady)
     conn.send(JSON.stringify({"type": MESSAGE_TYPE.INPUT, "payload": {"id": myId, "input": pressState()}}));
 }
 

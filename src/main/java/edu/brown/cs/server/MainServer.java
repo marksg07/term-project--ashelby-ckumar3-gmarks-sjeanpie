@@ -16,11 +16,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @WebSocket
 public class MainServer implements Server {
-  Set<String> clients;
-  List<BRServer> servers;
-  Map<String, Server> clientToServer;
+  private final Set<String> clients;
+  private final List<BRServer> servers;
+  private final Map<String, Server> clientToServer;
   private static final Gson GSON = new Gson();
-  private Map<String, Session> sessions;
+  private final Map<String, Session> sessions;
 
   public MainServer() {
     sessions = new ConcurrentHashMap<>();
@@ -51,16 +51,20 @@ public class MainServer implements Server {
 
   @Override
   public void update(String id, Object obj) {
-    if (clientToServer.containsKey(id)) {
-      clientToServer.get(id).update(id, obj);
+    synchronized (clientToServer) {
+      if (clientToServer.containsKey(id)) {
+        clientToServer.get(id).update(id, obj);
+      }
     }
   }
 
   @Override
   public JsonObject getGameState(String id) {
-    if (clientToServer.containsKey(id)) {
-      return clientToServer.get(id).getGameState(id);
+    synchronized (clientToServer) {
+      if (clientToServer.containsKey(id)) {
+        return clientToServer.get(id).getGameState(id);
+      }
+      return null;
     }
-    return null;
   }
 }

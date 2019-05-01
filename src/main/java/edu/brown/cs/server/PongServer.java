@@ -5,7 +5,7 @@ import edu.brown.cs.pong.PongGame;
 
 public class PongServer implements Server {
   private String p1Id, p2Id;
-  private PongGame game;
+  private final PongGame game;
 
   public PongServer(String p1, String p2) {
     p1Id = p1;
@@ -15,20 +15,24 @@ public class PongServer implements Server {
 
   @Override
   public void update(String id, Object obj) {
-    int input = (Integer) obj;
-    if (id.equals(p1Id)) {
-      game.setP1Input(PongGame.InputType.fromInt(input));
-    } else {
-      assert(id.equals(p2Id));
-      game.setP2Input(PongGame.InputType.fromInt(input));
+    synchronized (game) {
+      int input = (Integer) obj;
+      if (id.equals(p1Id)) {
+        game.setP1Input(PongGame.InputType.fromInt(input));
+      } else {
+        assert (id.equals(p2Id));
+        game.setP2Input(PongGame.InputType.fromInt(input));
+      }
+      game.tickToCurrent();
     }
-    game.tickToCurrent();
   }
 
   @Override
   public JsonObject getGameState(String id) {
     assert (p1Id.equals(id) || p2Id.equals(id));
-    return game.getState();
+    synchronized (game) {
+      return game.getState();
+    }
   }
 
   public String getID(String pNum) {

@@ -105,7 +105,6 @@ public class PongWebSocketHandler {
 
         case INPUT:
           Integer input = payload.get("input").getAsInt();
-          System.out.println("Got input " + input);
           server.update(id, input);
           JsonObject data = server.getGameState(id);
           if (data == null) { // client is not in a game

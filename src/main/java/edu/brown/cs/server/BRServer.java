@@ -10,15 +10,15 @@ import java.util.*;
 
 public class BRServer implements Server {
   private static final Gson GSON = new Gson();
-  private List<String> clients;
-  private Map<String, Session> sessions;
-  static final int MAXPLAYERS = 2;
+  private final List<String> clients;
+  private final Map<String, Session> sessions;
+  static final int MAXPLAYERS = 3;
 
   private class ServerPair {
     PongServer right, left;
   }
 
-  private Map<String, ServerPair> clientToServers;
+  private final Map<String, ServerPair> clientToServers;
   private boolean ready;
 
   public BRServer() {
@@ -33,19 +33,21 @@ public class BRServer implements Server {
   }
 
   public void addClient(String id, Session session) {
-    System.out.println("balss");
-    if (ready()) {
-      return;
-    }
-    System.out.println("balss");
-    clients.add(id);
-    System.out.println("balss");
-    sessions.put(id, session);
-    System.out.println("balss");
-    if (clients.size() == MAXPLAYERS) {
+    synchronized (clientToServers) {
       System.out.println("balss");
-      ready = true;
-      onFilled();
+      if (ready()) {
+        return;
+      }
+      System.out.println("balss");
+      clients.add(id);
+      System.out.println("balss");
+      sessions.put(id, session);
+      System.out.println("balss");
+      if (clients.size() == MAXPLAYERS) {
+        System.out.println("balss");
+        ready = true;
+        onFilled();
+      }
     }
   }
 
@@ -88,43 +90,60 @@ public class BRServer implements Server {
 
   @Override
   public void update(String id, Object obj) {
-    assert (clientToServers.containsKey(id));
-    ServerPair sp = clientToServers.get(id);
-    sp.right.update(id, obj);
-    sp.left.update(id, obj);
+    // XXX assert?
+
+    synchronized(clientToServers) {
+      if (clientToServers.containsKey(id)) {
+        ServerPair sp = clientToServers.get(id);
+        if (sp == null) {
+          // player dead
+          return;
+        }
+        sp.right.update(id, obj);
+        sp.left.update(id, obj);
+      }
+    }
   }
 
   @Override
   public JsonObject getGameState(String id) {
-    assert (clientToServers.containsKey(id));
-    ServerPair sp = clientToServers.get(id);
-    JsonObject obj = new JsonObject();
+    synchronized (clientToServers) {
+      if (clientToServers.containsKey(id)) {
+        ServerPair sp = clientToServers.get(id);
+        if (sp == null) {
+          // player dead
+          return new JsonObject();
+        }
+        JsonObject obj = new JsonObject();
 
-    String leftDeadID = "";
-    String rightDeadID = "";
-    if (sp.left.getGame().isP1Dead()) {
-      leftDeadID = sp.left.getID("1");
-    } else if (sp.left.getGame().isP2Dead()) {
-      leftDeadID = sp.left.getID("2");
+        String leftDeadID = "";
+        String rightDeadID = "";
+        if (sp.left.getGame().isP1Dead()) {
+          leftDeadID = sp.left.getID("1");
+        } else if (sp.left.getGame().isP2Dead()) {
+          leftDeadID = sp.left.getID("2");
+        }
+
+        if (sp.right.getGame().isP1Dead()) {
+          rightDeadID = sp.right.getID("1");
+        } else if (sp.right.getGame().isP2Dead()) {
+          rightDeadID = sp.right.getID("2");
+        }
+
+        if (!leftDeadID.equals("")) {
+          kill(leftDeadID);
+        }
+
+        if (!rightDeadID.equals("")) {
+          kill(rightDeadID);
+        }
+
+        obj.add("left", sp.left.getGameState(id));
+        obj.add("right", sp.right.getGameState(id));
+        return obj;
+      }
     }
-
-    if (sp.right.getGame().isP1Dead()) {
-      rightDeadID = sp.right.getID("1");
-    } else if (sp.right.getGame().isP2Dead()) {
-      rightDeadID = sp.right.getID("2");
-    }
-
-    if (!leftDeadID.equals("")) {
-      kill(leftDeadID);
-    }
-
-    if (!rightDeadID.equals("")) {
-      kill(rightDeadID);
-    }
-
-    obj.add("left", sp.left.getGameState(id));
-    obj.add("right", sp.right.getGameState(id));
-    return obj;
+    return new JsonObject();
   }
 
   private void kill(String playerID) {
@@ -149,7 +168,7 @@ public class BRServer implements Server {
       clientToServers.get(prevID).right = newServer;
       clientToServers.get(nextID).left = newServer;
       clients.remove(playerID);
-      clientToServers.remove(playerID);
+      clientToServers.put(playerID, null);
     }
 
   }
