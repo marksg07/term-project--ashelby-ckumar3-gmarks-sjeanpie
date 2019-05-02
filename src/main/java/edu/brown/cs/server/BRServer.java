@@ -10,14 +10,23 @@ import java.util.*;
 
 public class BRServer implements Server {
   private static final Gson GSON = new Gson();
-  private List<String> clients;
-  private Map<String, Session> sessions;
+  private final List<String> clients;
+  private final Map<String, Session> sessions;
+  private long myId;
+  static final int MAXPLAYERS = 3;
+
+  private static long idCounter = 0;
+
+  public static synchronized long nextId()
+  {
+    return idCounter++;
+  }
 
   private class ServerPair {
     PongServer right, left;
   }
 
-  private Map<String, ServerPair> clientToServers;
+  private final Map<String, ServerPair> clientToServers;
   private boolean ready;
 
   public BRServer() {
@@ -25,6 +34,7 @@ public class BRServer implements Server {
     sessions = new HashMap<>();
     clientToServers = new HashMap<>();
     ready = false;
+    myId = nextId();
   }
 
   public boolean ready() {
@@ -32,30 +42,28 @@ public class BRServer implements Server {
   }
 
   public void addClient(String id, Session session) {
-    System.out.println("balss");
-    if (ready()) {
-      return;
-    }
-    System.out.println("balss");
-    clients.add(id);
-    System.out.println("balss");
-    sessions.put(id, session);
-    System.out.println("balss");
-    if (clients.size() == 2) {
-      System.out.println("balss");
-      ready = true;
-      onFilled();
+    System.out.println("BR #" + myId + " :: Adding client " + id + ".");
+    synchronized (clientToServers) {
+      if (ready()) {
+        return;
+      }
+      clients.add(id);
+      sessions.put(id, session);
+      if (clients.size() == MAXPLAYERS) {
+        ready = true;
+        onFilled();
+      }
     }
   }
 
   public void onFilled() {
-    System.out.println("onFilled reached");;
+    System.out.println("BR #" + myId + " :: Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
     for(String cli : clients) {
       clientToServers.put(cli, new ServerPair());
     }
     for(int i = 0; i < clients.size(); i++) {
-      int iLeft = (clients.size() + i) % clients.size();
+      int iLeft = (clients.size() - 1 + i) % clients.size();
       String cliLeft = clients.get(iLeft);
       String cli = clients.get(i);
       PongServer serv = new PongServer(cliLeft, cli);
@@ -66,9 +74,7 @@ public class BRServer implements Server {
     // yes
 
     for(Map.Entry<String, Session> pair : sessions.entrySet()) {
-      String cli = pair.getKey();
       Session session = pair.getValue();
-      ServerPair sp = clientToServers.get(cli);
 
       JsonObject updateObj = new JsonObject();
       updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
@@ -86,68 +92,88 @@ public class BRServer implements Server {
   }
 
   @Override
-  public void run() {
-
-  }
-
-  @Override
   public void update(String id, Object obj) {
-    assert (clientToServers.containsKey(id));
-    ServerPair sp = clientToServers.get(id);
-    sp.right.update(id, obj);
-    sp.left.update(id, obj);
+    // XXX assert?
+
+    synchronized(clientToServers) {
+      if (clientToServers.containsKey(id)) {
+        ServerPair sp = clientToServers.get(id);
+        if (sp == null) {
+          // player dead
+          return;
+        }
+        sp.right.update(id, obj);
+        sp.left.update(id, obj);
+      }
+    }
   }
 
   @Override
   public JsonObject getGameState(String id) {
-    assert (clientToServers.containsKey(id));
-    ServerPair sp = clientToServers.get(id);
-    JsonObject obj = new JsonObject();
+    synchronized (clientToServers) {
+      if (clientToServers.containsKey(id)) {
+        ServerPair sp = clientToServers.get(id);
+        if (sp == null) {
+          // player dead
+          return new JsonObject();
+        }
+        JsonObject obj = new JsonObject();
 
-    String leftDeadID = "";
-    String rightDeadID = "";
-    if (sp.left.getGame().isP1Dead()) {
-      leftDeadID = sp.left.getID("1");
-    } else if (sp.left.getGame().isP2Dead()) {
-      leftDeadID = sp.left.getID("2");
+        String leftDeadID = "";
+        String rightDeadID = "";
+        if (sp.left.getGame().isP1Dead()) {
+          leftDeadID = sp.left.getID("1");
+        } else if (sp.left.getGame().isP2Dead()) {
+          leftDeadID = sp.left.getID("2");
+        }
+
+        if (sp.right.getGame().isP1Dead()) {
+          rightDeadID = sp.right.getID("1");
+        } else if (sp.right.getGame().isP2Dead()) {
+          rightDeadID = sp.right.getID("2");
+        }
+
+        if (!leftDeadID.equals("")) {
+          kill(leftDeadID);
+        }
+
+        if (!rightDeadID.equals("")) {
+          kill(rightDeadID);
+        }
+
+        obj.add("left", sp.left.getGameState(id));
+        obj.add("right", sp.right.getGameState(id));
+        return obj;
+      }
     }
-
-    if (sp.right.getGame().isP1Dead()) {
-      rightDeadID = sp.right.getID("1");
-    } else if (sp.right.getGame().isP2Dead()) {
-      rightDeadID = sp.right.getID("2");
-    }
-
-    if (!leftDeadID.equals("")) {
-      kill(leftDeadID);
-    }
-
-    if (!rightDeadID.equals("")) {
-      kill(rightDeadID);
-    }
-
-    obj.add("left", sp.left.getGameState(id));
-    obj.add("right", sp.right.getGameState(id));
-    return obj;
-  }
-
-  @Override
-  public void receiveMessage(JsonObject obj) {
-    // XXX get client id from obj and send obj to correct pongservers
+    return new JsonObject();
   }
 
   private void kill(String playerID) {
     Integer playerIndex = clients.indexOf(playerID);
     if (!playerIndex.equals(-1)) {
       String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
-      String nextID = clients.get((playerIndex + (clients.size() + 1)) % clients.size());
-      // sessions.get(playerID) XXX send a "you're dead" msg
+      String nextID = clients.get((playerIndex + 1) % clients.size());
+
+      Session deadSession = sessions.get(playerID);
+      JsonObject msg = new JsonObject();
+      msg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
+      msg.add("payload", new JsonObject());
+      try {
+        deadSession.getRemote().sendString(GSON.toJson(msg));
+      } catch (Exception e) {
+        System.out.println("Failed to send PLAYERDEAD");
+      }
       sessions.remove(playerID);
+
+      // make new server for new neighbors
       PongServer newServer = new PongServer(prevID, nextID);
       clientToServers.get(prevID).right = newServer;
       clientToServers.get(nextID).left = newServer;
       clients.remove(playerID);
+      clientToServers.put(playerID, null);
     }
+
   }
 
 }

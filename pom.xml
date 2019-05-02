@@ -98,9 +98,9 @@
         <version>3.0.1</version>
         <executions>
           <execution>
-              <id>copy-dependencies</id>
-              <phase>package</phase>
-              <goals><goal>copy-dependencies</goal></goals>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals><goal>copy-dependencies</goal></goals>
           </execution>
         </executions>
       </plugin>
@@ -109,11 +109,12 @@
         <artifactId>heroku-maven-plugin</artifactId>
         <version>1.1.3</version>
         <configuration>
-            <jdkVersion>1.8</jdkVersion>
-            <appName>boggle_test</appName>
-            <processTypes>
-                <web>java -jar ./target/javalin-heroku-example-1.0-jar-with-dependencies.jar</web>
-            </processTypes>
+          <jdkVersion>1.8</jdkVersion>
+          <appName>boggle_test</appName>
+          <processTypes>
+            <!-- Tell Heroku how to launch your application -->
+            <web>java -jar ./target/javalin-heroku-example-1.0-jar-with-dependencies.jar</web>
+          </processTypes>
         </configuration>
       </plugin>
     </plugins>

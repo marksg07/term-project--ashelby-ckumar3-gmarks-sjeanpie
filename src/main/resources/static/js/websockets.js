@@ -5,7 +5,8 @@ const MESSAGE_TYPE = {
     SENDID: 1,
     GAMESTART: 2,
     INPUT: 3,
-    UPDATE: 4
+    UPDATE: 4,
+    PLAYERDEAD: 5
 };
 
 function wsSetup() {
@@ -16,6 +17,7 @@ function wsSetup() {
  *  server when matchmaking is ready.
  * INPUT: Client->server, contains value of input and ID. Prompted by client periodically.
  * UPDATE: Server->client, contains ID of server and game data. Prompted by client input (XXX).
+ * PLAYERDEAD: me dead
  */
     conn = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port + "/gamesocket");
     conn.onerror = err => {
@@ -43,6 +45,10 @@ function wsSetup() {
             case MESSAGE_TYPE.UPDATE:
                 console.log('got update');
                 updateGame(data.payload.state);
+                break;
+            case MESSAGE_TYPE.PLAYERDEAD:
+                console.log('got dead lmao ur bad');
+                onPlayerDead();
                 break;
         }
     };

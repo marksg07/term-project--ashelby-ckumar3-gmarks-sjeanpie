@@ -23,6 +23,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
  *  server when matchmaking is ready.
  * INPUT: Client->server, contains value of input and ID. Prompted by client periodically.
  * UPDATE: Server->client, contains ID of server and game data. Prompted by client input (XXX).
+ * PLAYERDEAD: Server->client, contains nothing. u dead.
  */
 
 @WebSocket
@@ -36,7 +37,8 @@ public class PongWebSocketHandler {
     SENDID,
     GAMESTART,
     INPUT,
-    UPDATE;
+    UPDATE,
+    PLAYERDEAD;
 
     public static MESSAGE_TYPE fromInt(int t) {
       switch(t) {
@@ -50,6 +52,8 @@ public class PongWebSocketHandler {
           return INPUT;
         case 4:
           return UPDATE;
+        case 5:
+          return PLAYERDEAD;
       }
       return null;
     }
@@ -63,15 +67,19 @@ public class PongWebSocketHandler {
 
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
-    System.out.println("Requesting ident");
-
-    // Build the REQUESTID message
-    JsonObject connObj = new JsonObject();
-    connObj.add("type", new JsonPrimitive(MESSAGE_TYPE.REQUESTID.ordinal()));
-    JsonObject payload = new JsonObject();
-    connObj.add("payload", payload);
-    // TODO Send the CONNECT message
-    session.getRemote().sendString(GSON.toJson(connObj));
+    try {
+      System.out.println("Requesting ident");
+      // Build the REQUESTID message
+      JsonObject connObj = new JsonObject();
+      connObj.add("type", new JsonPrimitive(MESSAGE_TYPE.REQUESTID.ordinal()));
+      JsonObject payload = new JsonObject();
+      connObj.add("payload", payload);
+      // TODO Send the CONNECT message
+      session.getRemote().sendString(GSON.toJson(connObj));
+    } catch (Exception e) {
+      System.out.println("In web socket connect, caught error:");
+      e.printStackTrace();
+    }
   }
 
   @OnWebSocketClose
@@ -81,37 +89,41 @@ public class PongWebSocketHandler {
 
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
-    JsonObject received = GSON.fromJson(message, JsonObject.class);
-    JsonObject payload = received.get("payload").getAsJsonObject();
-    String id = payload.get("id").getAsString();
-    MESSAGE_TYPE type = MESSAGE_TYPE.fromInt(received.get("type").getAsInt());
-    switch (type) {
-      case SENDID:
-        String hash = payload.get("hash").getAsString();
-        // TODO LoginManager.verifyLogin(id, hash)
-        // sessions.put(id, session);
-        System.out.println("Got SENDID");
-        server.addClient(id, session);
-        break;
+    try {
+      JsonObject received = GSON.fromJson(message, JsonObject.class);
+      JsonObject payload = received.get("payload").getAsJsonObject();
+      String id = payload.get("id").getAsString();
+      MESSAGE_TYPE type = MESSAGE_TYPE.fromInt(received.get("type").getAsInt());
+      switch (type) {
+        case SENDID:
+          String hash = payload.get("hash").getAsString();
+          // TODO LoginManager.verifyLogin(id, hash)
+          // sessions.put(id, session);
+          System.out.println("Got SENDID");
+          server.addClient(id, session);
+          break;
 
-      case INPUT:
-        Integer input = payload.get("input").getAsInt();
-        System.out.println("Got input " + input);
-        server.update(id, input);
-        JsonObject data = server.getGameState(id);
-        if(data == null) { // client is not in a game
-          return;
-        }
-        JsonObject updateObj = new JsonObject();
-        updateObj.add("type", new JsonPrimitive(MESSAGE_TYPE.UPDATE.ordinal()));
-        JsonObject payloadOut = new JsonObject();
-        payloadOut.add("state", data);
-        updateObj.add("payload", payloadOut);
-        session.getRemote().sendString(GSON.toJson(updateObj));
-        break;
+        case INPUT:
+          Integer input = payload.get("input").getAsInt();
+          server.update(id, input);
+          JsonObject data = server.getGameState(id);
+          if (data == null) { // client is not in a game
+            return;
+          }
+          JsonObject updateObj = new JsonObject();
+          updateObj.add("type", new JsonPrimitive(MESSAGE_TYPE.UPDATE.ordinal()));
+          JsonObject payloadOut = new JsonObject();
+          payloadOut.add("state", data);
+          updateObj.add("payload", payloadOut);
+          session.getRemote().sendString(GSON.toJson(updateObj));
+          break;
 
-      default:
-        System.out.println("Received garbage from client! Thanks client!");
+        default:
+          System.out.println("Received garbage from client! Thanks client!");
+      }
+    } catch (Exception e) {
+      System.out.println("In web socket message, caught error:");
+      e.printStackTrace();
     }
   }
 

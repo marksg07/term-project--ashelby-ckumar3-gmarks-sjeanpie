@@ -8,6 +8,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Random;
 
 public class PongGame implements Cloneable {
   private double ballX, ballY, ballVelX, ballVelY;
@@ -16,8 +17,12 @@ public class PongGame implements Cloneable {
   private double paddleVel, paddleRadius;
   private double ballRadius; // NOTE: We call it a "ball" but it's gonna be a square
   private double startVel;
-  private Instant lastUpdate;
+  private Instant lastUpdate, startTime;
   private boolean p1Dead, p2Dead;
+  private double countdown;
+  private static final LongWrapper seed = new LongWrapper(
+          Duration.between(Instant.EPOCH, Instant.now()).toNanos());
+  Random rand;
 
   public enum InputType {
     NONE,
@@ -39,12 +44,18 @@ public class PongGame implements Cloneable {
 
   InputType p1Input, p2Input;
 
-  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel) {
+  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown) {
+    rand = new Random();
+    synchronized (seed) {
+      rand.setSeed(seed.getValue());
+      rand.nextLong(); // toss out first val in case it's = to seed
+      seed.setValue(rand.nextLong());
+    }
     maxX = sizeX;
     maxY = sizeY;
     ballX = maxX / 2;
     ballY = maxY / 2;
-    double initDirection = Math.random() * Math.PI * 2;
+    double initDirection = rand.nextDouble() * Math.PI * 2;
     if ((initDirection + Math.PI / 4) % Math.PI >= Math.PI / 2) {
       initDirection += Math.PI / 2;
     }
@@ -60,7 +71,10 @@ public class PongGame implements Cloneable {
     this.startVel = startVel;
     p1Dead = false;
     p2Dead = false;
-    lastUpdate = Instant.now();
+
+    countdown = startCountdown;
+    lastUpdate = Instant.now().plusNanos((long)(countdown * 1000000000));
+    startTime = lastUpdate;
   }
 
   @Override
@@ -76,12 +90,21 @@ public class PongGame implements Cloneable {
     RIGHT
   }
 
+  public boolean nowIsCurrent() {
+    return Duration.between(startTime, Instant.now()).toNanos() >= 0;
+  }
+
   public int tickToCurrent() {
     synchronized (lastUpdate) {
       Instant now = Instant.now();
       double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
-      lastUpdate = now;
-      return tick(seconds);
+
+      if(nowIsCurrent()) { // countdown over
+        System.out.println("Ticking " + seconds + " sec forwards");
+        lastUpdate = now;
+        return tick(seconds);
+      }
+      return 0;
     }
   }
 
@@ -164,7 +187,7 @@ public class PongGame implements Cloneable {
     boolean invalid = true;
     double newVelX = 0, newVelY = 0;
     while (invalid) {
-      double initDirection = Math.random() * Math.PI * 2;
+      double initDirection = rand.nextDouble() * Math.PI * 2;
       newVelX = ballVelX + startVel * frac * Math.cos(initDirection);
       newVelY = ballVelY + startVel * frac * Math.sin(initDirection);
       invalid = false;
@@ -380,14 +403,22 @@ public class PongGame implements Cloneable {
 
   public JsonObject getState() {
     JsonObject obj = new JsonObject();
-    obj.addProperty("ballX", ballX);
-    obj.addProperty("ballY", ballY);
-    obj.addProperty("ballVelX", ballVelX);
-    obj.addProperty("ballVelY", ballVelY);
-    obj.addProperty("p1PaddleY", p1PaddleY);
-    obj.addProperty("p2PaddleY", p2PaddleY);
-    obj.addProperty("p1Dead", p1Dead);
-    obj.addProperty("p2Dead", p2Dead);
+    if (nowIsCurrent()) {
+      obj.addProperty("ballX", ballX);
+      obj.addProperty("ballY", ballY);
+      obj.addProperty("ballVelX", ballVelX);
+      obj.addProperty("ballVelY", ballVelY);
+      obj.addProperty("p1PaddleY", p1PaddleY);
+      obj.addProperty("p2PaddleY", p2PaddleY);
+      obj.addProperty("p1Dead", p1Dead);
+      obj.addProperty("p2Dead", p2Dead);
+    } else {
+      // still in CD
+      Instant now = Instant.now();
+      double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
+      System.out.println("Duration between last and now is " + seconds);
+      obj.addProperty("cdSecondsLeft", -seconds);
+    }
     return obj;
   }
 
