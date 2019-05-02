@@ -127,16 +127,21 @@ public class BRServer implements Server {
 
         String leftDeadID = "";
         String rightDeadID = "";
-        if (sp.left != null && sp.left.getGame().isP1Dead()) {
-          leftDeadID = sp.left.getID("1");
-        } else if (sp.left.getGame().isP2Dead()) {
-          leftDeadID = sp.left.getID("2");
+        
+        if(sp.left != null) {
+          if (sp.left.getGame().isP1Dead()) {
+            leftDeadID = sp.left.getID("1");
+          } else if (sp.left.getGame().isP2Dead()) {
+            leftDeadID = sp.left.getID("2");
+          }
         }
 
-        if (sp.right != null && sp.right.getGame().isP1Dead()) {
-          rightDeadID = sp.right.getID("1");
-        } else if (sp.right.getGame().isP2Dead()) {
-          rightDeadID = sp.right.getID("2");
+        if (sp.right != null) {
+          if (sp.right.getGame().isP1Dead()) {
+            rightDeadID = sp.right.getID("1");
+          } else if (sp.right.getGame().isP2Dead()) {
+            rightDeadID = sp.right.getID("2");
+          }
         }
 
         if (!leftDeadID.equals("")) {
