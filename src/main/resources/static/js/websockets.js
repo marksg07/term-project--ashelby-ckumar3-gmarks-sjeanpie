@@ -19,7 +19,7 @@ function wsSetup() {
  * UPDATE: Server->client, contains ID of server and game data. Prompted by client input (XXX).
  * PLAYERDEAD: me dead
  */
-    conn = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/gamesocket");
+    conn = new WebSocket("wss://" + window.location.hostname + ":" + window.location.port + "/gamesocket");
     conn.onerror = err => {
         console.log('Connection error:', err);
     };
