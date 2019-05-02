@@ -1,5 +1,6 @@
 package edu.brown.cs.main;
 
+import edu.brown.cs.database.PongDatabase;
 import edu.brown.cs.pong.PongGame;
 import edu.brown.cs.server.MainServer;
 import edu.brown.cs.server.PongWebSocketHandler;
@@ -28,15 +29,16 @@ import com.google.gson.Gson;
 
 public final class Main {
 
-  private static final int DEFAULT_PORT = 4501;
+  private static final int DEFAULT_PORT = 4504;
   private static final List<PongGame> GAME_LIST = new ArrayList<>();
   private static final Gson GSON = new Gson();
+  private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
 
   /**
    * The initial method called when execution begins.
    * @param args An array of command line arguments
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) {  
     new Main(args).run();
   }
 
@@ -80,7 +82,7 @@ public final class Main {
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
-    Spark.post("/login", new LoginHandler());
+    Spark.post("/login", new LoginHandler(), freeMarker);
   }
 
   /**
@@ -105,7 +107,7 @@ public final class Main {
 	  @Override
 	  public ModelAndView handle(Request request, Response response) throws Exception {
 		  Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S");
+      "P O N G F O L K S", "response", "");
 
 		//code to have starting webpage that allows for user login
 		// finding a match/going into a lobby
@@ -115,16 +117,47 @@ public final class Main {
 	  }
   }
   
-  private static class LoginHandler implements Route {
+  private static class LoginHandler implements TemplateViewRoute {
 	    @Override
 	    public ModelAndView handle(Request req, Response res) throws SQLException {
 	    	QueryParamsMap qm = req.queryMap();
-	        String word = qm.value("username");
+	        String usr = qm.value("username");
+	        String pass = qm.value("password");
+	        String loginButton = qm.value("Log In");
+	        String acctButton = qm.value("Create Account");
+	        System.out.println(loginButton);
+	        System.out.println(acctButton);
+	        String response = "";
+	        if (loginButton != null) {
+	        	if (!db.validateUser(usr)) {
+	        		response = "User does not exist\n Would you like to create an account?";
+	        	}
+	        	else { //check password
+	        		if (db.validatePassword(usr, pass)) {
+	        			response = "Successfully logged in!";
+	        		}
+	        		else {
+	        			response = "User exists; however, password is incorrect";
+	        		}
+	        	}
+	        } else {
+	        	if (db.validateUser(usr)) {
+		        	response = "User already exists. Please choose a new username.";
+		        }
+		        else { 
+		        	db.createAccount(usr, pass);
+		        		response = "Account successfully created!";
+		        	}
+	        }
 	        //TODO: get password and hash it
-	      return null; //ModelAndView(variables, "play.ftl");
+		      Map<String, Object> variables = ImmutableMap.of("title",
+		              "P O N G F O L K S", "response", response);
+		   
+		      return new ModelAndView(variables, "home.ftl");
 	    }
 
 	  }
+
   
   private static class LobbyHandler implements TemplateViewRoute {
 	    @Override

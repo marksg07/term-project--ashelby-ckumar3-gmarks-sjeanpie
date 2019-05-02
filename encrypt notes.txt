@@ -9,6 +9,7 @@ verify password
 
 syntax for HASHBYTES is:
 --- HASHBYTES('hash_algo', password)
+---use has func 'SHA2_512'
 
 can declare the random salt with:
 ---- salt UNIQUEIDENTIFIER=NEWID()
@@ -23,3 +24,13 @@ in order to check with encrypt and hash:
     >>> recall: salt is a field in the table now
 
 also, we now want to use nvar chars
+
+- if user exists in db
+  > login as usual
+
+- if usr does not exist, ask if they want to create 
+  acct
+
+SELECT * FROM 'usr_pass' where usr = '';
+
+user, total games, winrate, ELO
