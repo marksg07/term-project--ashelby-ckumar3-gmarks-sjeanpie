@@ -42,7 +42,7 @@ function updateGame(state) {
     else if (state.left.hasOwnProperty("cdSecondsLeft")) {
         if(state.left.cdSecondsLeft > 3 && !leftGameBegun) {
             ctx.fillStyle = 'red';
-            ctx.rect(0, 0, canvas.width / 2 - 20, canvas.height);
+            ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
         }
         else {
             if(state.left.cdSecondsLeft <= 3) {
@@ -67,7 +67,7 @@ function updateGame(state) {
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
         if(state.right.cdSecondsLeft > 3 && !rightGameBegun) {
             ctx.fillStyle = 'red';
-            ctx.rect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+            ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
         }
         else {
             if (state.right.cdSecondsLeft <= 3) {
@@ -167,7 +167,7 @@ function onPlayerDead() {
     gameOver = true;
     clearInterval(inputHandle);
     ctx.fillStyle = "red";
-    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ded");
 }
 
@@ -175,7 +175,7 @@ function onPlayerWin() {
     gameOver = true;
     clearInterval(inputHandle);
     ctx.fillStyle = "green";
-    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ur winner");
 }
 
