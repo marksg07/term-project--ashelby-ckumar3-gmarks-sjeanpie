@@ -1,0 +1,36 @@
+verify password
+- have hashed version of password in db
+- take what user entered, hash it, see if it
+  matches
+
+- do the encrypt plus also the salt!
+
+*** should be usr and pass_HASH
+
+syntax for HASHBYTES is:
+--- HASHBYTES('hash_algo', password)
+---use has func 'SHA2_512'
+
+can declare the random salt with:
+---- salt UNIQUEIDENTIFIER=NEWID()
+---- then insert with hash and salt
+     >>> HASHBYTES('hash_algo' pass+CAST(salt as
+                   NVARCHAR(36))
+     *** the salt must be an extra param
+
+in order to check with encrypt and hash:
+--- hash = HASHBYTES('hash_func', pass+CAST(Salt 
+                     as NVARCHAR(36)) 
+    >>> recall: salt is a field in the table now
+
+also, we now want to use nvar chars
+
+- if user exists in db
+  > login as usual
+
+- if usr does not exist, ask if they want to create 
+  acct
+
+SELECT * FROM 'usr_pass' where usr = '';
+
+user, total games, winrate, ELO
