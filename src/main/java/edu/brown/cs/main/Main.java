@@ -42,9 +42,10 @@ public final class Main {
 
   /**
    * The initial method called when execution begins.
+   *
    * @param args An array of command line arguments
    */
-  public static void main(String[] args) {  
+  public static void main(String[] args) {
     new Main(args).run();
   }
 
@@ -58,7 +59,7 @@ public final class Main {
     // Parse command line arguments
     OptionParser parser = new OptionParser();
     parser.accepts("port").withRequiredArg().ofType(Integer.class)
-            .defaultsTo(DEFAULT_PORT);
+    .defaultsTo(DEFAULT_PORT);
     OptionSet options = parser.parse(args);
     runSparkServer((int) options.valueOf("port"));
   }
@@ -70,14 +71,14 @@ public final class Main {
       config.setDirectoryForTemplateLoading(templates);
     } catch (IOException ioe) {
       System.out.printf("ERROR: Unable use %s for template loading.%n",
-              templates);
+      templates);
       System.exit(1);
     }
     return new FreeMarkerEngine(config);
   }
 
   private void runSparkServer(int port) {
-    Spark.port(port);
+    Spark.port(getHerokuAssignedPort());
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
     FreeMarkerEngine freeMarker = createEngine();
@@ -111,17 +112,17 @@ public final class Main {
   }
 
   private static class HomePageHandler implements TemplateViewRoute {
-	  @Override
-	  public ModelAndView handle(Request request, Response response) throws Exception {
-		  Map<String, Object> variables = ImmutableMap.of("title",
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S", "response", "");
 
-		//code to have starting webpage that allows for user login
-		// finding a match/going into a lobby
-		// looking up users
-		// starting up the server should call this before game start handler  
-		  return new ModelAndView(variables, "home.ftl");
-	  }
+      //code to have starting webpage that allows for user login
+      // finding a match/going into a lobby
+      // looking up users
+      // starting up the server should call this before game start handler
+      return new ModelAndView(variables, "home.ftl");
+    }
   }
 
   private static class LeaderboardHandler implements TemplateViewRoute {
@@ -135,57 +136,55 @@ public final class Main {
       return new ModelAndView(variables, "leaderboard.ftl");
     }
   }
-  
+
   private static class LoginHandler implements TemplateViewRoute {
-	    @Override
-	    public ModelAndView handle(Request req, Response res) throws SQLException {
-	    	QueryParamsMap qm = req.queryMap();
-	        String usr = qm.value("username");
-	        String pass = qm.value("password");
-	        String loginButton = qm.value("Log In");
-	        String acctButton = qm.value("Create Account");
-	        System.out.println(loginButton);
-	        System.out.println(acctButton);
-	        String response = "";
-	        if (loginButton != null) {
-	        	if (!db.validateUser(usr)) {
-	        		response = "User does not exist\n Would you like to create an account?";
-	        	}
-	        	else { //check password
-	        		if (db.validatePassword(usr, pass)) {
-	        			response = "Successfully logged in!";
-	        		}
-	        		else {
-	        			response = "User exists; however, password is incorrect";
-	        		}
-	        	}
-	        } else {
-	        	if (db.validateUser(usr)) {
-		        	response = "User already exists. Please choose a new username.";
-		        }
-		        else { 
-		        	db.createAccount(usr, pass);
-		        		response = "Account successfully created!";
-		        	}
-	        }
-	        //TODO: get password and hash it
-		      Map<String, Object> variables = ImmutableMap.of("title",
-		              "P O N G F O L K S", "response", response);
-		   
-		      return new ModelAndView(variables, "home.ftl");
-	    }
+    @Override
+    public ModelAndView handle(Request req, Response res) throws SQLException {
+      QueryParamsMap qm = req.queryMap();
+      String usr = qm.value("username");
+      String pass = qm.value("password");
+      String loginButton = qm.value("Log In");
+      String acctButton = qm.value("Create Account");
+      System.out.println(loginButton);
+      System.out.println(acctButton);
+      String response = "";
+      if (loginButton != null) {
+        if (!db.validateUser(usr)) {
+          response = "User does not exist\n Would you like to create an account?";
+        } else { //check password
+          if (db.validatePassword(usr, pass)) {
+            response = "Successfully logged in!";
+          } else {
+            response = "User exists; however, password is incorrect";
+          }
+        }
+      } else {
+        if (db.validateUser(usr)) {
+          response = "User already exists. Please choose a new username.";
+        } else {
+          db.createAccount(usr, pass);
+          response = "Account successfully created!";
+        }
+      }
+      //TODO: get password and hash it
+      Map<String, Object> variables = ImmutableMap.of("title",
+      "P O N G F O L K S", "response", response);
 
-	  }
+      return new ModelAndView(variables, "home.ftl");
+    }
 
-  
+  }
+
+
   private static class LobbyHandler implements TemplateViewRoute {
-	    @Override
-	    public ModelAndView handle(Request request, Response response) throws Exception {
-	      Map<String, Object> variables = ImmutableMap.of("title",
-	              "Battle Royale");
-	      return new ModelAndView(variables, "lobby.ftl");
-	    }
-	  }
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+      "Battle Royale");
+      return new ModelAndView(variables, "lobby.ftl");
+    }
+  }
+
   /**
    * Handles the initial request to the server.
    */
@@ -194,7 +193,7 @@ public final class Main {
     public ModelAndView handle(Request request, Response response) throws Exception {
 
       Map<String, Object> variables = ImmutableMap.of("title",
-              "Game");
+      "Game");
       return new ModelAndView(variables, "pong.ftl");
     }
   }
@@ -208,4 +207,13 @@ public final class Main {
       return GSON.toJson(variables);
     }
   }
-}
+
+    static int getHerokuAssignedPort() {
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      if (processBuilder.environment().get("PORT") != null) {
+        return Integer.parseInt(processBuilder.environment().get("PORT"));
+      }
+      return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
+
+    }
+  }
