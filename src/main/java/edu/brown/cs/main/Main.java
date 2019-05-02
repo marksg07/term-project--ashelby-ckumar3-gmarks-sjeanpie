@@ -86,6 +86,14 @@ public final class Main {
     PongWebSocketHandler.setServer(serv);
     //Spark.webSocketIdleTimeoutMillis(2000);
 
+    Spark.before(((request, response) -> {
+      final String url = request.url();
+      if (url.startsWith("http://"))
+      {
+        final String[] split = url.split("http://");
+        response.redirect("https://" + split[1]);
+      }
+    }));
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
