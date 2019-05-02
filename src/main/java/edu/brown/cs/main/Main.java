@@ -80,6 +80,7 @@ public final class Main {
     MainServer serv = new MainServer();
     PongWebSocketHandler.setServer(serv);
     //Spark.webSocketIdleTimeoutMillis(2000);
+    
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
