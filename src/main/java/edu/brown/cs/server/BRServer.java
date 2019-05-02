@@ -124,13 +124,13 @@ public class BRServer implements Server {
 
         String leftDeadID = "";
         String rightDeadID = "";
-        if (sp.left.getGame().isP1Dead()) {
+        if (sp.left != null && sp.left.getGame().isP1Dead()) {
           leftDeadID = sp.left.getID("1");
         } else if (sp.left.getGame().isP2Dead()) {
           leftDeadID = sp.left.getID("2");
         }
 
-        if (sp.right.getGame().isP1Dead()) {
+        if (sp.right != null && sp.right.getGame().isP1Dead()) {
           rightDeadID = sp.right.getID("1");
         } else if (sp.right.getGame().isP2Dead()) {
           rightDeadID = sp.right.getID("2");
@@ -144,8 +144,17 @@ public class BRServer implements Server {
           kill(rightDeadID);
         }
 
-        obj.add("left", sp.left.getGameState(id));
-        obj.add("right", sp.right.getGameState(id));
+        if(sp.left != null) {
+          obj.add("left", sp.left.getGameState(id));
+        } else {
+          obj.addProperty("left", "dead");
+        }
+
+        if(sp.right != null) {
+          obj.add("right", sp.right.getGameState(id));
+        } else {
+          obj.addProperty("right", "dead");
+        }
         return obj;
       }
     }
@@ -159,21 +168,37 @@ public class BRServer implements Server {
       String nextID = clients.get((playerIndex + 1) % clients.size());
 
       Session deadSession = sessions.get(playerID);
-      JsonObject msg = new JsonObject();
-      msg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
-      msg.add("payload", new JsonObject());
+      JsonObject deadMsg = new JsonObject();
+      deadMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
+      deadMsg.add("payload", new JsonObject());
       try {
-        deadSession.getRemote().sendString(GSON.toJson(msg));
+        deadSession.getRemote().sendString(GSON.toJson(deadMsg));
       } catch (Exception e) {
         System.out.println("Failed to send PLAYERDEAD");
       }
       sessions.remove(playerID);
-
-      // make new server for new neighbors
-      PongServer newServer = new PongServer(prevID, nextID);
-      clientToServers.get(prevID).right = newServer;
-      clientToServers.get(nextID).left = newServer;
       clients.remove(playerID);
+      // make new server for new neighbors
+      if(clients.size() > 2) {
+        PongServer newServer = new PongServer(prevID, nextID);
+        clientToServers.get(prevID).right = newServer;
+        clientToServers.get(nextID).left = newServer;
+      } else if (clients.size() == 2) {
+        clientToServers.get(prevID).right = null;
+        clientToServers.get(nextID).left = null;
+      } else {
+        assert (clients.size() == 1);
+        Session winSession = sessions.get(clients.get(0));
+        JsonObject winMsg = new JsonObject();
+        winMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERWIN.ordinal());
+        winMsg.add("payload", new JsonObject());
+        try {
+          winSession.getRemote().sendString(GSON.toJson(winMsg));
+        } catch (Exception e) {
+          System.out.println("Failed to send PLAYERWIN");
+        }
+      }
+
       // the br server has to know the client used to exist
       clientToServers.put(playerID, null);
     } else {

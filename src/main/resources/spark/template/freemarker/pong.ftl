@@ -11,8 +11,7 @@
                 <p id="leftCountdown"></p>
                 <p id="rightCountdown"></p>
             </div>
-            <p id="statusLeft">P L A Y I N G</p>
-            <p id="statusRight">P L A Y I N G</p>
+            <p id="status" style="font-size: 48; bold: true;">Waiting for players...</p>
         </div>
     </div>
     <script src="js/jquery-2.1.1.js"></script>

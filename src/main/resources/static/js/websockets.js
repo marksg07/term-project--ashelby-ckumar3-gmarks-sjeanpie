@@ -6,7 +6,8 @@ const MESSAGE_TYPE = {
     GAMESTART: 2,
     INPUT: 3,
     UPDATE: 4,
-    PLAYERDEAD: 5
+    PLAYERDEAD: 5,
+    PLAYERWIN: 6
 };
 
 function wsSetup() {
@@ -49,6 +50,10 @@ function wsSetup() {
             case MESSAGE_TYPE.PLAYERDEAD:
                 console.log('got dead lmao ur bad');
                 onPlayerDead();
+                break;
+            case MESSAGE_TYPE.PLAYERWIN:
+                console.log('got win epic victory royale #1');
+                onPlayerWin();
                 break;
         }
     };

@@ -28,7 +28,13 @@ function updateGame(state) {
         // i am dead :(
         return;
     }
-    if(state.left.hasOwnProperty("cdSecondsLeft")) {
+
+    if (state.left === "dead") {
+        leftSec.hide();
+        oppLeftPaddle.hide();
+        ballLeft.hide();
+    }
+    else if (state.left.hasOwnProperty("cdSecondsLeft")) {
         leftSec.show();
         const secString = state.left.cdSecondsLeft.toFixed(1);
         leftSec.text(secString);
@@ -40,7 +46,11 @@ function updateGame(state) {
         ballLeft.setPosition(state.left.ballX, state.left.ballY);
     }
 
-    if(state.right.hasOwnProperty("cdSecondsLeft")) {
+    if (state.right === "dead") {
+        rightSec.hide();
+        oppRightPaddle.hide();
+        ballRight.hide();
+    } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
         rightSec.show();
         const secString = state.right.cdSecondsLeft.toFixed(1);
         rightSec.text(secString);
@@ -129,6 +139,11 @@ function checkInputs(e) {
 
 function onPlayerDead() {
     // XXX
+    $("#status").text("ded");
+}
+
+function onPlayerWin() {
+    $("#status").text("ur winner");
 }
 
 function executePong() {
@@ -153,18 +168,19 @@ function executePong() {
     oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
     ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
     ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
-    ctx.font = "50px Futura, sans-serif";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
+    // ctx.font = "50px Futura, sans-serif";
+    // ctx.fillStyle = "white";
+    // ctx.textAlign = "center";
+    // ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
     setInterval(sendInput, 20);
 }
 
 function rmWaitingText() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
+    // ctx.fillStyle = "black";
+    // ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
+    $("#status").text("");
 }
 
 $(document).ready(() => {
