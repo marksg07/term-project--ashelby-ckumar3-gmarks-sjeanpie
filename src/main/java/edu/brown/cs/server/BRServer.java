@@ -12,7 +12,15 @@ public class BRServer implements Server {
   private static final Gson GSON = new Gson();
   private final List<String> clients;
   private final Map<String, Session> sessions;
+  private long myId;
   static final int MAXPLAYERS = 3;
+
+  private static long idCounter = 0;
+
+  public static synchronized long nextId()
+  {
+    return idCounter++;
+  }
 
   private class ServerPair {
     PongServer right, left;
@@ -26,6 +34,7 @@ public class BRServer implements Server {
     sessions = new HashMap<>();
     clientToServers = new HashMap<>();
     ready = false;
+    myId = nextId();
   }
 
   public boolean ready() {
@@ -33,18 +42,14 @@ public class BRServer implements Server {
   }
 
   public void addClient(String id, Session session) {
+    System.out.println("BR #" + myId + " :: Adding client " + id + ".");
     synchronized (clientToServers) {
-      System.out.println("balss");
       if (ready()) {
         return;
       }
-      System.out.println("balss");
       clients.add(id);
-      System.out.println("balss");
       sessions.put(id, session);
-      System.out.println("balss");
       if (clients.size() == MAXPLAYERS) {
-        System.out.println("balss");
         ready = true;
         onFilled();
       }
@@ -52,13 +57,13 @@ public class BRServer implements Server {
   }
 
   public void onFilled() {
-    System.out.println("onFilled reached");
+    System.out.println("BR #" + myId + " :: Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
     for(String cli : clients) {
       clientToServers.put(cli, new ServerPair());
     }
     for(int i = 0; i < clients.size(); i++) {
-      int iLeft = (clients.size() + i) % clients.size();
+      int iLeft = (clients.size() - 1 + i) % clients.size();
       String cliLeft = clients.get(iLeft);
       String cli = clients.get(i);
       PongServer serv = new PongServer(cliLeft, cli);
@@ -150,7 +155,7 @@ public class BRServer implements Server {
     Integer playerIndex = clients.indexOf(playerID);
     if (!playerIndex.equals(-1)) {
       String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
-      String nextID = clients.get((playerIndex + (clients.size() + 1)) % clients.size());
+      String nextID = clients.get((playerIndex + 1) % clients.size());
 
       Session deadSession = sessions.get(playerID);
       JsonObject msg = new JsonObject();
