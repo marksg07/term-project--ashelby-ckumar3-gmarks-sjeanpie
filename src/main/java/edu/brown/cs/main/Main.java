@@ -80,7 +80,7 @@ public final class Main {
     MainServer serv = new MainServer();
     PongWebSocketHandler.setServer(serv);
     //Spark.webSocketIdleTimeoutMillis(2000);
-    
+
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.get("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
@@ -90,7 +90,7 @@ public final class Main {
   /**
    * Display an error page when an exception occurs in the server.
    */
-  private static class ExceptionPrinter implements ExceptionHandler {
+  private static class ExceptionPrinter implements ExceptionHandler<Exception> {
     @Override
     public void handle(Exception e, Request req, Response res) {
       res.status(500);
