@@ -9,7 +9,9 @@
          avoid minification for clarity. -->
 
 
-    <link rel="stylesheet" href="css/pong.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="css/bootstrap-reboot.css">
 </head>
 <body>
 ${content}
