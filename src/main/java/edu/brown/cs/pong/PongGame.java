@@ -55,10 +55,7 @@ public class PongGame implements Cloneable {
     maxY = sizeY;
     ballX = maxX / 2;
     ballY = maxY / 2;
-    double initDirection = rand.nextDouble() * Math.PI * 2;
-    if ((initDirection + Math.PI / 4) % Math.PI >= Math.PI / 2) {
-      initDirection += Math.PI / 2;
-    }
+    double initDirection = rand.nextDouble() * Math.PI * 2 / 3 - Math.PI / 3;
     ballVelX = startVel * Math.cos(initDirection);
     ballVelY = startVel * Math.sin(initDirection);
     p1PaddleY = maxY / 2;
