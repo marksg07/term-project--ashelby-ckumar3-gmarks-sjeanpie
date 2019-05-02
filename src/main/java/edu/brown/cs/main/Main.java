@@ -89,6 +89,8 @@ public final class Main {
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
+    Spark.get("/lb", new LeaderboardHandler(), freeMarker);
+    Spark.post("/stats", new StatsHandler());
   }
 
   /**
@@ -120,6 +122,18 @@ public final class Main {
 		// starting up the server should call this before game start handler  
 		  return new ModelAndView(variables, "home.ftl");
 	  }
+  }
+
+  private static class LeaderboardHandler implements TemplateViewRoute {
+
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      Map<String, Object> variables = ImmutableMap.of("title",
+      "Leaderboard");
+
+      System.out.println("here");
+
+      return new ModelAndView(variables, "leaderboard.ftl");
+    }
   }
   
   private static class LoginHandler implements TemplateViewRoute {
@@ -182,6 +196,16 @@ public final class Main {
       Map<String, Object> variables = ImmutableMap.of("title",
               "Game");
       return new ModelAndView(variables, "pong.ftl");
+    }
+  }
+
+  private static class StatsHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) {
+
+      Map<String, Object> variables =
+      ImmutableMap.of("userData", db.getLeaderboardData());
+      return GSON.toJson(variables);
     }
   }
 }

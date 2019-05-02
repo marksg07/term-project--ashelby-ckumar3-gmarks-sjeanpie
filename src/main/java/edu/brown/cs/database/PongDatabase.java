@@ -101,6 +101,27 @@ public class PongDatabase {
 		
 		prep.addBatch();
 		prep.executeBatch();
+
+		prep = conn.prepareStatement("INSERT INTO usr_stats (usr, total_games, elo, winrate) VALUES (?, 0, 0, 0);");
+		prep.setString(1, username);
+		prep.addBatch();
+		prep.executeBatch();
+	}
+
+	public List<String> getLeaderboardData() {
+		List<String> leaderboardData = new ArrayList<String>();
+		try {
+			prep = conn.prepareStatement("SELECT usr, total_games, elo, winrate from usr_stats ORDER BY winrate DESC;");
+			ResultSet rs = prep.executeQuery();
+			int i = 0;
+			while (rs.next() && i < 4) {
+				leaderboardData.add(rs.getString(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4));
+				i++;
+			}
+		} catch (SQLException e) {
+			leaderboardData.add("ERROR");
+		}
+		return leaderboardData;
 	}
 	
 	//password stuff should probably be put into its own class later...like a pass

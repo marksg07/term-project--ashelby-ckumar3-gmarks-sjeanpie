@@ -14,6 +14,13 @@
                 <input type="submit" id="find-game" class="find_game" value="Find Game">
                 </input>
             </form>
+            </div>
+    <div class="bottom">
+        <form action="/lb" method="GET">
+            <input type="submit" id="leaderboard" value="Leaderboard">
+            </input>
+        </form>
+        </div>
     </div>
 </#assign>
 <#include "main.ftl">
