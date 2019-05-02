@@ -49,6 +49,7 @@ public class BRServer implements Server {
       }
       clients.add(id);
       sessions.put(id, session);
+      System.out.println("BR #" + myId + " :: " + clients.size() + " players total.");
       if (clients.size() == MAXPLAYERS) {
         ready = true;
         onFilled();
