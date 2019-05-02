@@ -10,7 +10,7 @@ public class PongServer implements Server {
   public PongServer(String p1, String p2) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 150, 40, 10, 300, 5);
+    game = new PongGame(400, 300, 230, 40, 10, 150, 5);
   }
 
   @Override

@@ -74,9 +74,7 @@ public class BRServer implements Server {
     // yes
 
     for(Map.Entry<String, Session> pair : sessions.entrySet()) {
-      String cli = pair.getKey();
       Session session = pair.getValue();
-      ServerPair sp = clientToServers.get(cli);
 
       JsonObject updateObj = new JsonObject();
       updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
