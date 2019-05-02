@@ -30,6 +30,7 @@ public class MainServer implements Server {
   }
 
   public void addClient(String id, Session session) {
+    System.out.println("Main :: Adding client " + id);
     sessions.put(id, session);
     clients.add(id);
     synchronized(servers) {
@@ -41,6 +42,7 @@ public class MainServer implements Server {
         }
       }
       if (openServer == null) {
+        System.out.println("Main :: Made new server to accomodate client " + id);
         openServer = new BRServer();
         servers.add(openServer); // XXX actual MM
       }
