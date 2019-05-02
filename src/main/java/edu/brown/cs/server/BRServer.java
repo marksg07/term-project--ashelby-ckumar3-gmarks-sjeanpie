@@ -30,9 +30,9 @@ public class BRServer implements Server {
   private boolean ready;
 
   public BRServer() {
-    clients = new ArrayList<>();
-    sessions = new HashMap<>();
-    clientToServers = new HashMap<>();
+    clients = new CopyOnWriteArrayList<>();
+    sessions = new ConcurrentHashMap<>();
+    clientToServers = new ConcurrentHashMap<>();
     ready = false;
     myId = nextId();
   }
@@ -172,7 +172,10 @@ public class BRServer implements Server {
       clientToServers.get(prevID).right = newServer;
       clientToServers.get(nextID).left = newServer;
       clients.remove(playerID);
+      // the br server has to know the client used to exist
       clientToServers.put(playerID, null);
+    } else {
+      System.out.println("BR #" + myId + " :: Client DNE " + playerID + ".");
     }
 
   }

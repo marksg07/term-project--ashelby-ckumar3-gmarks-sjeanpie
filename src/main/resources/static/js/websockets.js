@@ -26,7 +26,7 @@ function wsSetup() {
 
     conn.onmessage = msg => {
         const data = JSON.parse(msg.data);
-        console.log(data);
+        // console.log(data);
         switch (data.type) {
             default:
                 console.log('Unknown message type!', data.type);
@@ -43,7 +43,7 @@ function wsSetup() {
                 rmWaitingText();
                 break;
             case MESSAGE_TYPE.UPDATE:
-                console.log('got update');
+                // console.log('got update');
                 updateGame(data.payload.state);
                 break;
             case MESSAGE_TYPE.PLAYERDEAD:

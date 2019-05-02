@@ -26,5 +26,4 @@ function updateLobbyCounter() {
     players = responseObject.players;
 
 
-});
 }
