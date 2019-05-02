@@ -19,8 +19,7 @@ public class BRServer implements Server {
 
   private static long idCounter = 0;
 
-  public static synchronized long nextId()
-  {
+  public static synchronized long nextId() {
     return idCounter++;
   }
 
@@ -62,10 +61,10 @@ public class BRServer implements Server {
   public void onFilled() {
     System.out.println("BR #" + myId + " :: Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
-    for(String cli : clients) {
+    for (String cli : clients) {
       clientToServers.put(cli, new ServerPair());
     }
-    for(int i = 0; i < clients.size(); i++) {
+    for (int i = 0; i < clients.size(); i++) {
       int iLeft = (clients.size() - 1 + i) % clients.size();
       String cliLeft = clients.get(iLeft);
       String cli = clients.get(i);
@@ -76,7 +75,7 @@ public class BRServer implements Server {
     // send all clients matchmaking packs?
     // yes
 
-    for(Map.Entry<String, Session> pair : sessions.entrySet()) {
+    for (Map.Entry<String, Session> pair : sessions.entrySet()) {
       Session session = pair.getValue();
 
       JsonObject updateObj = new JsonObject();
@@ -98,15 +97,19 @@ public class BRServer implements Server {
   public void update(String id, Object obj) {
     // XXX assert?
 
-    synchronized(clientToServers) {
+    synchronized (clientToServers) {
       if (clientToServers.containsKey(id)) {
         ServerPair sp = clientToServers.get(id);
         if (sp == null) {
           // player dead
           return;
         }
-        sp.right.update(id, obj);
-        sp.left.update(id, obj);
+        if (sp.right != null) {
+          sp.right.update(id, obj);
+        }
+        if (sp.left != null) {
+          sp.left.update(id, obj);
+        }
       }
     }
   }
@@ -124,16 +127,21 @@ public class BRServer implements Server {
 
         String leftDeadID = "";
         String rightDeadID = "";
-        if (sp.left != null && sp.left.getGame().isP1Dead()) {
-          leftDeadID = sp.left.getID("1");
-        } else if (sp.left.getGame().isP2Dead()) {
-          leftDeadID = sp.left.getID("2");
+        
+        if(sp.left != null) {
+          if (sp.left.getGame().isP1Dead()) {
+            leftDeadID = sp.left.getID("1");
+          } else if (sp.left.getGame().isP2Dead()) {
+            leftDeadID = sp.left.getID("2");
+          }
         }
 
-        if (sp.right != null && sp.right.getGame().isP1Dead()) {
-          rightDeadID = sp.right.getID("1");
-        } else if (sp.right.getGame().isP2Dead()) {
-          rightDeadID = sp.right.getID("2");
+        if (sp.right != null) {
+          if (sp.right.getGame().isP1Dead()) {
+            rightDeadID = sp.right.getID("1");
+          } else if (sp.right.getGame().isP2Dead()) {
+            rightDeadID = sp.right.getID("2");
+          }
         }
 
         if (!leftDeadID.equals("")) {
@@ -144,13 +152,13 @@ public class BRServer implements Server {
           kill(rightDeadID);
         }
 
-        if(sp.left != null) {
+        if (sp.left != null) {
           obj.add("left", sp.left.getGameState(id));
         } else {
           obj.addProperty("left", "dead");
         }
 
-        if(sp.right != null) {
+        if (sp.right != null) {
           obj.add("right", sp.right.getGameState(id));
         } else {
           obj.addProperty("right", "dead");
@@ -179,7 +187,7 @@ public class BRServer implements Server {
       sessions.remove(playerID);
       clients.remove(playerID);
       // make new server for new neighbors
-      if(clients.size() > 2) {
+      if (clients.size() > 2) {
         PongServer newServer = new PongServer(prevID, nextID);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;

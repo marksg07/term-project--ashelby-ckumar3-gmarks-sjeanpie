@@ -40,7 +40,7 @@ class Ball{
     hide() {
         this.hidden = true;
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
+        this.ctx.fillRect(this.x - (this.size / 2) - 1, this.y - (this.size / 2) - 1, this.size + 2, this.size + 2);
     }
 
     /**
