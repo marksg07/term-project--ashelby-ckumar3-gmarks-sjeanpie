@@ -7,6 +7,8 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BRServer implements Server {
   private static final Gson GSON = new Gson();
