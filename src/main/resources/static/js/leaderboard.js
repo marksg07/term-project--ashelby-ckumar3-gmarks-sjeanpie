@@ -7,7 +7,16 @@ $(document).ready(() => {
             let newP = document.createElement('p');
             let t = document.createTextNode(responseObject.userData[i]);
             newP.appendChild(t);
-            document.getElementById("leaderboarddiv").appendChild(newP);
+            console.log(i);
+            if (i % 4 === 0) {
+                document.getElementById("user").appendChild(newP);
+            } else if (i % 4 === 1) {
+                document.getElementById("totalGames").appendChild(newP);
+            } else if (i % 4 === 2) {
+                document.getElementById("elo").appendChild(newP);
+            } else {
+                document.getElementById("winRate").appendChild(newP);
+            }
         }
     });
 });

@@ -6,8 +6,6 @@
     top: 0;
     left: 0;
     background-color: #177082;
-
-
 }
 
 .centered {
@@ -191,5 +189,54 @@ body {
     top: -280px;
     left: 200px;
     z-index: 500;
+}
+
+.leaderboardtitle {
+    position: absolute;
+    font-size: 32px;
+    color: #28a745;
+    top: 25%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    border: 1px dashed deeppink;
+}
+.statstitleuser {
+    position: absolute;
+    font-size: 32px;
+    color: #28a745;
+    top: 50%;
+    left: 20%;
+    transform: translate(-50%,-50%);
+    border: 1px dashed deeppink;
+}
+
+.statstitletotalgames {
+    position: absolute;
+    font-size: 32px;
+    color: #28a745;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%,-50%);
+    border: 1px dashed deeppink;
+}
+
+.statstitleelo {
+    position: absolute;
+    font-size: 32px;
+    color: #28a745;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%,-50%);
+    border: 1px dashed deeppink;
+}
+
+.statstitlewinrate {
+    position: absolute;
+    font-size: 32px;
+    color: #28a745;
+    top: 50%;
+    left: 80%;
+    transform: translate(-50%,-50%);
+    border: 1px dashed deeppink;
 }
 

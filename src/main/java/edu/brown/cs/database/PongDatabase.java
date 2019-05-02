@@ -115,7 +115,10 @@ public class PongDatabase {
 			ResultSet rs = prep.executeQuery();
 			int i = 0;
 			while (rs.next() && i < 4) {
-				leaderboardData.add(rs.getString(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4));
+				leaderboardData.add(rs.getString(1));
+				leaderboardData.add(rs.getString(2));
+				leaderboardData.add(rs.getString(3));
+				leaderboardData.add(rs.getString(4));
 				i++;
 			}
 		} catch (SQLException e) {
