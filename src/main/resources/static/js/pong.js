@@ -187,6 +187,7 @@ function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
+    canvas.width += paddleWidth * 3;
     // Set up the canvas context.
     ctx = canvas.getContext("2d");
     ctx.fillStyle = "black";
@@ -221,6 +222,5 @@ function rmWaitingText() {
 }
 
 $(document).ready(() => {
-    canvas.width += paddleWidth * 3;
     executePong();
 });
