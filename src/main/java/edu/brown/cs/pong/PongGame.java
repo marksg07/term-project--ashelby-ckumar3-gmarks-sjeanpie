@@ -71,8 +71,8 @@ public class PongGame implements Cloneable {
     p2Dead = false;
 
     countdown = startCountdown;
-    lastUpdate = Instant.now().plusNanos((long)(countdown * 1000000000));
-    startTime = lastUpdate;
+    lastUpdate = Instant.now();
+    startTime = lastUpdate.plusNanos((long)(countdown * 1000000000));
     canUpdateDuringCountdown = updateCd;
   }
 
@@ -97,7 +97,7 @@ public class PongGame implements Cloneable {
     synchronized (lastUpdate) {
       Instant now = Instant.now();
       double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
-
+      assert (seconds >= 0);
       if(nowIsCurrent()) { // countdown over
         System.out.println("Ticking " + seconds + " sec forwards");
         lastUpdate = now;
