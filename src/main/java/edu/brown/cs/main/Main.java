@@ -128,7 +128,7 @@ public final class Main {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", "");
+      "P O N G F O L K S", "response", "", "successful", false);
 
       //code to have starting webpage that allows for user login
       // finding a match/going into a lobby
@@ -159,12 +159,14 @@ public final class Main {
       System.out.println(loginButton);
       System.out.println(acctButton);
       String response = "";
+      Boolean successful = false;
       if (loginButton != null) {
         if (!db.validateUser(usr)) {
           response = "User does not exist. Try creating an account!";
         } else { //check password
           if (db.validatePassword(usr, pass)) {
             response = "Successfully logged in!";
+            successful = true;
           } else {
             response = "Username and password do not match.";
           }
@@ -179,11 +181,13 @@ public final class Main {
         } else {
           db.createAccount(usr, pass);
           response = "Account successfully created!";
+          successful = true;
         }
       }
       //TODO: get password and hash it
       Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", response);
+      "P O N G F O L K S", "response", response,
+              "successful", successful);
 
       return new ModelAndView(variables, "home.ftl");
     }

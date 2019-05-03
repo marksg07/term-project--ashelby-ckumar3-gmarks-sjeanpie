@@ -5,13 +5,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    background-image: linear-gradient(lightseagreen, darkturquoise);
+    background-image: linear-gradient(deepskyblue, lightseagreen);
     font-family: 'Nunito', sans-serif;
-}
-
-#login-pass + .glyphicon {
-    cursor: pointer;
-    pointer-events: all;
 }
 
 /*
@@ -27,6 +22,13 @@ first try: background: linear-gradient(to right, #30CFD0 0%, #330867 100%);
     font-family: 'Righteous', cursive;
 }
 
+.grad-text-2 {
+    background: linear-gradient(to right, darkgreen 0%, darkblue 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Righteous', cursive;
+}
+
 /*
 h1 { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; } h3 { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } p { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } blockquote { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } pre { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
 */
@@ -34,6 +36,19 @@ h1 { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-seri
 #grad {
     background-image: linear-gradient(#177082, blueviolet);
 }
+
+.leaderboard {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18pt;
+    padding: 20px;
+    text-align: left;
+    color: whitesmoke;
+}
+
+.leaderboard tr:first-child {background-color: transparent !important; }
+
+.leaderboard tr:nth-child(even) {background-color: cornflowerblue;}
+.leaderboard tr:nth-child(odd) {background-color: steelblue;}
 
 .top-header {
     font-size: 72pt;
@@ -47,8 +62,18 @@ h1 { font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-seri
     transform: translate(-50%, -50%);
 }
 
+.lowest {
+    position: center;
+    top: 100%;
+}
+
+.more-lowest {
+    position: center;
+    top: 130%;
+}
+
 .horiz-centered {
-    position: absolute;;
+    position: absolute;
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%,0%);
@@ -145,7 +170,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     display: block;
-    width: 800px;
+    width: 850px;
 }
 
 #pong-canvas {
@@ -237,7 +262,6 @@ body {
     top: -90%;
     left:90%;
     transform: translate(-50%,-50%);
-    font-family: "DejaVu Sans";
 }
 
 #leaderboard {
@@ -247,7 +271,11 @@ body {
     top: -60%;
     left: 50%;
     transform: translate(-50%,-50%);
+    font-family: 'Nunito', sans-serif;
+
+    /*
     font-family: "DejaVu Sans";
+    */
 }
 
 #leaderboard td {
