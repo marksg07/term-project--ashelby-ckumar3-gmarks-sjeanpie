@@ -35,6 +35,14 @@ class Ball{
     }
 
     /**
+     * draws the paddle
+     */
+    draw() {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x - (this.size / 2), y - (this.size / 2), this.size, this.size);
+    }
+
+    /**
      * hides the paddle
      */
     hide() {

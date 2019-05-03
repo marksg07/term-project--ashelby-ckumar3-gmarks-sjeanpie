@@ -20,9 +20,42 @@ let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
 
+let leftBoardState = 'none';
+let rightBoardState = 'none';
+
 
 function setGameReady(v) {
     gameReady = v;
+}
+
+function setLeftBoardState(st) {
+    if (st === leftBoardState)
+        return;
+    leftBoardState = st;
+    if (st === 'red') {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+    } else if (st === 'none') {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+        oppLeftPaddle.draw();
+        ballLeft.draw();
+    }
+}
+
+function setRightBoardState(st) {
+    if (st === rightBoardState)
+        return;
+    rightBoardState = st;
+    if (st === 'red') {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+    } else if (st === 'none') {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+        oppLeftPaddle.draw();
+        ballLeft.draw();
+    }
 }
 
 function updateGame(state) {
@@ -39,24 +72,24 @@ function updateGame(state) {
         leftSec.hide();
         oppLeftPaddle.hide();
         ballLeft.hide();
-        ctx.fillStyle = 'red';
-        ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+        setLeftBoardState('red');
     }
     else if (state.left.hasOwnProperty("cdSecondsLeft")) {
         if(state.left.cdSecondsLeft > 3 && leftGameBegun) {
-            ctx.fillStyle = 'red';
-            ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+            setLeftBoardState('red');
         }
         else {
             if(state.left.cdSecondsLeft <= 3) {
                 leftGameBegun = true;
             }
+            setLeftBoardState('none')
             leftSec.show();
             const secString = state.left.cdSecondsLeft.toFixed(1);
             leftSec.text(secString);
         }
     } else {
         // console.log("left game live");
+        setLeftBoardState('none');
         leftSec.hide();
         oppLeftPaddle.setPosition(state.left.p1PaddleY);
         playerPaddle.setPosition(state.left.p2PaddleY);
@@ -67,22 +100,22 @@ function updateGame(state) {
         rightSec.hide();
         oppRightPaddle.hide();
         ballRight.hide();
-        ctx.fillStyle = 'red';
-        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+        setRightBoardState('red');
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
         if(state.right.cdSecondsLeft > 3 && rightGameBegun) {
-            ctx.fillStyle = 'red';
-            ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+            setRightBoardState('red');
         }
         else {
             if (state.right.cdSecondsLeft <= 3) {
                 rightGameBegun = true;
             }
+            setRightBoardState('none');
             rightSec.show();
             const secString = state.right.cdSecondsLeft.toFixed(1);
             rightSec.text(secString);
         }
     } else {
+        setRightBoardState('none');
         // console.log("right game live");
         rightSec.hide();
         oppRightPaddle.setPosition(state.right.p2PaddleY);
