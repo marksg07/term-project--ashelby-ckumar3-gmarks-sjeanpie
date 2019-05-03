@@ -14,8 +14,8 @@ let playersRemaining;
 let upDown = [0,0];
 let myId = Math.random();
 let gameReady = false;
-let leftGameBegun = true;
-let rightGameBegun = true;
+let leftGameBegun = false;
+let rightGameBegun = false;
 let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
@@ -43,7 +43,7 @@ function updateGame(state) {
         ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
     }
     else if (state.left.hasOwnProperty("cdSecondsLeft")) {
-        if(state.left.cdSecondsLeft > 3 && !leftGameBegun) {
+        if(state.left.cdSecondsLeft > 3 && leftGameBegun) {
             ctx.fillStyle = 'red';
             ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
         }
@@ -70,7 +70,7 @@ function updateGame(state) {
         ctx.fillStyle = 'red';
         ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
-        if(state.right.cdSecondsLeft > 3 && !rightGameBegun) {
+        if(state.right.cdSecondsLeft > 3 && rightGameBegun) {
             ctx.fillStyle = 'red';
             ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
         }
