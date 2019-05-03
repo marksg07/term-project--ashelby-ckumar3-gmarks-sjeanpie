@@ -17,7 +17,7 @@ public class BRServer implements Server {
   private final Map<String, Session> sessions;
   private long myId;
   private final PongDatabase db;
-  static final int MAXPLAYERS = 3;
+  static final int MAXPLAYERS = 4;
 
   private static long idCounter = 0;
 
