@@ -233,7 +233,7 @@ public class BRServer implements Server {
     synchronized (clientToServers) {
       kill(id);
     }
-  }lients.get(0))
+  }
 
   @Override
   public void println(String msg) {
