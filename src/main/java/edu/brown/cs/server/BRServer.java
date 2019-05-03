@@ -177,6 +177,7 @@ public class BRServer implements Server {
   }
 
   private void kill(String playerID) {
+    println("Killing player " + playerID);
     if(clients.size() == 1) {
       // don't "kill" last client, just leave it as every connection should be closed
       return;
