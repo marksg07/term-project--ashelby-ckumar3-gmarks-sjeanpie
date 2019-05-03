@@ -100,8 +100,7 @@ public final class Main {
     // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
       final String url = request.url();
-      if (url.startsWith("http://"))
-      {
+      if (url.startsWith("http://")) {
         final String[] split = url.split("http://");
         //response.redirect("https://" + split[1]);
       }
