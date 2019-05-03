@@ -10,13 +10,13 @@ public class PongServer implements Server {
   public PongServer(String p1, String p2) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 230, 40, 10, 150, 5, false);
+    game = new PongGame(400, 300, 400, 40, 10, 150, 5, false);
   }
 
   public PongServer(String p1, String p2, double p1PaddleY, double p2PaddleY) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 230, 40, 10, 150, 5, true);
+    game = new PongGame(400, 300, 400, 40, 10, 150, 5, true);
     game.setP1PaddleY(p1PaddleY);
     game.setP2PaddleY(p2PaddleY);
   }
