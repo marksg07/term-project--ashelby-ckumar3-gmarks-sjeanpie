@@ -124,6 +124,9 @@ public class PongDatabase {
 		} catch (SQLException e) {
 			leaderboardData.add("ERROR");
 		}
+		while (leaderboardData.size() < 20) {
+			leaderboardData.add("N/A");
+		}
 		return leaderboardData;
 	}
 	

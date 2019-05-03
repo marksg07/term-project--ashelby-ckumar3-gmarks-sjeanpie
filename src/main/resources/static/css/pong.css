@@ -112,6 +112,7 @@ body {
 
 #pong-canvas {
     overflow: scroll;
+    background-color: black;
 }
 
 
@@ -193,50 +194,50 @@ body {
 
 .leaderboardtitle {
     position: absolute;
-    font-size: 32px;
-    color: #28a745;
-    top: 25%;
-    left:50%;
+    font-size: 16px;
+    color: #fff;
+    top: 10%;
+    left:53%;
     transform: translate(-50%,-50%);
-    border: 1px dashed deeppink;
+    font-family: Helvteica;
 }
 .statstitleuser {
     position: absolute;
-    font-size: 32px;
-    color: #28a745;
-    top: 50%;
-    left: 20%;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 30.5%;
     transform: translate(-50%,-50%);
-    border: 1px dashed deeppink;
+    font-family: Helvteica;
 }
 
 .statstitletotalgames {
     position: absolute;
-    font-size: 32px;
-    color: #28a745;
-    top: 50%;
-    left: 40%;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 45.5%;
     transform: translate(-50%,-50%);
-    border: 1px dashed deeppink;
+    font-family: Helvteica;
 }
 
 .statstitleelo {
     position: absolute;
-    font-size: 32px;
-    color: #28a745;
-    top: 50%;
-    left: 60%;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 60.5%;
     transform: translate(-50%,-50%);
-    border: 1px dashed deeppink;
+    font-family: Helvteica;
 }
 
 .statstitlewinrate {
     position: absolute;
-    font-size: 32px;
-    color: #28a745;
-    top: 50%;
-    left: 80%;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 75.5%;
     transform: translate(-50%,-50%);
-    border: 1px dashed deeppink;
+    font-family: Helvteica;
 }
 
