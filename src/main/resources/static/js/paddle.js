@@ -54,6 +54,11 @@ class Paddle{
         this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
     }
 
+    show() {
+        this.hidden = false;
+        this.ctx.fillStyle = "white";
+    }
+
     /**
      * Change fill of paddle
      * @param fill

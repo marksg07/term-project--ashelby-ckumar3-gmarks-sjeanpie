@@ -35,6 +35,7 @@ function setLeftBoardState(st) {
     if (st === 'red') {
         ctx.fillStyle = 'red';
         ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+
     } else if (st === 'none') {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
@@ -53,8 +54,8 @@ function setRightBoardState(st) {
     } else if (st === 'none') {
         ctx.fillStyle = 'black';
         ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
-        oppLeftPaddle.draw();
-        ballLeft.draw();
+        oppRightPaddle.draw();
+        ballRight.draw();
     }
 }
 

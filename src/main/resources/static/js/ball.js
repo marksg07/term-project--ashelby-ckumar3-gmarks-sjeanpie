@@ -51,6 +51,11 @@ class Ball{
         this.ctx.fillRect(this.x - (this.size / 2) - 1, this.y - (this.size / 2) - 1, this.size + 2, this.size + 2);
     }
 
+    show() {
+        this.hidden = false;
+        this.ctx.fillStyle = "white";
+    }
+
     /**
      * Change fill of ball
      * @param fill
