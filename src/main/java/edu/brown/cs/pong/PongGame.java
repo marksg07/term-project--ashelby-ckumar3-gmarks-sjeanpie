@@ -22,6 +22,7 @@ public class PongGame implements Cloneable {
   private double countdown;
   private static final LongWrapper seed = new LongWrapper(
           Duration.between(Instant.EPOCH, Instant.now()).toNanos());
+  private boolean canUpdateDuringCountdown;
   Random rand;
 
   public enum InputType {
@@ -44,7 +45,7 @@ public class PongGame implements Cloneable {
 
   InputType p1Input, p2Input;
 
-  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown) {
+  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown, boolean updateCd) {
     rand = new Random();
     synchronized (seed) {
       rand.setSeed(seed.getValue());
@@ -70,8 +71,9 @@ public class PongGame implements Cloneable {
     p2Dead = false;
 
     countdown = startCountdown;
-    lastUpdate = Instant.now().plusNanos((long)(countdown * 1000000000));
-    startTime = lastUpdate;
+    lastUpdate = Instant.now();
+    startTime = lastUpdate.plusNanos((long)(countdown * 1000000000));
+    canUpdateDuringCountdown = updateCd;
   }
 
   @Override
@@ -91,18 +93,18 @@ public class PongGame implements Cloneable {
     return Duration.between(startTime, Instant.now()).toNanos() >= 0;
   }
 
-  public int tickToCurrent() {
-    synchronized (lastUpdate) {
+  public synchronized int tickToCurrent() {
       Instant now = Instant.now();
       double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
-
+      assert (seconds >= 0);
+      lastUpdate = now;
       if(nowIsCurrent()) { // countdown over
         System.out.println("Ticking " + seconds + " sec forwards");
-        lastUpdate = now;
         return tick(seconds);
+      } else if (canUpdateDuringCountdown) {
+        movePaddles(seconds);
       }
       return 0;
-    }
   }
 
   private class Collision {
@@ -403,12 +405,29 @@ public class PongGame implements Cloneable {
     if (nowIsCurrent()) {
       obj.addProperty("ballX", ballX);
       obj.addProperty("ballY", ballY);
-      obj.addProperty("ballVelX", ballVelX);
-      obj.addProperty("ballVelY", ballVelY);
       obj.addProperty("p1PaddleY", p1PaddleY);
       obj.addProperty("p2PaddleY", p2PaddleY);
-      obj.addProperty("p1Dead", p1Dead);
-      obj.addProperty("p2Dead", p2Dead);
+      //obj.addProperty("p1Dead", p1Dead);
+      //obj.addProperty("p2Dead", p2Dead);
+    } else {
+      // still in CD
+      Instant now = Instant.now();
+      double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
+      System.out.println("Duration between last and now is " + seconds);
+      obj.addProperty("cdSecondsLeft", -seconds);
+    }
+    return obj;
+  }
+
+  public JsonObject getFlippedState() {
+    JsonObject obj = new JsonObject();
+    if (nowIsCurrent()) {
+      obj.addProperty("ballX", maxX - ballX);
+      obj.addProperty("ballY", ballY);
+      obj.addProperty("p1PaddleY", p2PaddleY);
+      obj.addProperty("p2PaddleY", p1PaddleY);
+      //obj.addProperty("p1Dead", p2Dead);
+      //obj.addProperty("p2Dead", p1Dead);
     } else {
       // still in CD
       Instant now = Instant.now();
@@ -435,5 +454,23 @@ public class PongGame implements Cloneable {
    */
   public boolean isP1Dead() {
     return p1Dead;
+  }
+
+  /**
+   * Sets new p2PaddleY.
+   *
+   * @param p2PaddleY New value of p2PaddleY.
+   */
+  public void setP2PaddleY(double p2PaddleY) {
+    this.p2PaddleY = p2PaddleY;
+  }
+
+  /**
+   * Sets new p1PaddleY.
+   *
+   * @param p1PaddleY New value of p1PaddleY.
+   */
+  public void setP1PaddleY(double p1PaddleY) {
+    this.p1PaddleY = p1PaddleY;
   }
 }

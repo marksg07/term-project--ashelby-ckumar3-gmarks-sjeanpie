@@ -8,6 +8,7 @@ let ballRight;
 const paddleWidth = 10;
 const paddleHeight = 40;
 const ballSize = 20;
+const gameScreenTime = 3.8;
 let up = false;
 let down = false;
 let playersRemaining;
@@ -76,11 +77,11 @@ function updateGame(state) {
         setLeftBoardState('red');
     }
     else if (state.left.hasOwnProperty("cdSecondsLeft")) {
-        if(state.left.cdSecondsLeft > 3 && leftGameBegun) {
+        if(state.left.cdSecondsLeft > gameScreenTime && leftGameBegun) {
             setLeftBoardState('red');
         }
         else {
-            if(state.left.cdSecondsLeft <= 3) {
+            if(state.left.cdSecondsLeft <= gameScreenTime) {
                 leftGameBegun = true;
             }
             setLeftBoardState('none')
@@ -103,11 +104,11 @@ function updateGame(state) {
         ballRight.hide();
         setRightBoardState('red');
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
-        if(state.right.cdSecondsLeft > 3 && rightGameBegun) {
+        if(state.right.cdSecondsLeft > gameScreenTime && rightGameBegun) {
             setRightBoardState('red');
         }
         else {
-            if (state.right.cdSecondsLeft <= 3) {
+            if (state.right.cdSecondsLeft <= gameScreenTime) {
                 rightGameBegun = true;
             }
             setRightBoardState('none');

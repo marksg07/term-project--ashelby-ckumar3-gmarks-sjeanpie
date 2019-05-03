@@ -10,7 +10,15 @@ public class PongServer implements Server {
   public PongServer(String p1, String p2) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 230, 40, 10, 150, 5);
+    game = new PongGame(400, 300, 400, 40, 10, 150, 5, false);
+  }
+
+  public PongServer(String p1, String p2, double p1PaddleY, double p2PaddleY) {
+    p1Id = p1;
+    p2Id = p2;
+    game = new PongGame(400, 300, 400, 40, 10, 150, 5, true);
+    game.setP1PaddleY(p1PaddleY);
+    game.setP2PaddleY(p2PaddleY);
   }
 
   @Override
@@ -32,6 +40,13 @@ public class PongServer implements Server {
     assert (p1Id.equals(id) || p2Id.equals(id));
     synchronized (game) {
       return game.getState();
+    }
+  }
+
+  public JsonObject getFlippedGameState(String id) {
+    assert (p1Id.equals(id) || p2Id.equals(id));
+    synchronized (game) {
+      return game.getFlippedState();
     }
   }
 
@@ -58,5 +73,13 @@ public class PongServer implements Server {
   @Override
   public void println(String msg) {
     System.out.println("Pong (\"" + p1Id + "\" vs \"" + p2Id + "\") :: " + msg);
+  }
+
+  public double getP1PaddleY() {
+    return game.getP1PaddleY();
+  }
+
+  public double getP2PaddleY() {
+    return game.getP2PaddleY();
   }
 }

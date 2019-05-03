@@ -159,16 +159,20 @@ public class BRServer implements Server {
           kill(rightDeadID);
         }
 
+        if(sp.left == null && sp.right == null) {
+          return obj;
+        }
+
         if (sp.left != null) {
           obj.add("left", sp.left.getGameState(id));
         } else {
-          obj.addProperty("left", "dead");
+          obj.add("left", sp.right.getFlippedGameState(id));
         }
 
         if (sp.right != null) {
           obj.add("right", sp.right.getGameState(id));
         } else {
-          obj.addProperty("right", "dead");
+          obj.add("right", sp.left.getFlippedGameState(id));
         }
         return obj;
       }
@@ -200,7 +204,9 @@ public class BRServer implements Server {
       clients.remove(playerID);
       // make new server for new neighbors
       if (clients.size() > 2) {
-        PongServer newServer = new PongServer(prevID, nextID);
+        double p1PaddleY = clientToServers.get(prevID).right.getP1PaddleY();
+        double p2PaddleY = clientToServers.get(nextID).left.getP2PaddleY();
+        PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;
       } else if (clients.size() == 2) {
