@@ -85,7 +85,7 @@ public final class Main {
 
     MainServer serv = new MainServer();
     PongWebSocketHandler.setServer(serv);
-
+    
     // timeout for websockets = 2 seconds in case of badly behaved clients
     Spark.webSocketIdleTimeoutMillis(2000);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);

@@ -6,8 +6,6 @@
     top: 0;
     left: 0;
     background-color: #177082;
-
-
 }
 
 .centered {
@@ -114,6 +112,7 @@ body {
 
 #pong-canvas {
     overflow: scroll;
+    background-color: black;
 }
 
 
@@ -191,5 +190,54 @@ body {
     top: -280px;
     left: 200px;
     z-index: 500;
+}
+
+.leaderboardtitle {
+    position: absolute;
+    font-size: 16px;
+    color: #fff;
+    top: 10%;
+    left:53%;
+    transform: translate(-50%,-50%);
+    font-family: Helvteica;
+}
+.statstitleuser {
+    position: absolute;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 30.5%;
+    transform: translate(-50%,-50%);
+    font-family: Helvteica;
+}
+
+.statstitletotalgames {
+    position: absolute;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 45.5%;
+    transform: translate(-50%,-50%);
+    font-family: Helvteica;
+}
+
+.statstitleelo {
+    position: absolute;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 60.5%;
+    transform: translate(-50%,-50%);
+    font-family: Helvteica;
+}
+
+.statstitlewinrate {
+    position: absolute;
+    font-size: 16px;
+    color: #fff;
+    top: 30%;
+    left: 75.5%;
+    transform: translate(-50%,-50%);
+    font-family: Helvteica;
 }
 

@@ -3,9 +3,9 @@
     	<p>${response} </p>
         <form method="post" action="/login">
             Username:<br>
-            <textarea name="username" placeholder="Enter username here"></textarea><br>
+            <input type="text" name="username"></input><br>
             Password:<br>
-            <textarea name="password"></textarea><br>
+            <input type="text" name="password"></input><br>
             <input type="submit" name="Log In" value="Log In"></input>
             <input type="submit" name="Create Account" value="Create Account"></input>
         </form>
