@@ -38,6 +38,8 @@ function updateGame(state) {
         leftSec.hide();
         oppLeftPaddle.hide();
         ballLeft.hide();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
     }
     else if (state.left.hasOwnProperty("cdSecondsLeft")) {
         if(state.left.cdSecondsLeft > 3 && !leftGameBegun) {
@@ -64,6 +66,8 @@ function updateGame(state) {
         rightSec.hide();
         oppRightPaddle.hide();
         ballRight.hide();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
         if(state.right.cdSecondsLeft > 3 && !rightGameBegun) {
             ctx.fillStyle = 'red';
