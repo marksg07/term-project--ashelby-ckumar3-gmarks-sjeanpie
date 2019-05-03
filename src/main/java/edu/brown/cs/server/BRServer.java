@@ -177,6 +177,10 @@ public class BRServer implements Server {
   }
 
   private void kill(String playerID) {
+    if(clients.size() == 1) {
+      // don't "kill" last client, just leave it as every connection should be closed
+      return;
+    }
     Integer playerIndex = clients.indexOf(playerID);
     if (!playerIndex.equals(-1)) {
       String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
@@ -226,8 +230,10 @@ public class BRServer implements Server {
   }
 
   public void removeClient(String id) {
-    kill(id);
-  }
+    synchronized (clientToServers) {
+      kill(id);
+    }
+  }lients.get(0))
 
   @Override
   public void println(String msg) {
