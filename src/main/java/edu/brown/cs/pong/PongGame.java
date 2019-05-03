@@ -93,20 +93,18 @@ public class PongGame implements Cloneable {
     return Duration.between(startTime, Instant.now()).toNanos() >= 0;
   }
 
-  public int tickToCurrent() {
-    synchronized (lastUpdate) {
+  public synchronized int tickToCurrent() {
       Instant now = Instant.now();
       double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
       assert (seconds >= 0);
+      lastUpdate = now;
       if(nowIsCurrent()) { // countdown over
         System.out.println("Ticking " + seconds + " sec forwards");
-        lastUpdate = now;
         return tick(seconds);
       } else if (canUpdateDuringCountdown) {
         movePaddles(seconds);
       }
       return 0;
-    }
   }
 
   private class Collision {
