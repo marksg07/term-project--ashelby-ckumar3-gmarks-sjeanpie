@@ -4,52 +4,90 @@ let oppLeftPaddle;
 let ballLeft;
 let ballRight;
 
-let paddleWidth;
-let paddleHeight;
-let ballSize;
+
+const paddleWidth = 10;
+const paddleHeight = 40;
+const ballSize = 20;
 let up = false;
 let down = false;
 let playersRemaining;
 let upDown = [0,0];
 let myId = Math.random();
 let gameReady = false;
-
+let leftGameBegun = true;
+let rightGameBegun = true;
 let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
+
 
 function setGameReady(v) {
     gameReady = v;
 }
 
 function updateGame(state) {
-    console.log(state);
+    if(gameOver) {
+        return;
+    }
+    // console.log(state);
     if(!state.hasOwnProperty("left") && !state.hasOwnProperty("right")) {
         // i am dead :(
         return;
     }
-    if(state.left.hasOwnProperty("cdSecondsLeft")) {
-        leftSec.show();
-        const secString = state.left.cdSecondsLeft.toFixed(1);
-        leftSec.text(secString);
+
+    if (state.left === "dead") {
+        leftSec.hide();
+        oppLeftPaddle.hide();
+        ballLeft.hide();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+    }
+    else if (state.left.hasOwnProperty("cdSecondsLeft")) {
+        if(state.left.cdSecondsLeft > 3 && !leftGameBegun) {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(0, 0, canvas.width / 2 - 20, canvas.height);
+        }
+        else {
+            if(state.left.cdSecondsLeft <= 3) {
+                leftGameBegun = true;
+            }
+            leftSec.show();
+            const secString = state.left.cdSecondsLeft.toFixed(1);
+            leftSec.text(secString);
+        }
     } else {
-        console.log("left game live");
+        // console.log("left game live");
         leftSec.hide();
         oppLeftPaddle.setPosition(state.left.p1PaddleY);
         playerPaddle.setPosition(state.left.p2PaddleY);
-        ballLeft.setPosition(state.left.ballX, state.left.ballY);
+        ballLeft.setPosition(state.left.ballX + paddleWidth, state.left.ballY);
     }
 
-    if(state.right.hasOwnProperty("cdSecondsLeft")) {
-        rightSec.show();
-        const secString = state.right.cdSecondsLeft.toFixed(1);
-        rightSec.text(secString);
+    if (state.right === "dead") {
+        rightSec.hide();
+        oppRightPaddle.hide();
+        ballRight.hide();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+    } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
+        if(state.right.cdSecondsLeft > 3 && !rightGameBegun) {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+        }
+        else {
+            if (state.right.cdSecondsLeft <= 3) {
+                rightGameBegun = true;
+            }
+            rightSec.show();
+            const secString = state.right.cdSecondsLeft.toFixed(1);
+            rightSec.text(secString);
+        }
     } else {
-        console.log("right game live");
+        // console.log("right game live");
         rightSec.hide();
         oppRightPaddle.setPosition(state.right.p2PaddleY);
         playerPaddle.setPosition(state.right.p1PaddleY);
-        ballRight.setPosition(state.right.ballX + canvas.width / 2, state.right.ballY);
+        ballRight.setPosition(state.right.ballX + canvas.width / 2 + paddleWidth / 2, state.right.ballY);
     }
 
 }
@@ -127,44 +165,58 @@ function checkInputs(e) {
     return;
 }
 
+let inputHandle;
+
 function onPlayerDead() {
     // XXX
+    gameOver = true;
+    clearInterval(inputHandle);
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    $("#status").text("ded");
+}
+
+function onPlayerWin() {
+    gameOver = true;
+    clearInterval(inputHandle);
+    ctx.fillStyle = "green";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    $("#status").text("ur winner");
 }
 
 function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
+    console.log(canvas.width);
+    canvas.width = canvas.width + paddleWidth * 3;
+    console.log(canvas.width);
     // Set up the canvas context.
     ctx = canvas.getContext("2d");
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //initial width of paddle, will be a constant
-    paddleWidth = 10;
-    //initial height of paddles, another constant
-    paddleHeight = 40;
-    //initial ball size, another constant
-    ballSize = 20;
+
     //initialize 5 entities.
     up = false;
     down = false;
     playerPaddle = new Paddle(canvas.width/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
     oppLeftPaddle = new Paddle(paddleWidth/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
     oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
-    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
-    ctx.font = "50px Futura, sans-serif";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
+    ballLeft = new Ball(ballSize, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
+    ballRight = new Ball(ballSize, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
+    // ctx.font = "50px Futura, sans-serif";
+    // ctx.fillStyle = "white";
+    // ctx.textAlign = "center";
+    // ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
-    setInterval(sendInput, 20);
+    inputHandle = setInterval(sendInput, 20);
 }
 
 function rmWaitingText() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
+    // ctx.fillStyle = "black";
+    // ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
+    $("#status").text("");
 }
 
 $(document).ready(() => {

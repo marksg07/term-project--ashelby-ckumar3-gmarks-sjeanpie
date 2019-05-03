@@ -9,6 +9,7 @@ class Paddle{
      * @param ctx context to be drawing on.
      */
     constructor(x, y, width, height, ctx) {
+        this.hidden = false;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -25,11 +26,24 @@ class Paddle{
      * @param y only y position will change.
      */
     setPosition(y){
+        if (!this.hidden) {
+            this.ctx.fillStyle = "black";
+            this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
+            this.ctx.fillStyle = this.fillStyle;
+            this.ctx.fillRect(this.x - (this.width / 2), y - (this.height / 2), this.width, this.height);
+            this.y = y;
+        } else {
+
+        }
+    }
+
+    /**
+     * hides the paddle
+     */
+    hide() {
+        this.hidden = true;
         this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.x -(this.width/2) - 1, this.y - (this.height/2) - 1, this.width + 2, this.height + 2);
-        this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(this.x-(this.width/2), y-(this.height/2), this.width, this.height);
-        this.y = y;
+        this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
     }
 
     /**

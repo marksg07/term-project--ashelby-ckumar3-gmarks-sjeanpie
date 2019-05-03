@@ -38,7 +38,8 @@ public class PongWebSocketHandler {
     GAMESTART,
     INPUT,
     UPDATE,
-    PLAYERDEAD;
+    PLAYERDEAD,
+    PLAYERWIN;
 
     public static MESSAGE_TYPE fromInt(int t) {
       switch(t) {
@@ -54,6 +55,8 @@ public class PongWebSocketHandler {
           return UPDATE;
         case 5:
           return PLAYERDEAD;
+        case 6:
+          return PLAYERWIN;
       }
       return null;
     }

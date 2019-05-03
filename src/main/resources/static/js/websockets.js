@@ -6,7 +6,8 @@ const MESSAGE_TYPE = {
     GAMESTART: 2,
     INPUT: 3,
     UPDATE: 4,
-    PLAYERDEAD: 5
+    PLAYERDEAD: 5,
+    PLAYERWIN: 6
 };
 
 function wsSetup() {
@@ -26,7 +27,7 @@ function wsSetup() {
 
     conn.onmessage = msg => {
         const data = JSON.parse(msg.data);
-        console.log(data);
+        // console.log(data);
         switch (data.type) {
             default:
                 console.log('Unknown message type!', data.type);
@@ -43,12 +44,16 @@ function wsSetup() {
                 rmWaitingText();
                 break;
             case MESSAGE_TYPE.UPDATE:
-                console.log('got update');
+                // console.log('got update');
                 updateGame(data.payload.state);
                 break;
             case MESSAGE_TYPE.PLAYERDEAD:
                 console.log('got dead lmao ur bad');
                 onPlayerDead();
+                break;
+            case MESSAGE_TYPE.PLAYERWIN:
+                console.log('got win epic victory royale #1');
+                onPlayerWin();
                 break;
         }
     };

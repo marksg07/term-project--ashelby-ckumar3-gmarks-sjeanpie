@@ -85,14 +85,21 @@ public final class Main {
     MainServer serv = new MainServer();
     PongWebSocketHandler.setServer(serv);
     //Spark.webSocketIdleTimeoutMillis(2000);
-
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
-    Spark.get("/game", new GameStartHandler(), freeMarker);
+    Spark.post("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
     Spark.post("/stats", new StatsHandler());
+    Spark.before(((request, response) -> {
+      final String url = request.url();
+      if (url.startsWith("http://"))
+      {
+        final String[] split = url.split("http://");
+        response.redirect("https://" + split[1]);
+      }
+    }));
   }
 
   /**
