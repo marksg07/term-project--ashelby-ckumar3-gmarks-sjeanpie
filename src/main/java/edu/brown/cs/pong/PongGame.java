@@ -22,6 +22,7 @@ public class PongGame implements Cloneable {
   private double countdown;
   private static final LongWrapper seed = new LongWrapper(
           Duration.between(Instant.EPOCH, Instant.now()).toNanos());
+  private boolean canUpdateDuringCountdown;
   Random rand;
 
   public enum InputType {
@@ -44,7 +45,7 @@ public class PongGame implements Cloneable {
 
   InputType p1Input, p2Input;
 
-  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown) {
+  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown, boolean updateCd) {
     rand = new Random();
     synchronized (seed) {
       rand.setSeed(seed.getValue());
@@ -72,6 +73,7 @@ public class PongGame implements Cloneable {
     countdown = startCountdown;
     lastUpdate = Instant.now().plusNanos((long)(countdown * 1000000000));
     startTime = lastUpdate;
+    canUpdateDuringCountdown = updateCd;
   }
 
   @Override
@@ -100,6 +102,8 @@ public class PongGame implements Cloneable {
         System.out.println("Ticking " + seconds + " sec forwards");
         lastUpdate = now;
         return tick(seconds);
+      } else if (canUpdateDuringCountdown) {
+        movePaddles(seconds);
       }
       return 0;
     }
@@ -435,5 +439,23 @@ public class PongGame implements Cloneable {
    */
   public boolean isP1Dead() {
     return p1Dead;
+  }
+
+  /**
+   * Sets new p2PaddleY.
+   *
+   * @param p2PaddleY New value of p2PaddleY.
+   */
+  public void setP2PaddleY(double p2PaddleY) {
+    this.p2PaddleY = p2PaddleY;
+  }
+
+  /**
+   * Sets new p1PaddleY.
+   *
+   * @param p1PaddleY New value of p1PaddleY.
+   */
+  public void setP1PaddleY(double p1PaddleY) {
+    this.p1PaddleY = p1PaddleY;
   }
 }

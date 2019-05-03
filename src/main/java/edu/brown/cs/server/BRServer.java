@@ -200,7 +200,9 @@ public class BRServer implements Server {
       clients.remove(playerID);
       // make new server for new neighbors
       if (clients.size() > 2) {
-        PongServer newServer = new PongServer(prevID, nextID);
+        double p1PaddleY = clientToServers.get(prevID).right.getP1PaddleY();
+        double p2PaddleY = clientToServers.get(nextID).left.getP2PaddleY();
+        PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;
       } else if (clients.size() == 2) {
