@@ -10,9 +10,11 @@
             <input type="submit" name="Create Account" value="Create Account"></input>
         </form>
         <div class="centered">
-            <form action="/game" method="GET">
+            <form action="/game" method="POST">
                 <input type="submit" id="find-game" class="find_game" value="Find Game">
                 </input>
+                <input type="hidden" name="user" id="gameuser">
+                <input type="hidden" name="pass" id="gamepass">
             </form>
             </div>
     <div class="bottom">
