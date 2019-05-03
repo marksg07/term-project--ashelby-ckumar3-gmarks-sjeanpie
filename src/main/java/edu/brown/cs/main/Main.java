@@ -100,8 +100,7 @@ public final class Main {
     // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
       final String url = request.url();
-      if (url.startsWith("http://"))
-      {
+      if (url.startsWith("http://")) {
         final String[] split = url.split("http://");
         //response.redirect("https://" + split[1]);
       }
@@ -129,7 +128,7 @@ public final class Main {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", "");
+      "P O N G F O L K S", "response", "", "successful", false);
 
       //code to have starting webpage that allows for user login
       // finding a match/going into a lobby
@@ -160,31 +159,35 @@ public final class Main {
       System.out.println(loginButton);
       System.out.println(acctButton);
       String response = "";
+      Boolean successful = false;
       if (loginButton != null) {
         if (!db.validateUser(usr)) {
-          response = "User does not exist\n Would you like to create an account?";
+          response = "User does not exist. Try creating an account!";
         } else { //check password
           if (db.validatePassword(usr, pass)) {
             response = "Successfully logged in!";
+            successful = true;
           } else {
-            response = "User exists; however, password is incorrect";
+            response = "Username and password do not match.";
           }
         }
       } else {
         if (usr.length() > 10) {
-          response = "Username is too long! Username can not have more than 10 characters";
+          response = "Your username must not exceed 10 characters.";
         } else if (pass.length() < 3) {
-          response = "Password must be greater than 3 characters";
+          response = "Password must exceed 3 characters.";
         } else if (db.validateUser(usr)) {
-          response = "User already exists. Please choose a new username.";
+          response = "Please choose a new username.";
         } else {
           db.createAccount(usr, pass);
           response = "Account successfully created!";
+          successful = true;
         }
       }
       //TODO: get password and hash it
       Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", response);
+      "P O N G F O L K S", "response", response,
+              "successful", successful);
 
       return new ModelAndView(variables, "home.ftl");
     }

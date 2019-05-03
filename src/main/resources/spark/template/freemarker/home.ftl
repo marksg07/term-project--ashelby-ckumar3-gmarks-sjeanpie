@@ -1,27 +1,44 @@
 <#assign content>
     <div class="wrapper">
-    	<p>${response} </p>
-        <form method="post" action="/login">
-            Username:<br>
-            <input type="text" name="username"></input><br>
-            Password:<br>
-            <input type="text" name="password"></input><br>
-            <input type="submit" name="Log In" value="Log In"></input>
-            <input type="submit" name="Create Account" value="Create Account"></input>
-        </form>
-        <div class="centered">
-            <form action="/game" method="POST">
-                <input type="submit" id="find-game" class="find_game" value="Find Game">
-                </input>
-                <input type="hidden" name="user" id="gameuser">
-                <input type="hidden" name="pass" id="gamepass">
+        <div>
+            <h2 class="grad-text horiz-centered top-header font-weight-bold">
+                pongfolks
+            </h2>
+        </div>
+        <div class="centered border rounded border-light">
+            <div class="m-5" style="color:white">
+                <h5>
+                ${response}
+                </h5>
+                <#if successful>
+                    <form method="post" style="color:white" action="/game">
+                        <br>
+                        <button class="btn btn-outline-primary form-control">Find Game</button>
+                        <br>
+                    </form>
+                <#else>
+                <form method="post" style="color:white" action="/login">
+                Username:<br>
+                <input type="text" name="username" class="form-control">
+                Password:<br>
+                <input id="login-pass" type="password" name="password" class="form-control">
+                <input type="submit" name="Log In" value="Log In" class="btn btn-outline-primary form-control">
+                    <br>
+                <br>
+                <div class="form-group">
+                    New here? Why don't you
+                    <input type="submit" name="Create Account" value="Create An Account" class="btn btn-outline-primary form-control">
+                </div>
+                    </#if>
+            </form>
+            <br><br>
+            <form action="/lb" method="GET" style="color:white">
+                Feeling competitive? Check out the
+                <input type="submit" name="leaderboard" value="Leaderboard" class="btn btn-outline-primary form-control"><br>
             </form>
             </div>
+            </div>
     <div class="bottom">
-        <form action="/lb" method="GET">
-            <input type="submit" id="leaderboard" value="Leaderboard">
-            </input>
-        </form>
         </div>
     </div>
 </#assign>
