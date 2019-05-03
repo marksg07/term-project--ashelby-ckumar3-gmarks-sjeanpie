@@ -9,21 +9,36 @@
                 <canvas id="pong-canvas" width="800" height="300" style="border:10px solid #164751;">
 
                 </canvas>
-                <div class="leaderboardtitle" class="alert-danger" id="leaderboarddiv">
-                    LEADERBOARD
+                <div class="leaderboardtitle">
+                    <strong>LEADERBOARD</strong>
+
                 </div>
-                <div class="statstitleuser" id="user">
-                    USER
-                </div>
-                <div class="statstitletotalgames" id="totalGames">
-                    TOTAL GAMES
-                </div>
-                <div class="statstitleelo" id="elo">
-                    ELO
-                </div>
-                <div class="statstitlewinrate" id="winRate">
-                    WIN RATE
-                </div>
+                <table id="leaderboard">
+                    <tr><th>Username</th>
+                        <th>Total Games</th>
+                        <th>ELO</th>
+                        <th>Win Rate</th></tr>
+                    <#if leaderboardData??>
+                        <#list leaderboardData as entry>
+                            <#if !entry??>
+                                <tr><td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td></tr>
+                            <#else>
+                            <tr><td>${entry.getUsr()}</td>
+                                <td>${entry.getTotalGames()}</td>
+                                <td>${entry.getElo()}</td>
+                                <#if entry.getTotalGames() != 0>
+                                    <td>${entry.getWins() * 100.0 / entry.getTotalGames()}%</td>
+                                <#else>
+                                    <td>0%</td>
+                                </#if>
+                            </tr>
+                            </#if>
+                        </#list>
+                    </#if>
+                </table>
             </div>
         </div>
     </div>

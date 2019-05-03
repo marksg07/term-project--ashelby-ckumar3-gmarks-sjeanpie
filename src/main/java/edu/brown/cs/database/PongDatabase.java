@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package edu.brown.cs.database;
 
@@ -25,136 +25,197 @@ import java.security.SecureRandom;
  */
 
 public class PongDatabase {
-	private static Connection conn;
-	private String path;
-	private static PreparedStatement prep;
-	private static final Random RANDOM = new SecureRandom();
+  private Connection conn;
+  private String path;
+  private static final Random RANDOM = new SecureRandom();
 
-	
-	/**
-	 * 
-	 */
-	public PongDatabase(String dbPath) {
-		try {
-			this.establishConnection(dbPath);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
-		//TODO: validate the database and path entered. favor try/catch
-		Class.forName("org.sqlite.JDBC");
-	      String url = "jdbc:sqlite:" + dbPath;
-	      conn = DriverManager.getConnection(url);
-	      Statement stat = conn.createStatement();
-	        stat.executeUpdate("PRAGMA foreign_keys = ON;");
-	      stat.close();
-	      dbPath = path;
-	}
-	
-	public Boolean validateUser(String username) throws SQLException {
-		
-	    prep = conn
-		        .prepareStatement("SELECT * FROM usr_pass "
-		            + "WHERE usr = ?;");
-	    
-	   prep.setString(1, username);
-	   ResultSet rs = prep.executeQuery();
-	   
-	   while (rs.next()) {
-		   return true;
-	   }
-	   return false;
-	}
 
-	public Boolean validatePassword(String username, String password) throws SQLException {
-		boolean valid = false;
-	    prep = conn
-		        .prepareStatement("SELECT salt, pass FROM usr_pass "
-		            + "WHERE usr = ?;");
-	    
-	   prep.setString(1, username);
-	   ResultSet rs = prep.executeQuery();
-	   
-	   while (rs.next()) {
-		   if (this.hashPassword(password, rs.getString(1)).equals(rs.getString(2))) {
-			   valid = true;
-		   }
-	   }
-	   rs.close();
-	   
-	   return valid;
-	}
-	
-	//password will be hashed in the future
-	public void createAccount(String username, String password) throws SQLException {
-	    prep = conn
-		        .prepareStatement("INSERT INTO usr_pass (usr, pass, salt) VALUES "
-		            + "(?, ?, ?);");
-	    String salt = this.generateSalt();
-		prep.setString(1, username);
-		prep.setString(2, this.hashPassword(password, salt));
-		prep.setString(3, salt);
-		
-		prep.addBatch();
-		prep.executeBatch();
+  /**
+   *
+   */
+  public PongDatabase(String dbPath) {
+    try {
+      this.establishConnection(dbPath);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
 
-		prep = conn.prepareStatement("INSERT INTO usr_stats (usr, total_games, elo, winrate) VALUES (?, 0, 0, 0);");
-		prep.setString(1, username);
-		prep.addBatch();
-		prep.executeBatch();
-	}
+  public void establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
+    //TODO: validate the database and path entered. favor try/catch
+    Class.forName("org.sqlite.JDBC");
+    String url = "jdbc:sqlite:" + dbPath;
+    conn = DriverManager.getConnection(url);
+    Statement stat = conn.createStatement();
+    stat.executeUpdate("PRAGMA foreign_keys = ON;");
+    stat.close();
+    dbPath = path;
+    setupTables();
+  }
 
-	public List<String> getLeaderboardData() {
-		List<String> leaderboardData = new ArrayList<String>();
-		try {
-			prep = conn.prepareStatement("SELECT usr, total_games, elo, winrate from usr_stats ORDER BY winrate DESC;");
-			ResultSet rs = prep.executeQuery();
-			int i = 0;
-			while (rs.next() && i < 4) {
-				leaderboardData.add(rs.getString(1));
-				leaderboardData.add(rs.getString(2));
-				leaderboardData.add(rs.getString(3));
-				leaderboardData.add(rs.getString(4));
-				i++;
-			}
-		} catch (SQLException e) {
-			leaderboardData.add("ERROR");
-		}
-		while (leaderboardData.size() < 20) {
-			leaderboardData.add("N/A");
-		}
-		return leaderboardData;
-	}
-	
-	//password stuff should probably be put into its own class later...like a pass
-	//manager or w/e
-	//https://stackoverflow.com/questions/33085493/how-to-hash-a-password-with-sha-512-in-java
-	public String hashPassword(String password, String salt) {
-		String generatedPassword = null;
-	    try {
-	         MessageDigest md = MessageDigest.getInstance("SHA-512");
-	         md.update(salt.getBytes(StandardCharsets.UTF_8));
-	         byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
-	         StringBuilder sb = new StringBuilder();
-	         for(int i=0; i< bytes.length ;i++){
-	            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-	         }
-	         generatedPassword = sb.toString();
-	        } 
-	       catch (NoSuchAlgorithmException e){
-	        e.printStackTrace();
-	       }
-	    return generatedPassword;
-	}
-	
-	public String generateSalt() {
-		byte[] salt = new byte[16];
-		RANDOM.nextBytes(salt);
-		return new String(salt);
-	}
-		
+  public void setupTables() {
+    try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_stats" +
+            "(" +
+            "usr TEXT," +
+            "total_games INTEGER," +
+            "elo REAL," +
+            "wins INTEGER" +
+            ")")) {
+      prep.execute();
+    } catch (Exception e) {
+      System.out.println("Failed to create table:");
+      e.printStackTrace();
+    }
+    try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_pass" +
+            "(" +
+            "usr TEXT," +
+            "pass TEXT," +
+            "salt TEXT" +
+            ")")) {
+      prep.execute();
+    } catch (Exception e) {
+      System.out.println("Failed to create table:");
+      e.printStackTrace();
+    }
+  }
+
+  public Boolean validateUser(String username) throws SQLException {
+
+    try (PreparedStatement prep = conn
+            .prepareStatement("SELECT usr FROM usr_pass "
+                    + "WHERE usr = ?;")) {
+
+      prep.setString(1, username);
+      ResultSet rs = prep.executeQuery();
+
+      while (rs.next()) {
+        return true;
+      }
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public Boolean validatePassword(String username, String password) throws SQLException {
+    boolean valid = false;
+    try (PreparedStatement prep = conn
+            .prepareStatement("SELECT salt, pass FROM usr_pass "
+                    + "WHERE usr = ?;")) {
+
+      prep.setString(1, username);
+      ResultSet rs = prep.executeQuery();
+
+      while (rs.next()) {
+        if (this.hashPassword(password, rs.getString(1)).equals(rs.getString(2))) {
+          valid = true;
+        }
+      }
+      rs.close();
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+
+    return valid;
+  }
+
+  //password will be hashed in the future
+  public void createAccount(String username, String password) throws SQLException {
+    try (PreparedStatement prep = conn
+            .prepareStatement("INSERT INTO usr_pass (usr, pass, salt) VALUES "
+                    + "(?, ?, ?)")) {
+      String salt = this.generateSalt();
+      prep.setString(1, username);
+      prep.setString(2, this.hashPassword(password, salt));
+      prep.setString(3, salt);
+
+      prep.addBatch();
+      prep.executeBatch();
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+
+    try (PreparedStatement prep = conn.prepareStatement(
+            "INSERT INTO usr_stats (usr, total_games, elo, wins) VALUES (?, 0, 0, 0);")) {
+      prep.setString(1, username);
+      prep.addBatch();
+      prep.executeBatch();
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+  }
+
+  public List<LeaderboardEntry> getLeaderboardData() {
+    List<LeaderboardEntry> leaderboardData = new ArrayList<>();
+    try(PreparedStatement prep = conn.prepareStatement(
+            "SELECT usr, total_games, elo, wins from usr_stats ORDER BY wins * 1.0 / total_games DESC;")) {
+      ResultSet rs = prep.executeQuery();
+      int i = 0;
+      while (rs.next() && i < 5) {
+        leaderboardData.add(new LeaderboardEntry(rs.getString(1), rs.getInt(2), rs.getInt(4), rs.getDouble(3)));
+        i++;
+      }
+    } catch (SQLException e) {
+      return null;
+    }
+    while (leaderboardData.size() < 5) {
+      leaderboardData.add(null);
+    }
+    return leaderboardData;
+  }
+
+  public void incrementTotalGames(String usr) {
+    try (PreparedStatement prep = conn.prepareStatement(
+            "UPDATE usr_stats SET total_games = total_games + 1 WHERE usr = ?")){
+      prep.setString(1, usr);
+      prep.executeQuery();
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+  }
+
+  public void incrementWins(String usr) {
+    try (PreparedStatement prep = conn.prepareStatement(
+            "UPDATE usr_stats SET wins = wins + 1 WHERE usr = ?")){
+      prep.setString(1, usr);
+      prep.executeQuery();
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+    }
+  }
+
+  //password stuff should probably be put into its own class later...like a pass
+  //manager or w/e
+  //https://stackoverflow.com/questions/33085493/how-to-hash-a-password-with-sha-512-in-java
+  public String hashPassword(String password, String salt) {
+    String generatedPassword = null;
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-512");
+      md.update(salt.getBytes(StandardCharsets.UTF_8));
+      byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < bytes.length; i++) {
+        sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+      }
+      generatedPassword = sb.toString();
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+    return generatedPassword;
+  }
+
+  public String generateSalt() {
+    byte[] salt = new byte[16];
+    RANDOM.nextBytes(salt);
+    return new String(salt);
+  }
+
 }
