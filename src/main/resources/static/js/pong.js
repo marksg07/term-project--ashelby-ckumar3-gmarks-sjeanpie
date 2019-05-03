@@ -4,9 +4,10 @@ let oppLeftPaddle;
 let ballLeft;
 let ballRight;
 
-let paddleWidth;
-let paddleHeight;
-let ballSize;
+
+const paddleWidth = 10;
+const paddleHeight = 40;
+const ballSize = 20;
 let up = false;
 let down = false;
 let playersRemaining;
@@ -188,26 +189,21 @@ function executePong() {
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
     console.log(canvas.width);
-    canvas.width += paddleWidth * 3;
+    canvas.width = canvas.width + paddleWidth * 3;
     console.log(canvas.width);
     // Set up the canvas context.
     ctx = canvas.getContext("2d");
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //initial width of paddle, will be a constant
-    paddleWidth = 10;
-    //initial height of paddles, another constant
-    paddleHeight = 40;
-    //initial ball size, another constant
-    ballSize = 20;
+
     //initialize 5 entities.
     up = false;
     down = false;
     playerPaddle = new Paddle(canvas.width/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
     oppLeftPaddle = new Paddle(paddleWidth/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
     oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(20, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
-    ballRight = new Ball(20, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
+    ballLeft = new Ball(ballSize, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
+    ballRight = new Ball(ballSize, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
     // ctx.font = "50px Futura, sans-serif";
     // ctx.fillStyle = "white";
     // ctx.textAlign = "center";
