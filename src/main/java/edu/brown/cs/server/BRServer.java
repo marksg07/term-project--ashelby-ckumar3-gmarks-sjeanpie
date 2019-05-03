@@ -223,7 +223,7 @@ public class BRServer implements Server {
       }
 
       // the br server has to know the client used to exist
-      clientToServers.put(playerID, null);
+      clientToServers.remove(playerID);
     } else {
       println("Client DNE " + playerID + ".");
     }
