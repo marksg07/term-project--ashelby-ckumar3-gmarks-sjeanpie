@@ -162,21 +162,21 @@ public final class Main {
       String response = "";
       if (loginButton != null) {
         if (!db.validateUser(usr)) {
-          response = "User does not exist\n Would you like to create an account?";
+          response = "User does not exist. Try creating an account!";
         } else { //check password
           if (db.validatePassword(usr, pass)) {
             response = "Successfully logged in!";
           } else {
-            response = "User exists; however, password is incorrect";
+            response = "Username and password do not match.";
           }
         }
       } else {
         if (usr.length() > 10) {
-          response = "Username is too long! Username can not have more than 10 characters";
+          response = "Your username must not exceed 10 characters.";
         } else if (pass.length() < 3) {
-          response = "Password must be greater than 3 characters";
+          response = "Password must exceed 3 characters.";
         } else if (db.validateUser(usr)) {
-          response = "User already exists. Please choose a new username.";
+          response = "Please choose a new username.";
         } else {
           db.createAccount(usr, pass);
           response = "Account successfully created!";
