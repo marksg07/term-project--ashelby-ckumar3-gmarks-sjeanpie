@@ -59,7 +59,7 @@ function updateGame(state) {
         leftSec.hide();
         oppLeftPaddle.setPosition(state.left.p1PaddleY);
         playerPaddle.setPosition(state.left.p2PaddleY);
-        ballLeft.setPosition(state.left.ballX, state.left.ballY);
+        ballLeft.setPosition(state.left.ballX + paddleWidth, state.left.ballY);
     }
 
     if (state.right === "dead") {
@@ -86,7 +86,7 @@ function updateGame(state) {
         rightSec.hide();
         oppRightPaddle.setPosition(state.right.p2PaddleY);
         playerPaddle.setPosition(state.right.p1PaddleY);
-        ballRight.setPosition(state.right.ballX + canvas.width / 2, state.right.ballY);
+        ballRight.setPosition(state.right.ballX + canvas.width / 2 + paddleWidth / 2, state.right.ballY);
     }
 
 }
@@ -221,5 +221,6 @@ function rmWaitingText() {
 }
 
 $(document).ready(() => {
+    canvas.width += paddleWidth * 3;
     executePong();
 });
