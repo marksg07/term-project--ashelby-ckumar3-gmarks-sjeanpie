@@ -2,7 +2,6 @@
     <div class="wrapper">
         <form action="/home" method="GET">
             <input type="submit" id="find-game" class="find_game" value="Go Home">
-            </input>
         </form>
         <div class="pong-board">
             <div style="width: 800px; height: 300px;">
@@ -11,7 +10,7 @@
                 <p id="leftCountdown"></p>
                 <p id="rightCountdown"></p>
             </div>
-            <p id="status" style="font-size: 48; bold: true;">Waiting for players...</p>
+            <p id="status" style="font-size: 48px; margin-top: 24px; bold: true;">Waiting for players...</p>
         </div>
     </div>
     <script src="js/jquery-2.1.1.js"></script>

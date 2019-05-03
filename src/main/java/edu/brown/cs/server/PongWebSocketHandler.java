@@ -88,6 +88,7 @@ public class PongWebSocketHandler {
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     // user bad
+    server.removeSession(session);
   }
 
   @OnWebSocketMessage

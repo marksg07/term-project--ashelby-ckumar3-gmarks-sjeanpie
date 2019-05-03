@@ -43,14 +43,14 @@ public class BRServer implements Server {
   }
 
   public void addClient(String id, Session session) {
-    System.out.println("BR #" + myId + " :: Adding client " + id + ".");
+    println("Adding client " + id + ".");
     synchronized (clientToServers) {
       if (ready()) {
         return;
       }
       clients.add(id);
       sessions.put(id, session);
-      System.out.println("BR #" + myId + " :: " + clients.size() + " players total.");
+      println(clients.size() + " players total.");
       if (clients.size() == MAXPLAYERS) {
         ready = true;
         onFilled();
@@ -58,8 +58,8 @@ public class BRServer implements Server {
     }
   }
 
-  public void onFilled() {
-    System.out.println("BR #" + myId + " :: Game filled with " + clients.size() + " players, starting.");
+  private void onFilled() {
+    println("Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
     for (String cli : clients) {
       clientToServers.put(cli, new ServerPair());
@@ -85,7 +85,7 @@ public class BRServer implements Server {
       try {
         session.getRemote().sendString(GSON.toJson(updateObj));
       } catch (IOException e) {
-        System.out.println("Sending game start update failed:");
+        println("Sending game start update failed:");
         e.printStackTrace();
       }
     }
@@ -182,7 +182,7 @@ public class BRServer implements Server {
       try {
         deadSession.getRemote().sendString(GSON.toJson(deadMsg));
       } catch (Exception e) {
-        System.out.println("Failed to send PLAYERDEAD");
+        println("Failed to send PLAYERDEAD");
       }
       sessions.remove(playerID);
       clients.remove(playerID);
@@ -203,16 +203,25 @@ public class BRServer implements Server {
         try {
           winSession.getRemote().sendString(GSON.toJson(winMsg));
         } catch (Exception e) {
-          System.out.println("Failed to send PLAYERWIN");
+          println("Failed to send PLAYERWIN");
         }
       }
 
       // the br server has to know the client used to exist
       clientToServers.put(playerID, null);
     } else {
-      System.out.println("BR #" + myId + " :: Client DNE " + playerID + ".");
+      println("Client DNE " + playerID + ".");
     }
 
+  }
+
+  public void removeClient(String id) {
+    kill(id);
+  }
+
+  @Override
+  public void println(String msg) {
+    System.out.println("BR #" + myId + " :: " + msg);
   }
 
 }
