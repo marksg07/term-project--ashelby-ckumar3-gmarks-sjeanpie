@@ -83,7 +83,7 @@ public final class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
-    MainServer serv = new MainServer();
+    MainServer serv = new MainServer(db);
     PongWebSocketHandler.setServer(serv);
     
     // timeout for websockets = 2 seconds in case of badly behaved clients
@@ -95,7 +95,7 @@ public final class Main {
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
-    Spark.post("/stats", new StatsHandler());
+    //Spark.post("/stats", new StatsHandler());
 
     // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
@@ -103,7 +103,7 @@ public final class Main {
       if (url.startsWith("http://"))
       {
         final String[] split = url.split("http://");
-        response.redirect("https://" + split[1]);
+        //response.redirect("https://" + split[1]);
       }
     }));
   }
@@ -143,9 +143,7 @@ public final class Main {
 
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Leaderboard");
-
-      System.out.println("here");
+      "Leaderboard", "leaderboardData", db.getLeaderboardData());
 
       return new ModelAndView(variables, "leaderboard.ftl");
     }

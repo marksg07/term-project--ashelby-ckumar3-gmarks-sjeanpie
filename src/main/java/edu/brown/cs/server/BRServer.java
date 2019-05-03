@@ -3,6 +3,7 @@ package edu.brown.cs.server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class BRServer implements Server {
   private final List<String> clients;
   private final Map<String, Session> sessions;
   private long myId;
+  private final PongDatabase db;
   static final int MAXPLAYERS = 3;
 
   private static long idCounter = 0;
@@ -30,12 +32,13 @@ public class BRServer implements Server {
   private final Map<String, ServerPair> clientToServers;
   private boolean ready;
 
-  public BRServer() {
+  public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
     clientToServers = new ConcurrentHashMap<>();
     ready = false;
     myId = nextId();
+    this.db = db;
   }
 
   public boolean ready() {
@@ -76,8 +79,12 @@ public class BRServer implements Server {
     // yes
 
     for (Map.Entry<String, Session> pair : sessions.entrySet()) {
-      Session session = pair.getValue();
+      String id = pair.getKey();
+      synchronized (db) {
+        db.incrementTotalGames(id);
+      }
 
+      Session session = pair.getValue();
       JsonObject updateObj = new JsonObject();
       updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
       JsonObject payload = new JsonObject();
@@ -127,8 +134,8 @@ public class BRServer implements Server {
 
         String leftDeadID = "";
         String rightDeadID = "";
-        
-        if(sp.left != null) {
+
+        if (sp.left != null) {
           if (sp.left.getGame().isP1Dead()) {
             leftDeadID = sp.left.getID("1");
           } else if (sp.left.getGame().isP2Dead()) {
@@ -196,6 +203,9 @@ public class BRServer implements Server {
         clientToServers.get(nextID).left = null;
       } else {
         assert (clients.size() == 1);
+        synchronized (db) {
+          db.incrementWins(clients.get(0));
+        }
         Session winSession = sessions.get(clients.get(0));
         JsonObject winMsg = new JsonObject();
         winMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERWIN.ordinal());

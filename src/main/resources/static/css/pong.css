@@ -193,51 +193,31 @@ body {
 }
 
 .leaderboardtitle {
-    position: absolute;
-    font-size: 16px;
+    position: relative;
+    font-size: 24px;
     color: #fff;
-    top: 10%;
-    left:53%;
+    top: -90%;
+    left:90%;
     transform: translate(-50%,-50%);
-    font-family: Helvteica;
-}
-.statstitleuser {
-    position: absolute;
-    font-size: 16px;
-    color: #fff;
-    top: 30%;
-    left: 30.5%;
-    transform: translate(-50%,-50%);
-    font-family: Helvteica;
+    font-family: "DejaVu Sans";
 }
 
-.statstitletotalgames {
-    position: absolute;
+#leaderboard {
+    position: relative;
     font-size: 16px;
     color: #fff;
-    top: 30%;
-    left: 45.5%;
+    top: -60%;
+    left: 50%;
     transform: translate(-50%,-50%);
-    font-family: Helvteica;
+    font-family: "DejaVu Sans";
 }
 
-.statstitleelo {
-    position: absolute;
-    font-size: 16px;
-    color: #fff;
-    top: 30%;
-    left: 60.5%;
-    transform: translate(-50%,-50%);
-    font-family: Helvteica;
+#leaderboard td {
+    width: 200px;
+    text-align: center;
 }
 
-.statstitlewinrate {
-    position: absolute;
-    font-size: 16px;
-    color: #fff;
-    top: 30%;
-    left: 75.5%;
-    transform: translate(-50%,-50%);
-    font-family: Helvteica;
+#leaderboard th {
+    width: 200px;
+    text-align: center;
 }
-

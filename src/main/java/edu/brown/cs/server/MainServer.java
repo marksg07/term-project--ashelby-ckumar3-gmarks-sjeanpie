@@ -3,6 +3,7 @@ package edu.brown.cs.server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
@@ -21,12 +22,14 @@ public class MainServer implements Server {
   private final Map<String, BRServer> clientToServer;
   private static final Gson GSON = new Gson();
   private final Map<String, Session> sessions;
+  private final PongDatabase db;
 
-  public MainServer() {
+  public MainServer(PongDatabase db) {
     sessions = new ConcurrentHashMap<>();
     clients = new ConcurrentSkipListSet<>();
     clientToServer = new ConcurrentHashMap<>();
     servers = new CopyOnWriteArrayList<>();
+    this.db = db;
   }
 
   public void addClient(String id, Session session) {
@@ -43,7 +46,7 @@ public class MainServer implements Server {
       }
       if (openServer == null) {
         println("Made new server to accomodate client " + id);
-        openServer = new BRServer();
+        openServer = new BRServer(db);
         servers.add(openServer); // XXX actual MM
       }
       openServer.addClient(id, session);
