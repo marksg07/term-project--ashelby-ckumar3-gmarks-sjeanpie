@@ -405,12 +405,29 @@ public class PongGame implements Cloneable {
     if (nowIsCurrent()) {
       obj.addProperty("ballX", ballX);
       obj.addProperty("ballY", ballY);
-      obj.addProperty("ballVelX", ballVelX);
-      obj.addProperty("ballVelY", ballVelY);
       obj.addProperty("p1PaddleY", p1PaddleY);
       obj.addProperty("p2PaddleY", p2PaddleY);
-      obj.addProperty("p1Dead", p1Dead);
-      obj.addProperty("p2Dead", p2Dead);
+      //obj.addProperty("p1Dead", p1Dead);
+      //obj.addProperty("p2Dead", p2Dead);
+    } else {
+      // still in CD
+      Instant now = Instant.now();
+      double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
+      System.out.println("Duration between last and now is " + seconds);
+      obj.addProperty("cdSecondsLeft", -seconds);
+    }
+    return obj;
+  }
+
+  public JsonObject getFlippedState() {
+    JsonObject obj = new JsonObject();
+    if (nowIsCurrent()) {
+      obj.addProperty("ballX", maxX - ballX);
+      obj.addProperty("ballY", ballY);
+      obj.addProperty("p1PaddleY", p2PaddleY);
+      obj.addProperty("p2PaddleY", p1PaddleY);
+      //obj.addProperty("p1Dead", p2Dead);
+      //obj.addProperty("p2Dead", p1Dead);
     } else {
       // still in CD
       Instant now = Instant.now();

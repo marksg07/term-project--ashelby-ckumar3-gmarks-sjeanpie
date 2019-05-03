@@ -43,6 +43,13 @@ public class PongServer implements Server {
     }
   }
 
+  public JsonObject getFlippedGameState(String id) {
+    assert (p1Id.equals(id) || p2Id.equals(id));
+    synchronized (game) {
+      return game.getFlippedState();
+    }
+  }
+
   public String getID(String pNum) {
     switch (pNum) {
       case "player1":

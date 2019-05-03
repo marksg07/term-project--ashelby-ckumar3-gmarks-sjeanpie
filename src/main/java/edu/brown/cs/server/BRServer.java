@@ -159,16 +159,20 @@ public class BRServer implements Server {
           kill(rightDeadID);
         }
 
+        if(sp.left == null && sp.right == null) {
+          return obj;
+        }
+
         if (sp.left != null) {
           obj.add("left", sp.left.getGameState(id));
         } else {
-          obj.addProperty("left", "dead");
+          obj.add("left", sp.right.getFlippedGameState(id));
         }
 
         if (sp.right != null) {
           obj.add("right", sp.right.getGameState(id));
         } else {
-          obj.addProperty("right", "dead");
+          obj.add("right", sp.left.getFlippedGameState(id));
         }
         return obj;
       }
