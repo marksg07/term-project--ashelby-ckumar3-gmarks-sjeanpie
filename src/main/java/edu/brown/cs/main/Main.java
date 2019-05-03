@@ -160,7 +160,11 @@ public final class Main {
           }
         }
       } else {
-        if (db.validateUser(usr)) {
+        if (usr.length() > 10) {
+          response = "Username is too long! Username can not have more than 10 characters";
+        } else if (pass.length() < 3) {
+          response = "Password must be greater than 3 characters";
+        } else if (db.validateUser(usr)) {
           response = "User already exists. Please choose a new username.";
         } else {
           db.createAccount(usr, pass);
