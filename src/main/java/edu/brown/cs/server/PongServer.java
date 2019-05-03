@@ -46,12 +46,17 @@ public class PongServer implements Server {
       case "2":
         return p2Id;
       default:
-        System.out.println("BAD GETID");
-        return "BAD ARG";
+        println("BAD GETID");
+        return null;
     }
   }
 
   public PongGame getGame() {
     return game;
+  }
+
+  @Override
+  public void println(String msg) {
+    System.out.println("Pong (\"" + p1Id + "\" vs \"" + p2Id + "\") :: " + msg);
   }
 }

@@ -174,6 +174,7 @@ function onPlayerDead() {
     ctx.fillStyle = "red";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ded");
+    conn.close();
 }
 
 function onPlayerWin() {
@@ -182,6 +183,7 @@ function onPlayerWin() {
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ur winner");
+    conn.close();
 }
 
 function executePong() {
