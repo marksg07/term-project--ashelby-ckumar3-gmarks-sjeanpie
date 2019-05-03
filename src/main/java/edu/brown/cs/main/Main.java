@@ -36,7 +36,6 @@ public final class Main {
 
 
   private static final int DEFAULT_PORT = 4567;
-  private static final List<PongGame> GAME_LIST = new ArrayList<>();
   private static final Gson GSON = new Gson();
   private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
 
@@ -81,17 +80,24 @@ public final class Main {
     Spark.port(getHerokuAssignedPort());
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
+
     FreeMarkerEngine freeMarker = createEngine();
+
     MainServer serv = new MainServer();
     PongWebSocketHandler.setServer(serv);
-    //Spark.webSocketIdleTimeoutMillis(2000);
+
+    // timeout for websockets = 2 seconds in case of badly behaved clients
+    Spark.webSocketIdleTimeoutMillis(2000);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
+
     Spark.post("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
     Spark.post("/stats", new StatsHandler());
+
+    // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
       final String url = request.url();
       if (url.startsWith("http://"))
