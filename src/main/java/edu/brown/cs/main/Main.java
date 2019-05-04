@@ -15,6 +15,7 @@ import spark.Route;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
+import java.util.Random;
 
 import java.awt.font.GlyphMetrics;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public final class Main {
   private static final int DEFAULT_PORT = 4567;
   private static final Gson GSON = new Gson();
   private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
+  private static final Map<String, String> unsToUuids = new HashMap<>();
 
   /**
    * The initial method called when execution begins.
@@ -149,38 +151,73 @@ public final class Main {
 
 
       Map<String, String> cookies = req.cookies();
+
+      /**
+       * homepage loading with cookies, so we just want to check
+       * if the user id matches the stored user id. if so, we log
+       * them in. if not, we don't
+       */
       if (cookies != null) {
-
-        Boolean successful = false;
-        String response = "";
-
         String usr = cookies.getOrDefault("username", "");
-        String pass = cookies.getOrDefault("password", "");
+        String clientId = cookies.getOrDefault("userid", "");
+        if (clientId.equals(unsToUuids.getOrDefault(usr, "DNE"))) {
 
-        if (!db.validateUser(usr)) {
-          response = "User does not exist. Try creating an account!";
-        } else { //check password
-          if (db.validatePassword(usr, pass)) {
-            response = "Successfully logged in!";
-            successful = true;
-          } else {
-            response = "Username and password do not match.";
-          }
+
+
+//        String usr = cookies.getOrDefault("username", "");
+//        String pass = cookies.getOrDefault("password", "");
+//
+//
+//        if ((!usr.equals("")) && (!pass.equals(""))) {
+//
+          Boolean successful = false;
+          String response = "";
+//          if (!db.validateUser(usr)) {
+//            response = "User does not exist. Try creating an account!";
+//          } else { //check password
+//            if (db.validatePassword(usr, pass)) {
+              response = "Successfully logged in!";
+              successful = true;
+//            } else {
+//              response = "Username and password do not match.";
+//            }
+//          }
+//
+//          if (successful) {
+//            String userId = "";
+//
+//
+//            /**
+//             * based on https://www.baeldung.com/java-random-string
+//             */
+//              int leftLimit = 97; // letter 'a'
+//              int rightLimit = 122; // letter 'z'
+//              int targetStringLength = 32;
+//              Random random = new Random();
+//              StringBuilder buffer = new StringBuilder(targetStringLength);
+//              for (int i = 0; i < targetStringLength; i++) {
+//                int randomLimitedInt = leftLimit + (int)
+//                        (random.nextFloat() * (rightLimit - leftLimit + 1));
+//                buffer.append((char) randomLimitedInt);
+//              }
+//              userId = buffer.toString();
+//
+//              unsToUuids.put(usr, userId);
+//
+//
+            variables = ImmutableMap.<String, Object>builder().put("title",
+                    "P O N G F O L K S").put( "response", response).put(
+                    "successful", successful).put(
+                            "username", usr).put(
+                                    "userid", clientId).build();
+//          } else {
+//            variables = ImmutableMap.of("title",
+//                    "P O N G F O L K S", "response", response,
+//                    "successful", successful);
+//          }
+
+          return new ModelAndView(variables, "home.ftl");
         }
-
-        if(successful) {
-          String hash = db.getHash(usr);
-          assert (hash != null);
-          variables = ImmutableMap.of("title",
-                  "P O N G F O L K S", "response", response,
-                  "successful", successful, "username", usr, "hash", hash);
-        } else {
-          variables = ImmutableMap.of("title",
-                  "P O N G F O L K S", "response", response,
-                  "successful", successful);
-        }
-
-        return new ModelAndView(variables, "home.ftl");
       }
 
 
@@ -241,11 +278,28 @@ public final class Main {
       //TODO: get password and hash it
       Map<String, Object> variables;
       if(successful) {
-        String hash = db.getHash(usr);
-        assert (hash != null);
+        String hash = unsToUuids.get(usr);
+        if (hash == null) {
+                      /**
+             * based on https://www.baeldung.com/java-random-string
+             */
+              int leftLimit = 97; // letter 'a'
+              int rightLimit = 122; // letter 'z'
+              int targetStringLength = 32;
+              Random random = new Random();
+              StringBuilder buffer = new StringBuilder(targetStringLength);
+              for (int i = 0; i < targetStringLength; i++) {
+                int randomLimitedInt = leftLimit + (int)
+                        (random.nextFloat() * (rightLimit - leftLimit + 1));
+                buffer.append((char) randomLimitedInt);
+              }
+          hash = buffer.toString();
+
+              unsToUuids.put(usr, hash);
+        }
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
-                "successful", successful, "username", usr, "hash", hash);
+                "successful", successful, "username", usr, "userid", hash);
       } else {
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
@@ -274,11 +328,11 @@ public final class Main {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
       QueryParamsMap map = request.queryMap();
-      if(!(map.hasKey("username") && map.hasKey("hash"))) {
+      if(!(map.hasKey("username") && map.hasKey("userid"))) {
         return new HomePageHandler().handle(request, response);
       }
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Game", "username", map.value("username"), "hash", map.value("hash"));
+      "Game", "username", map.value("username"), "userid", map.value("userid"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }

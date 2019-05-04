@@ -23,7 +23,7 @@
     </div>
     <script>
         const myId = "${username}";
-        const hash = "${hash}";
+        const userid = "${userid}";
     </script>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/pong.js"> </script>
