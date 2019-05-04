@@ -6,6 +6,8 @@ import com.google.gson.JsonPrimitive;
 import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +19,9 @@ public class BRServer implements Server {
   private final Map<String, Session> sessions;
   private long myId;
   private final PongDatabase db;
-  static final int MAXPLAYERS = 4;
+  static final int MINPLAYERS = 3;
+  static final int MAXPLAYERS = 10;
+  static final double startTime = 20;
 
   private static long idCounter = 0;
 
@@ -31,12 +35,15 @@ public class BRServer implements Server {
 
   private final Map<String, ServerPair> clientToServers;
   private boolean ready;
+  private boolean starting;
+  private Timer startTimer;
 
   public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
     clientToServers = new ConcurrentHashMap<>();
     ready = false;
+    starting = false;
     myId = nextId();
     this.db = db;
   }
@@ -54,7 +61,25 @@ public class BRServer implements Server {
       clients.add(id);
       sessions.put(id, session);
       println(clients.size() + " players total.");
+      if (clients.size() == MINPLAYERS) {
+        starting = true;
+        startTimer = new Timer();
+        startTimer.schedule(new TimerTask() {
+          @Override
+          public void run() {
+            synchronized (clientToServers) {
+              starting = false;
+              ready = true;
+              onFilled();
+            }
+          }
+        }, (long)(startTime * 1000));
+      }
       if (clients.size() == MAXPLAYERS) {
+        assert (starting);
+        starting = false;
+        startTimer.cancel();
+        startTimer = null;
         ready = true;
         onFilled();
       }
@@ -276,6 +301,11 @@ public class BRServer implements Server {
       } else { // otherwise, remove the player from the clients list
         clients.remove(id);
         sessions.remove(id);
+        if (starting && clients.size() < MINPLAYERS) { // no longer enough players! :(
+          starting = false;
+          startTimer.cancel();
+          startTimer = null;
+        }
       }
     }
   }
