@@ -162,30 +162,36 @@ public class BRServer implements Server {
         JsonObject obj = new JsonObject();
 
         String leftDeadID = "";
+        String leftKillerID = "";
         String rightDeadID = "";
+        String rightKillerID = "";
 
         if (sp.left != null) {
           if (sp.left.getGame().isP1Dead()) {
             leftDeadID = sp.left.getID("1");
+            leftKillerID = sp.left.getID("2");
           } else if (sp.left.getGame().isP2Dead()) {
             leftDeadID = sp.left.getID("2");
+            leftKillerID = sp.left.getID("1");
           }
         }
 
         if (sp.right != null) {
           if (sp.right.getGame().isP1Dead()) {
             rightDeadID = sp.right.getID("1");
+            rightKillerID = sp.right.getID("2");
           } else if (sp.right.getGame().isP2Dead()) {
             rightDeadID = sp.right.getID("2");
+            rightKillerID = sp.right.getID("1");
           }
         }
 
         if (!leftDeadID.equals("")) {
-          kill(leftDeadID);
+          kill(leftKillerID, leftDeadID);
         }
 
         if (!rightDeadID.equals("")) {
-          kill(rightDeadID);
+          kill(rightKillerID, rightDeadID);
         }
 
         if(sp.left == null && sp.right == null) {
@@ -209,18 +215,18 @@ public class BRServer implements Server {
     return new JsonObject();
   }
 
-  private void kill(String playerID) {
-    println("Killing player " + playerID);
+  private void kill(String killer, String killed) {
+    println("Killing player " + killed);
     if(clients.size() == 1) {
       // don't "kill" last client, just leave it as every connection should be closed
       return;
     }
-    Integer playerIndex = clients.indexOf(playerID);
+    Integer playerIndex = clients.indexOf(killed);
     if (!playerIndex.equals(-1)) {
       String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
       String nextID = clients.get((playerIndex + 1) % clients.size());
 
-      Session deadSession = sessions.get(playerID);
+      Session deadSession = sessions.get(killed);
       JsonObject deadMsg = new JsonObject();
       deadMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
       deadMsg.add("payload", new JsonObject());
@@ -229,8 +235,24 @@ public class BRServer implements Server {
       } catch (Exception e) {
         println("Failed to send PLAYERDEAD");
       }
-      sessions.remove(playerID);
-      clients.remove(playerID);
+
+      JsonObject killLogMsg = new JsonObject();
+      killLogMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.KILLLOG.ordinal());
+      JsonObject logPayload = new JsonObject();
+      logPayload.addProperty("killer", killer == null ? "" : killer);
+      logPayload.addProperty("killed", killed);
+      killLogMsg.add("payload", new JsonObject());
+      String killLogString = GSON.toJson(killLogMsg);
+      for(Session session : sessions.values()) {
+        try {
+          session.getRemote().sendString(killLogString);
+        } catch (Exception e) {
+          println("Failed to send kill log");
+        }
+      }
+
+      sessions.remove(killed);
+      clients.remove(killed);
       // make new server for new neighbors
       if (clients.size() > 2) {
         double p1PaddleY = clientToServers.get(prevID).right.getP1PaddleY();
@@ -262,9 +284,9 @@ public class BRServer implements Server {
       }
 
       // the br server has to know the client used to exist
-      clientToServers.remove(playerID);
+      clientToServers.remove(killed);
     } else {
-      println("Client DNE " + playerID + ".");
+      println("Client DNE " + killed + ".");
     }
 
   }
@@ -272,7 +294,7 @@ public class BRServer implements Server {
   public void removeClient(String id) {
     synchronized (clientToServers) {
       if(ready) { // if the game is running, just kill the player
-        kill(id);
+        kill(null, id);
       } else { // otherwise, remove the player from the clients list
         clients.remove(id);
         sessions.remove(id);

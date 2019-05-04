@@ -22,6 +22,9 @@ const rightSec = $("#rightCountdown");
 
 let leftBoardState = 'none';
 let rightBoardState = 'none';
+let killLog = [];
+let logStartPointer = 0;
+let killLogElement;
 
 
 function setGameReady(v) {
@@ -225,10 +228,41 @@ function setUsers(left, right) {
     $("#rightName").text(right);
 }
 
+function logEntryElement(killer, killed) {
+    let newDiv = document.createElement("div");
+    if(killer !== "") {
+        newDiv.innerText = killer + " ponged " + killed;
+    } else {
+        newDiv.innerText = killed + " disconnected"
+    }
+    return newDiv;
+}
+
+function addToKillLog(killer, killed) {
+    killLog.push([killer, killed, (new Date()).getTime()]);
+    killLogElement.appendChild(logEntryElement(killer, killed));
+}
+
+const logTime = 4;
+
+function drawKillLog() {
+    const earliestLogTime = (new Date()).getTime() - logTime * 1000;
+    for(let i = logStartPointer; i < killLog.length; i++) {
+        const log = killLog[i];
+        if(log[2] < earliestLogTime) {
+            logStartPointer = i + 1;
+            // Was in the log, must be deleted
+            killLogElement.removeChild(killLogElement.firstChild);
+        }
+
+    }
+}
+
 function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
+    killLogElement = $("#killLog")[0];
     console.log(canvas.width);
     // canvas.width = canvas.width + paddleWidth * 3;
     console.log(canvas.width);
@@ -252,6 +286,7 @@ function executePong() {
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
     inputHandle = setInterval(sendInput, 20);
+    setInterval(drawKillLog, 20);
     $("#name").text(myId);
 }
 
