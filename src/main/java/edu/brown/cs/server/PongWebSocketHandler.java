@@ -39,7 +39,9 @@ public class PongWebSocketHandler {
     INPUT,
     UPDATE,
     PLAYERDEAD,
-    PLAYERWIN;
+    PLAYERWIN,
+    BADID,
+    UPDATEUSERS;
 
     public static MESSAGE_TYPE fromInt(int t) {
       switch(t) {
@@ -57,6 +59,10 @@ public class PongWebSocketHandler {
           return PLAYERDEAD;
         case 6:
           return PLAYERWIN;
+        case 7:
+          return BADID;
+        case 8:
+          return UPDATEUSERS;
       }
       return null;
     }
@@ -101,10 +107,14 @@ public class PongWebSocketHandler {
       switch (type) {
         case SENDID:
           String hash = payload.get("hash").getAsString();
-          // TODO LoginManager.verifyLogin(id, hash)
-          // sessions.put(id, session);
-          System.out.println("Got SENDID");
-          server.addClient(id, session);
+          if(server.getDatabase().validateHash(id, hash)) {
+            server.addClient(id, session);
+          } else {
+            JsonObject badIdObj = new JsonObject();
+            badIdObj.add("type", new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
+            badIdObj.add("payload", new JsonObject());
+            session.getRemote().sendString(GSON.toJson(badIdObj));
+          }
           break;
 
         case INPUT:

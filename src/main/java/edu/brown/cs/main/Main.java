@@ -219,9 +219,12 @@ public final class Main {
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-
+      QueryParamsMap map = request.queryMap();
+      if(!(map.hasKey("username") && map.hasKey("hash"))) {
+        return new HomePageHandler().handle(request, response);
+      }
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Game");
+      "Game", "username", map.get("username").toString(), "hash", map.get("hash").toString());
       return new ModelAndView(variables, "pong.ftl");
     }
   }

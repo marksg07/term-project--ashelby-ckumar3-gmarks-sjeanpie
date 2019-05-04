@@ -95,4 +95,8 @@ public class MainServer implements Server {
   public void println(String msg) {
     System.out.println("Main :: " + msg);
   }
+
+  public PongDatabase getDatabase() {
+    return db;
+  }
 }

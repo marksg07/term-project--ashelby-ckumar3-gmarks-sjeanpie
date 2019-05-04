@@ -13,7 +13,6 @@ let up = false;
 let down = false;
 let playersRemaining;
 let upDown = [0,0];
-let myId = Math.random();
 let gameReady = false;
 let leftGameBegun = false;
 let rightGameBegun = false;

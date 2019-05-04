@@ -7,7 +7,8 @@ const MESSAGE_TYPE = {
     INPUT: 3,
     UPDATE: 4,
     PLAYERDEAD: 5,
-    PLAYERWIN: 6
+    PLAYERWIN: 6,
+    BADID: 7
 };
 
 function wsSetup() {
@@ -29,13 +30,10 @@ function wsSetup() {
         const data = JSON.parse(msg.data);
         // console.log(data);
         switch (data.type) {
-            default:
-                console.log('Unknown message type!', data.type);
-                break;
             case MESSAGE_TYPE.REQUESTID:
                 console.log('got requestid');
                 // TODO Assign myId
-                const idObj = {type: MESSAGE_TYPE.SENDID, payload: {id: myId, hash: 0}};
+                const idObj = {type: MESSAGE_TYPE.SENDID, payload: {id: myId, hash: hash}};
                 conn.send(JSON.stringify(idObj));
                 break;
             case MESSAGE_TYPE.GAMESTART:
@@ -54,6 +52,13 @@ function wsSetup() {
             case MESSAGE_TYPE.PLAYERWIN:
                 console.log('got win epic victory royale #1');
                 onPlayerWin();
+                break;
+            case MESSAGE_TYPE.BADID:
+                console.log('got badid, redirect inc');
+                $.get("/home");
+                break;
+            default:
+                console.log('Unknown message type!', data.type);
                 break;
         }
     };

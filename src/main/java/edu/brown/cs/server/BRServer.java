@@ -78,26 +78,43 @@ public class BRServer implements Server {
     // send all clients matchmaking packs?
     // yes
 
-    for (Map.Entry<String, Session> pair : sessions.entrySet()) {
-      String id = pair.getKey();
+    for (String id : sessions.keySet()) {
       synchronized (db) {
         db.incrementTotalGames(id);
       }
-
-      Session session = pair.getValue();
-      JsonObject updateObj = new JsonObject();
-      updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
-      JsonObject payload = new JsonObject();
-      updateObj.add("payload", payload);
-      try {
-        session.getRemote().sendString(GSON.toJson(updateObj));
-      } catch (IOException e) {
-        println("Sending game start update failed:");
-        e.printStackTrace();
-      }
+      sendGameStart(id);
+      sendUsernamesUpdate(id);
     }
+  }
 
+  public void sendGameStart(String id) {
+    Session session = sessions.get(id);
+    JsonObject updateObj = new JsonObject();
+    updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
+    JsonObject payload = new JsonObject();
+    updateObj.add("payload", payload);
+    try {
+      session.getRemote().sendString(GSON.toJson(updateObj));
+    } catch (IOException e) {
+      println("Sending game start update failed:");
+      e.printStackTrace();
+    }
+  }
 
+  public void sendUsernamesUpdate(String id) {
+    Session session = sessions.get(id);
+    JsonObject usernamesObj = new JsonObject();
+    usernamesObj.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.UPDATEUSERS.ordinal());
+    JsonObject userPayload = new JsonObject();
+    userPayload.addProperty("left", clientToServers.get(id).left.getID("1"));
+    userPayload.addProperty("right", clientToServers.get(id).right.getID("2"));
+    usernamesObj.add("payload", userPayload);
+    try {
+      session.getRemote().sendString(GSON.toJson(usernamesObj));
+    } catch (IOException e) {
+      println("Sending username update failed:");
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -209,9 +226,13 @@ public class BRServer implements Server {
         PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;
+        sendUsernamesUpdate(prevID);
+        sendUsernamesUpdate(nextID);
       } else if (clients.size() == 2) {
         clientToServers.get(prevID).right = null;
         clientToServers.get(nextID).left = null;
+        sendUsernamesUpdate(prevID);
+        sendUsernamesUpdate(nextID);
       } else {
         assert (clients.size() == 1);
         synchronized (db) {
@@ -238,7 +259,12 @@ public class BRServer implements Server {
 
   public void removeClient(String id) {
     synchronized (clientToServers) {
-      kill(id);
+      if(ready) { // if the game is running, just kill the player
+        kill(id);
+      } else { // otherwise, remove the player from the clients list
+        clients.remove(id);
+        sessions.remove(id);
+      }
     }
   }
 
