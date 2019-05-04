@@ -191,7 +191,7 @@ public class PongDatabase {
     try (PreparedStatement prep = conn.prepareStatement(
             "UPDATE usr_stats SET total_games = total_games + 1 WHERE usr = ?")){
       prep.setString(1, usr);
-      prep.executeQuery();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();
@@ -202,7 +202,7 @@ public class PongDatabase {
     try (PreparedStatement prep = conn.prepareStatement(
             "UPDATE usr_stats SET wins = wins + 1 WHERE usr = ?")){
       prep.setString(1, usr);
-      prep.executeQuery();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();

@@ -54,7 +54,7 @@ function wsSetup() {
                 updateGame(data.payload.state);
                 break;
             case MESSAGE_TYPE.PLAYERDEAD:
-                console.log('got dead lmao ur bad');
+                console.log('got dead');
                 onPlayerDead();
                 break;
             case MESSAGE_TYPE.PLAYERWIN:
@@ -63,7 +63,7 @@ function wsSetup() {
                 break;
             case MESSAGE_TYPE.BADID:
                 console.log('got badid, redirect inc');
-                $.get("/home");
+                window.location.pathname = "/home";
                 break;
             case MESSAGE_TYPE.UPDATEUSERS:
                 console.log('got user update!');
