@@ -70,6 +70,7 @@ function updateGame(state) {
     if (state.hasOwnProperty("timeUntilStart")) {
         console.log(state.timeUntilStart);
         displayTimer(state.timeUntilStart);
+        return;
     }
     if(gameOver) {
         return;
