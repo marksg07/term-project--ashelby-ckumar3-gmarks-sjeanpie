@@ -159,7 +159,7 @@ public final class Main {
       System.out.println(loginButton);
       System.out.println(acctButton);
       String response = "";
-      Boolean successful = false;
+      boolean successful = false;
       if (loginButton != null) {
         if (!db.validateUser(usr)) {
           response = "User does not exist. Try creating an account!";
@@ -185,9 +185,18 @@ public final class Main {
         }
       }
       //TODO: get password and hash it
-      Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", response,
-              "successful", successful);
+      Map<String, Object> variables;
+      if(successful) {
+        String hash = db.getHash(usr);
+        assert (hash != null);
+        variables = ImmutableMap.of("title",
+                "P O N G F O L K S", "response", response,
+                "successful", successful, "username", usr, "hash", hash);
+      } else {
+        variables = ImmutableMap.of("title",
+                "P O N G F O L K S", "response", response,
+                "successful", successful);
+      }
 
       return new ModelAndView(variables, "home.ftl");
     }
@@ -210,9 +219,12 @@ public final class Main {
   private static class GameStartHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
-
+      QueryParamsMap map = request.queryMap();
+      if(!(map.hasKey("username") && map.hasKey("hash"))) {
+        return new HomePageHandler().handle(request, response);
+      }
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Game");
+      "Game", "username", map.value("username"), "hash", map.value("hash"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }

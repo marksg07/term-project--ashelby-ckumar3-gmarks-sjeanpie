@@ -123,7 +123,24 @@ public class PongDatabase {
     return valid;
   }
 
-  //password will be hashed in the future
+  public Boolean validateHash(String username, String hash) {
+    try (PreparedStatement prep = conn.prepareStatement("SELECT usr FROM usr_pass WHERE usr = ? AND pass = ?")) {
+      prep.setString(1, username);
+      prep.setString(2, hash);
+      ResultSet rs = prep.executeQuery();
+
+      while (rs.next()) {
+        return true; // it matched
+      }
+      return false;
+    } catch (Exception e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  //password will be hashed in the present
   public void createAccount(String username, String password) throws SQLException {
     try (PreparedStatement prep = conn
             .prepareStatement("INSERT INTO usr_pass (usr, pass, salt) VALUES "
@@ -210,6 +227,21 @@ public class PongDatabase {
       e.printStackTrace();
     }
     return generatedPassword;
+  }
+
+  public String getHash(String usr) {
+    try (PreparedStatement prep = conn.prepareStatement("SELECT pass FROM usr_pass WHERE usr = ?")) {
+      prep.setString(1, usr);
+      ResultSet rs = prep.executeQuery();
+      while (rs.next()) {
+        return rs.getString(1);
+      }
+      return null;
+    } catch (SQLException e) {
+      System.out.println("SQL query failed:");
+      e.printStackTrace();
+      return null;
+    }
   }
 
   public String generateSalt() {

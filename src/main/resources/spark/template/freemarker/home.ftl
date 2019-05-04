@@ -13,7 +13,9 @@
                 <#if successful>
                     <form method="post" style="color:white" action="/game">
                         <br>
-                        <button class="btn btn-outline-primary form-control">Find Game</button>
+                        <input type="submit" class="btn btn-outline-primary form-control" value="Find Game">
+                        <input type="hidden" name="username" value="${username}">
+                        <input type="hidden" name="hash" value="${hash}">
                         <br>
                     </form>
                 <#else>
