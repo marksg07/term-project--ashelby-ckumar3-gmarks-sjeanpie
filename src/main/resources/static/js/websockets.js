@@ -63,7 +63,7 @@ function wsSetup() {
                 break;
             case MESSAGE_TYPE.BADID:
                 console.log('got badid, redirect inc');
-                $.get("/home");
+                window.location.pathname = "/home";
                 break;
             case MESSAGE_TYPE.UPDATEUSERS:
                 console.log('got user update!');
