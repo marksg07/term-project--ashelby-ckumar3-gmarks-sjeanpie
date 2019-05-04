@@ -184,7 +184,7 @@ public class BRServer implements Server {
     synchronized (clientToServers) {
       if (!ready && starting) {
         Duration timerValue = Duration.between(Instant.now(), timerStart);
-        long timerValueSeconds = timerValue.getSeconds();
+        double timerValueSeconds = timerValue.getNano() * 1000000000;
         JsonObject ret = new JsonObject();
         ret.addProperty("timeUntilStart", timerValueSeconds);
         return ret;
