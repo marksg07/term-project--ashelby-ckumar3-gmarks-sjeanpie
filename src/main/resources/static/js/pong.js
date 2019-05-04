@@ -62,7 +62,7 @@ function setRightBoardState(st) {
 
 function displayTimer(seconds) {
     midSec.show();
-    const secString = seconds.toFixed(1);
+    const secString = "Game will start in: " + seconds.toFixed(1) + "seconds";
     midSec.text(secString);
 }
 
