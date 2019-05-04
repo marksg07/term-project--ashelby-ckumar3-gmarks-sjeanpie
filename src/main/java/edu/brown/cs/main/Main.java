@@ -191,7 +191,7 @@ public final class Main {
         assert (hash != null);
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
-                "successful", successful, "user", usr, "hash", hash);
+                "successful", successful, "username", usr, "hash", hash);
       } else {
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
