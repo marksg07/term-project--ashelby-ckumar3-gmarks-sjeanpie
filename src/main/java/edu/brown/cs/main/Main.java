@@ -224,7 +224,7 @@ public final class Main {
         return new HomePageHandler().handle(request, response);
       }
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Game", "username", map.get("username").toString(), "hash", map.get("hash").toString());
+      "Game", "username", map.value("username"), "hash", map.value("hash"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }

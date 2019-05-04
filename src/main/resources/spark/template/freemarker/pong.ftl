@@ -8,7 +8,7 @@
                 <p id="leftCountdown"></p>
                 <p id="rightCountdown"></p>
             </div>
-            <div class="nameFlex">
+            <div class="nameFlex" style="margin-top: 30px;">
                 <div class="flexText" style="text-align: left;" id="leftName"></div>
                 <div class="flexText" style="text-align: center;" id="name"></div>
                 <div class="flexText" style="text-align: right;" id="rightName"></div>
