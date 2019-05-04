@@ -9,6 +9,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,6 +24,7 @@ public class BRServer implements Server {
   static final int MINPLAYERS = 3;
   static final int MAXPLAYERS = 10;
   static final double startTime = 20;
+  private Instant timerStart = null;
 
   private static long idCounter = 0;
 
@@ -64,6 +67,7 @@ public class BRServer implements Server {
       if (clients.size() == MINPLAYERS) {
         starting = true;
         startTimer = new Timer();
+        timerStart = Instant.now();
         startTimer.schedule(new TimerTask() {
           @Override
           public void run() {
@@ -178,6 +182,13 @@ public class BRServer implements Server {
   @Override
   public JsonObject getGameState(String id) {
     synchronized (clientToServers) {
+      if (!ready && starting) {
+        Duration timerValue = Duration.between(Instant.now(), timerStart);
+        long timerValueSeconds = timerValue.getSeconds();
+        JsonObject ret = new JsonObject();
+        ret.addProperty("timeUntilStart", timerValueSeconds);
+        return ret;
+      }
       if (clientToServers.containsKey(id)) {
         ServerPair sp = clientToServers.get(id);
         if (sp == null) {
