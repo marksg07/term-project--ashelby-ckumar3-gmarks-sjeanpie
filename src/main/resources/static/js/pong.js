@@ -19,6 +19,7 @@ let rightGameBegun = false;
 let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
+const midSec = $("#midCountdown");
 
 let leftBoardState = 'none';
 let rightBoardState = 'none';
@@ -59,7 +60,17 @@ function setRightBoardState(st) {
     }
 }
 
+function displayTimer(seconds) {
+    midSec.show();
+    const secString = seconds.toFixed(1);
+    midSec.text(secString);
+}
+
 function updateGame(state) {
+    if (state.hasOwnProperty("timeUntilStart")) {
+        console.log(state.timeUntilStart);
+        displayTimer(state.timeUntilStart);
+    }
     if(gameOver) {
         return;
     }

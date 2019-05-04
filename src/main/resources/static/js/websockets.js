@@ -48,6 +48,7 @@ function wsSetup() {
                 console.log('got gamestart');
                 setGameReady(true);
                 rmWaitingText();
+                midSec.hide();
                 break;
             case MESSAGE_TYPE.UPDATE:
                 // console.log('got update');
