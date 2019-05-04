@@ -241,7 +241,7 @@ public class BRServer implements Server {
       JsonObject logPayload = new JsonObject();
       logPayload.addProperty("killer", killer == null ? "" : killer);
       logPayload.addProperty("killed", killed);
-      killLogMsg.add("payload", new JsonObject());
+      killLogMsg.add("payload", logPayload);
       String killLogString = GSON.toJson(killLogMsg);
       for(Session session : sessions.values()) {
         try {
