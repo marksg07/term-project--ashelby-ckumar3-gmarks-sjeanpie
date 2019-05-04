@@ -27,6 +27,13 @@ function wsSetup() {
         console.log('Connection error:', err);
     };
 
+    conn.onclose = evt => {
+        if(!gameOver) {
+            console.log("connection closed, restarting...");
+            wsSetup();
+        }
+    }
+
     conn.onmessage = msg => {
         const data = JSON.parse(msg.data);
         // console.log(data);
