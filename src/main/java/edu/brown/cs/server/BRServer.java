@@ -111,13 +111,13 @@ public class BRServer implements Server {
     if(sp.left != null) {
       userPayload.addProperty("left", sp.left.getID("1"));
     } else {
-      userPayload.addProperty("left", "");
+      userPayload.addProperty("left", sp.right.getID("2"));
     }
 
     if(sp.right != null) {
-      userPayload.addProperty("right", clientToServers.get(id).right.getID("2"));
+      userPayload.addProperty("right", sp.right.getID("2"));
     } else {
-      userPayload.addProperty("right", "");
+      userPayload.addProperty("right", sp.left.getID("1"));
     }
 
     usernamesObj.add("payload", userPayload);
