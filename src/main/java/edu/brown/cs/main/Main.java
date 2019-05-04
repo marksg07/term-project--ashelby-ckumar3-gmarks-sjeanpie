@@ -159,7 +159,7 @@ public final class Main {
       System.out.println(loginButton);
       System.out.println(acctButton);
       String response = "";
-      Boolean successful = false;
+      boolean successful = false;
       if (loginButton != null) {
         if (!db.validateUser(usr)) {
           response = "User does not exist. Try creating an account!";
@@ -187,9 +187,11 @@ public final class Main {
       //TODO: get password and hash it
       Map<String, Object> variables;
       if(successful) {
+        String hash = db.getHash(usr);
+        assert (hash != null);
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
-                "successful", successful, "user", usr, "hash", db.getHash(usr));
+                "successful", successful, "user", usr, "hash", hash);
       } else {
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
