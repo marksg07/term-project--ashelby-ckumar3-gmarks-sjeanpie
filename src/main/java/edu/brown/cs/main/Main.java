@@ -143,9 +143,46 @@ public final class Main {
 
   private static class HomePageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request request, Response response) throws Exception {
+    public ModelAndView handle(Request req, Response res) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
       "P O N G F O L K S", "response", "", "successful", false);
+
+
+      Map<String, String> cookies = req.cookies();
+      if (cookies != null) {
+
+        Boolean successful = false;
+        String response = "";
+
+        String usr = cookies.getOrDefault("username", "");
+        String pass = cookies.getOrDefault("password", "");
+
+        if (!db.validateUser(usr)) {
+          response = "User does not exist. Try creating an account!";
+        } else { //check password
+          if (db.validatePassword(usr, pass)) {
+            response = "Successfully logged in!";
+            successful = true;
+          } else {
+            response = "Username and password do not match.";
+          }
+        }
+
+        if(successful) {
+          String hash = db.getHash(usr);
+          assert (hash != null);
+          variables = ImmutableMap.of("title",
+                  "P O N G F O L K S", "response", response,
+                  "successful", successful, "username", usr, "hash", hash);
+        } else {
+          variables = ImmutableMap.of("title",
+                  "P O N G F O L K S", "response", response,
+                  "successful", successful);
+        }
+
+        return new ModelAndView(variables, "home.ftl");
+      }
+
 
       //code to have starting webpage that allows for user login
       // finding a match/going into a lobby

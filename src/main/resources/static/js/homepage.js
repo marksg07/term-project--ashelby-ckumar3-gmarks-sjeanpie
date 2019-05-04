@@ -20,3 +20,27 @@ function test() {
         }
     );
 }
+
+$(".login-push").submit(function() {
+    console.log($("#remember-user")[0].checked);
+    if ($("#remember-user")[0].checked) {
+        console.log("X");
+        console.log("username=" + $("#username").val());
+        console.log("; password=" + $("#login-pass").val());
+        console.log("X");
+        let cookie = "";
+        cookie += "username=";
+        cookie += ($("#username").val()).toString();
+        cookie += "; expires Thu, 21 Aug 2099 20:00:00 UTC; path=/ ";
+        document.cookie = cookie;
+        cookie = "";
+        cookie += "password=";
+        cookie += ($("#login-pass").val()).toString();
+        cookie += "; expires Thu, 21 Aug 2099 20:00:00 UTC; path=/ ";
+        document.cookie = cookie;
+    } else {
+        console.log("UNCHECKED");
+        document.cookie = "username=; expires Thu, 21 Aug 2010 20:00:00 UTC";
+        document.cookie = "password=; expires Thu, 21 Aug 2010 20:00:00 UTC";
+    }
+});
