@@ -8,6 +8,11 @@
                 <p id="leftCountdown"></p>
                 <p id="rightCountdown"></p>
             </div>
+            <div class="nameFlex">
+                <div style="align-self: flex-start; text-align: left;" id="leftName"></div>
+                <div style="align-self: center; text-align: center;" id="name"></div>
+                <div style="align-self: flex-end; text-align: right;" id="rightName"></div>
+            </div>
             <p id="status" class="horiz-centered" style="font-size: 48px; margin-top: 24px; bold: true;">Waiting for players...</p>
 
             <form class="lowest horiz-centered" action="/home" method="GET">
@@ -17,8 +22,8 @@
         </div>
     </div>
     <script>
-        const myId = ${username};
-        const hash = ${hash};
+        const myId = "${username}";
+        const hash = "${hash}";
     </script>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/pong.js"> </script>

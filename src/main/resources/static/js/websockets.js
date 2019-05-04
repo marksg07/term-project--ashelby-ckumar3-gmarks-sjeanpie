@@ -8,7 +8,8 @@ const MESSAGE_TYPE = {
     UPDATE: 4,
     PLAYERDEAD: 5,
     PLAYERWIN: 6,
-    BADID: 7
+    BADID: 7,
+    UPDATEUSERS: 8
 };
 
 function wsSetup() {
@@ -57,6 +58,9 @@ function wsSetup() {
                 console.log('got badid, redirect inc');
                 $.get("/home");
                 break;
+            case MESSAGE_TYPE.UPDATEUSERS:
+                console.log('got user update!');
+                setUsers(data.payload.left, data.payload.right);
             default:
                 console.log('Unknown message type!', data.type);
                 break;

@@ -220,6 +220,11 @@ function onPlayerWin() {
     conn.close();
 }
 
+function setUsers(left, right) {
+    $("#leftName").text(left);
+    $("#rightName").text(right);
+}
+
 function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
@@ -247,6 +252,7 @@ function executePong() {
     $(document).keydown(event => {checkPressed(event);});
     $(document).keyup(event => {checkUp(event);});
     inputHandle = setInterval(sendInput, 20);
+    $("#name").text(myId);
 }
 
 function rmWaitingText() {

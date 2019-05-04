@@ -106,8 +106,20 @@ public class BRServer implements Server {
     JsonObject usernamesObj = new JsonObject();
     usernamesObj.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.UPDATEUSERS.ordinal());
     JsonObject userPayload = new JsonObject();
-    userPayload.addProperty("left", clientToServers.get(id).left.getID("1"));
-    userPayload.addProperty("right", clientToServers.get(id).right.getID("2"));
+    ServerPair sp = clientToServers.get(id);
+
+    if(sp.left != null) {
+      userPayload.addProperty("left", sp.left.getID("1"));
+    } else {
+      userPayload.addProperty("left", "");
+    }
+
+    if(sp.right != null) {
+      userPayload.addProperty("right", clientToServers.get(id).right.getID("2"));
+    } else {
+      userPayload.addProperty("right", "");
+    }
+
     usernamesObj.add("payload", userPayload);
     try {
       session.getRemote().sendString(GSON.toJson(usernamesObj));
