@@ -185,9 +185,16 @@ public final class Main {
         }
       }
       //TODO: get password and hash it
-      Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", response,
-              "successful", successful);
+      Map<String, Object> variables;
+      if(successful) {
+        variables = ImmutableMap.of("title",
+                "P O N G F O L K S", "response", response,
+                "successful", successful, "user", usr, "hash", db.getHash(usr));
+      } else {
+        variables = ImmutableMap.of("title",
+                "P O N G F O L K S", "response", response,
+                "successful", successful);
+      }
 
       return new ModelAndView(variables, "home.ftl");
     }
