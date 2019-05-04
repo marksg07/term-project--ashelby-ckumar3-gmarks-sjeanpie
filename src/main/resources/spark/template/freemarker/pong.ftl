@@ -9,9 +9,9 @@
                 <p id="rightCountdown"></p>
             </div>
             <div class="nameFlex">
-                <div style="align-self: flex-start; text-align: left;" id="leftName"></div>
-                <div style="align-self: center; text-align: center;" id="name"></div>
-                <div style="align-self: flex-end; text-align: right;" id="rightName"></div>
+                <div class="flexText" style="text-align: left;" id="leftName"></div>
+                <div class="flexText" style="text-align: center;" id="name"></div>
+                <div class="flexText" style="text-align: right;" id="rightName"></div>
             </div>
             <p id="status" class="horiz-centered" style="font-size: 48px; margin-top: 24px; bold: true;">Waiting for players...</p>
 
