@@ -45,7 +45,7 @@ public class MainServer implements Server {
   public boolean addClient(String id, Session session) {
     println("Adding client " + id);
     synchronized(clientToServer) {
-      if(clientToServer.containsKey(id)) {
+      if(clientToServer.containsKey(id) && clientToServer.get(id).hasClient(id)) {
         return false;
       }
       sessions.put(id, session);

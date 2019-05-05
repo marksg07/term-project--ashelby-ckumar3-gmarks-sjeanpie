@@ -389,4 +389,8 @@ public class BRServer implements Server {
     System.out.println("BR #" + myId + " :: " + msg);
   }
 
+  public boolean hasClient(String id) {
+    return clientToServers.containsKey(id);
+  }
+
 }
