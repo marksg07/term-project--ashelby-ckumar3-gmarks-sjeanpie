@@ -307,12 +307,12 @@ function executePong() {
     // ctx.fillStyle = "white";
     // ctx.textAlign = "center";
     // ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
-    $(document).keydown(event => {checkPressed(event);
-})
-    ;
-    $(document).keyup(event => {checkUp(event);
-})
-    ;
+    $(document).keydown(event => {
+        checkPressed(event);
+    });
+    $(document).keyup(event => {
+        checkUp(event);
+    });
     inputHandle = setInterval(sendInput, 20);
     setInterval(drawKillLog, 20);
     $("#name").text(myId);
@@ -326,5 +326,4 @@ function rmWaitingText() {
 
 $(document).ready(() => {
     executePong();
-})
-;
+});

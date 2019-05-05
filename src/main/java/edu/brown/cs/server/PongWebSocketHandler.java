@@ -109,9 +109,14 @@ public class PongWebSocketHandler {
       MESSAGE_TYPE type = MESSAGE_TYPE.fromInt(received.get("type").getAsInt());
       switch (type) {
         case SENDID:
-          String hash = payload.get("hash").getAsString();
-          if(server.getDatabase().validateHash(id, hash)) {
-            server.addClient(id, session);
+          String userid = payload.get("userid").getAsString();
+          if(server.hasName(id) && userid.equals(server.getUUID(id))) {
+            if(!server.addClient(id, session)) {
+              JsonObject badIdObj = new JsonObject();
+              badIdObj.add("type", new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
+              badIdObj.add("payload", new JsonObject());
+              session.getRemote().sendString(GSON.toJson(badIdObj));
+            }
           } else {
             JsonObject badIdObj = new JsonObject();
             badIdObj.add("type", new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));

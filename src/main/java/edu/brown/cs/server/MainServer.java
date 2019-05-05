@@ -11,28 +11,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Representation of a main server which can spawn new BR lobbies (i.e. BR servers)
+ * to handle joining users. All requests to update a user's input and for game state go
+ * through this class first.
+ */
 @WebSocket
 public class MainServer implements Server {
-  private final Set<String> clients;
   private final List<BRServer> servers;
   private final Map<String, BRServer> clientToServer;
   private static final Gson GSON = new Gson();
   private final Map<String, Session> sessions;
   private final PongDatabase db;
+  private final Map<String, String> unsToUuids;
 
   public MainServer(PongDatabase db) {
     sessions = new ConcurrentHashMap<>();
-    clients = new ConcurrentSkipListSet<>();
     clientToServer = new ConcurrentHashMap<>();
     servers = new CopyOnWriteArrayList<>();
+    unsToUuids = new ConcurrentHashMap<>();
     this.db = db;
   }
 
-  public void addClient(String id, Session session) {
+  public boolean addClient(String id, Session session) {
     println("Adding client " + id);
     synchronized(clientToServer) {
+      if(clientToServer.containsKey(id)) {
+        return false;
+      }
       sessions.put(id, session);
-      clients.add(id);
       BRServer openServer = null;
       for (BRServer server : servers) {
         if (!server.ready()) {
@@ -48,6 +55,7 @@ public class MainServer implements Server {
       openServer.addClient(id, session);
       clientToServer.put(id, openServer);
     }
+    return true;
   }
 
   public void removeSession(Session session) {
@@ -94,5 +102,17 @@ public class MainServer implements Server {
 
   public PongDatabase getDatabase() {
     return db;
+  }
+
+  public String getUUID(String name) {
+    return unsToUuids.get(name);
+  }
+
+  public void putUUID(String name, String uuid) {
+    unsToUuids.put(name, uuid);
+  }
+
+  public boolean hasName(String name) {
+    return unsToUuids.containsKey(name);
   }
 }
