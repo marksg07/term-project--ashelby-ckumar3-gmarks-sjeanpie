@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -522,6 +523,55 @@ public class PongGame implements Cloneable {
     double unitVelY = ballVelY / norm;
     ballVelX += unitVelX * diff;
     ballVelY += unitVelY * diff;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    PongGame pongGame = (PongGame) o;
+    return Double.compare(pongGame.ballX, ballX) == 0 &&
+            Double.compare(pongGame.ballY, ballY) == 0 &&
+            Double.compare(pongGame.ballVelX, ballVelX) == 0 &&
+            Double.compare(pongGame.ballVelY, ballVelY) == 0 &&
+            Double.compare(pongGame.p1PaddleY, p1PaddleY) == 0 &&
+            Double.compare(pongGame.p2PaddleY, p2PaddleY) == 0 &&
+            Double.compare(pongGame.maxX, maxX) == 0 &&
+            Double.compare(pongGame.maxY, maxY) == 0 &&
+            Double.compare(pongGame.paddleVel, paddleVel) == 0 &&
+            Double.compare(pongGame.paddleRadius, paddleRadius) == 0 &&
+            Double.compare(pongGame.ballRadius, ballRadius) == 0 &&
+            Double.compare(pongGame.startVel, startVel) == 0 &&
+            p1Dead == pongGame.p1Dead &&
+            p2Dead == pongGame.p2Dead;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(ballX, ballY, ballVelX, ballVelY, p1PaddleY, p2PaddleY, maxX, maxY, paddleVel, paddleRadius, ballRadius, startVel, p1Dead, p2Dead);
+  }
+
+  @Override
+  public String toString() {
+    return "PongGame{" +
+            "p1Input=" + p1Input +
+            ", p2Input=" + p2Input +
+            ", ballX=" + ballX +
+            ", ballY=" + ballY +
+            ", ballVelX=" + ballVelX +
+            ", ballVelY=" + ballVelY +
+            ", p1PaddleY=" + p1PaddleY +
+            ", p2PaddleY=" + p2PaddleY +
+            ", maxX=" + maxX +
+            ", maxY=" + maxY +
+            ", paddleVel=" + paddleVel +
+            ", paddleRadius=" + paddleRadius +
+            ", ballRadius=" + ballRadius +
+            ", startVel=" + startVel +
+            ", p1Dead=" + p1Dead +
+            ", p2Dead=" + p2Dead +
+            ", countdown=" + countdown +
+            '}';
   }
 
   /**
