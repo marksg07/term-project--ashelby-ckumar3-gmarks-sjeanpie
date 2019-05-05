@@ -5,11 +5,11 @@ package edu.brown.cs.database;
  */
 public class LeaderboardEntry {
   private String usr;
-  private int total_games, wins;
+  private int totalGames, wins;
   private double elo;
 
   /**
-   * A constructor for a LeaderboardEntry
+   * A constructor for a LeaderboardEntry.
    * @param u username
    * @param t total games
    * @param w wins
@@ -17,7 +17,7 @@ public class LeaderboardEntry {
    */
   public LeaderboardEntry(String u, int t, int w, double e) {
     usr = u;
-    total_games = t;
+    totalGames = t;
     wins = w;
     elo = e;
   }
@@ -55,6 +55,6 @@ public class LeaderboardEntry {
    * @return Value of total_games.
    */
   public int getTotalGames() {
-    return total_games;
+    return totalGames;
   }
 }

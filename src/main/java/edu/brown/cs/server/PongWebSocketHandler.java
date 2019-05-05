@@ -17,13 +17,13 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 
 /**
  * Packet descriptions:
- * REQUESTID: Server->client, contains nothing. Prompted by client connect.
- * SENDID: Client->server, sends ID and password hash. Prompted by request ID packet.
- * GAMESTART: Server->client, contains nothing. Prompted by
+ * REQUESTID: Server to client, contains nothing. Prompted by client connect.
+ * SENDID: Client to server, sends ID and password hash. Prompted by request ID packet.
+ * GAMESTART: Server to client, contains nothing. Prompted by
  *  server when matchmaking is ready.
- * INPUT: Client->server, contains value of input and ID. Prompted by client periodically.
- * UPDATE: Server->client, contains ID of server and game data. Prompted by client input (XXX).
- * PLAYERDEAD: Server->client, contains nothing. u dead.
+ * INPUT: Client to server, contains value of input and ID. Prompted by client periodically.
+ * UPDATE: Server to client, contains ID of server and game data. Prompted by client input (XXX).
+ * PLAYERDEAD: Server to client, contains nothing. u dead.
  */
 
 @WebSocket
@@ -100,6 +100,12 @@ public class PongWebSocketHandler {
     server.removeSession(session);
   }
 
+  /**
+   * Sends message through a session.
+   * @param session session through which to send message
+   * @param message message to send
+   * @throws IOException if io fails
+   */
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
     try {
@@ -110,16 +116,18 @@ public class PongWebSocketHandler {
       switch (type) {
         case SENDID:
           String userid = payload.get("userid").getAsString();
-          if(server.hasName(id) && userid.equals(server.getUUID(id))) {
-            if(!server.addClient(id, session)) {
+          if (server.hasName(id) && userid.equals(server.getUUID(id))) {
+            if (!server.addClient(id, session)) {
               JsonObject badIdObj = new JsonObject();
-              badIdObj.add("type", new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
+              badIdObj.add("type",
+                      new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
               badIdObj.add("payload", new JsonObject());
               session.getRemote().sendString(GSON.toJson(badIdObj));
             }
           } else {
             JsonObject badIdObj = new JsonObject();
-            badIdObj.add("type", new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
+            badIdObj.add("type",
+                    new JsonPrimitive(MESSAGE_TYPE.BADID.ordinal()));
             badIdObj.add("payload", new JsonObject());
             session.getRemote().sendString(GSON.toJson(badIdObj));
           }
@@ -133,7 +141,8 @@ public class PongWebSocketHandler {
             return;
           }
           JsonObject updateObj = new JsonObject();
-          updateObj.add("type", new JsonPrimitive(MESSAGE_TYPE.UPDATE.ordinal()));
+          updateObj.add("type",
+                  new JsonPrimitive(MESSAGE_TYPE.UPDATE.ordinal()));
           JsonObject payloadOut = new JsonObject();
           payloadOut.add("state", data);
           updateObj.add("payload", payloadOut);
@@ -149,6 +158,10 @@ public class PongWebSocketHandler {
     }
   }
 
+  /**
+   * Sets the server of the socket handler.
+   * @param server the MainServer
+   */
   public static void setServer(MainServer server) {
     PongWebSocketHandler.server = server;
   }

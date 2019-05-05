@@ -19,11 +19,16 @@ import java.io.StringWriter;
 
 import com.google.gson.Gson;
 
+/**
+ * Main class of app.
+ */
 public final class Main {
 
   private static final int DEFAULT_PORT = 4567;
+  private static final int TIMEOUT_MILIS = 2000;
   private static final Gson GSON = new Gson();
-  private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
+  private static final PongDatabase DB =
+          new PongDatabase("data/pongfolksDB.sqlite3");
   private MainServer server;
 
   /**
@@ -52,7 +57,8 @@ public final class Main {
    */
   private static FreeMarkerEngine createEngine() {
     Configuration config = new Configuration();
-    File templates = new File("src/main/resources/spark/template/freemarker");
+    File templates =
+            new File("src/main/resources/spark/template/freemarker");
     try {
       config.setDirectoryForTemplateLoading(templates);
     } catch (IOException ioe) {
@@ -73,13 +79,13 @@ public final class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
-    server = new MainServer(db);
+    server = new MainServer(DB);
     PongWebSocketHandler.setServer(server);
 
     // timeout for websockets = 2 seconds in case of badly behaved clients
-    Spark.webSocketIdleTimeoutMillis(2000);
+    Spark.webSocketIdleTimeoutMillis(TIMEOUT_MILIS);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
-    (new RouteHandler(server, db)).addRoutes(freeMarker);
+    (new RouteHandler(server, DB)).addRoutes(freeMarker);
     // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
       final String url = request.url();
@@ -117,7 +123,8 @@ public final class Main {
     if (processBuilder.environment().get("PORT") != null) {
       return Integer.parseInt(processBuilder.environment().get("PORT"));
     }
-    return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
+    //return default port if heroku-port isn't set (i.e. on localhost)
+    return DEFAULT_PORT;
 
   }
 }

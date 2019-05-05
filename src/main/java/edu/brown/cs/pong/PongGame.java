@@ -11,38 +11,47 @@ import java.util.Random;
  * moves player paddles.
  */
 public class PongGame implements Cloneable {
-  private static final LongWrapper seed = new LongWrapper(
+  private static final LongWrapper SEED = new LongWrapper(
           Duration.between(Instant.EPOCH, Instant.now()).toNanos());
-  Random rand;
-  InputType p1Input, p2Input;
+  private Random rand;
+  private InputType p1Input, p2Input;
   private double ballX, ballY, ballVelX, ballVelY;
   private double p1PaddleY, p2PaddleY;
   private double maxX, maxY;
   private double paddleVel, paddleRadius;
-  private double ballRadius; // NOTE: We call it a "ball" but it's gonna be a square
+  private double ballRadius; // NOTE: We call it a "ball"
+  // but it's gonna be a square
   private double startVel;
   private Instant lastUpdate, startTime;
   private boolean p1Dead, p2Dead;
   private double countdown;
   private boolean canUpdateDuringCountdown;
+  private static final Double BILLION = 1000000000.;
+  private static final Integer BILLIONT = 1000000000;
+  private static final Double MIN_VEL = 64. / 81;
+  private static final Double MAX_VEL = 100. / 81;
+  private static final Double RANDOMNESS = .4;
 
   /**
    * Constructor for PongGame.
-   * @param sizeX x size of game in px
-   * @param sizeY y size of game in px
-   * @param paddleVel px traveled per second
-   * @param paddleLen length of paddle in px
-   * @param ballRadius radius of ball in px
-   * @param startVel starting velocity of ball in px per second
+   *
+   * @param sizeX          x size of game in px
+   * @param sizeY          y size of game in px
+   * @param paddleVel      px traveled per second
+   * @param paddleLen      length of paddle in px
+   * @param ballRadius     radius of ball in px
+   * @param startVel       starting velocity of ball in px per second
    * @param startCountdown starting countdown of game
-   * @param updateCd whether or not paddles can move while counting down
+   * @param updateCd       whether or not paddles can move while counting down
    */
-  public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown, boolean updateCd) {
+  public PongGame(double sizeX, double sizeY, double paddleVel,
+                  double paddleLen, double ballRadius, double startVel,
+                  double startCountdown, boolean updateCd) {
     rand = new Random();
-    synchronized (seed) {
-      rand.setSeed(seed.getValue());
-      rand.nextLong(); // toss out first val in case it's = to seed
-      seed.setValue(rand.nextLong());
+    synchronized (SEED) {
+      rand.setSeed(SEED.getValue());
+      rand.nextLong(); // toss out first val in case it's = to SEED
+      SEED.setValue(rand.nextLong());
     }
     maxX = sizeX;
     maxY = sizeY;
@@ -64,7 +73,7 @@ public class PongGame implements Cloneable {
 
     countdown = startCountdown;
     lastUpdate = Instant.now();
-    startTime = lastUpdate.plusNanos((long) (countdown * 1000000000));
+    startTime = lastUpdate.plusNanos((long) (countdown * BILLIONT));
     canUpdateDuringCountdown = updateCd;
   }
 
@@ -91,7 +100,7 @@ public class PongGame implements Cloneable {
    */
   public synchronized int tickToCurrent() {
     Instant now = Instant.now();
-    double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
+    double seconds = Duration.between(lastUpdate, now).toNanos() / BILLION;
     assert (seconds >= 0);
     lastUpdate = now;
     if (nowIsCurrent()) { // countdown over
@@ -160,9 +169,10 @@ public class PongGame implements Cloneable {
             assert (false);
         }
 
-        addRandomness(0.4);
+        addRandomness(RANDOMNESS);
 
-        // once handled, we repeat the collision test with updated X, Y, vX, vY, pX, pY
+        // once handled, we repeat the collision test
+        // with updated X, Y, vX, vY, pX, pY
         collision = getNextCollision(seconds);
       }
 
@@ -172,10 +182,12 @@ public class PongGame implements Cloneable {
     }
     // do paddle movements, then done
     movePaddles(seconds);
-    if (p1Dead)
+    if (p1Dead) {
       return 2;
-    if (p2Dead)
+    }
+    if (p2Dead) {
       return 1;
+    }
     return 0;
   }
 
@@ -194,8 +206,10 @@ public class PongGame implements Cloneable {
       invalid = false;
       if ((newVelX > 0) != (ballVelX > 0) || (newVelY > 0) != (ballVelY > 0)) {
         invalid = true;
-      } else if (newVelX * newVelX + newVelY * newVelY < (startVel * startVel) * 64. / 81
-              || newVelX * newVelX + newVelY * newVelY > (startVel * startVel) * 100. / 81) {
+      } else if (newVelX * newVelX + newVelY * newVelY <
+              (startVel * startVel) * MIN_VEL
+              || newVelX * newVelX + newVelY * newVelY >
+              (startVel * startVel) * MAX_VEL) {
         invalid = true;
       } else if (Math.abs(newVelX) < startVel / 3.) {
         invalid = true;
@@ -214,24 +228,28 @@ public class PongGame implements Cloneable {
     if (!p1Dead) {
       if (p1Input == InputType.DOWN) {
         p1PaddleY += time * paddleVel;
-        if (p1PaddleY > maxY)
+        if (p1PaddleY > maxY) {
           p1PaddleY = maxY;
+        }
       } else if (p1Input == InputType.UP) {
         p1PaddleY -= time * paddleVel;
-        if (p1PaddleY < 0)
+        if (p1PaddleY < 0) {
           p1PaddleY = 0;
+        }
       }
     }
 
     if (!p2Dead) {
       if (p2Input == InputType.DOWN) {
         p2PaddleY += time * paddleVel;
-        if (p2PaddleY > maxY)
+        if (p2PaddleY > maxY) {
           p2PaddleY = maxY;
+        }
       } else if (p2Input == InputType.UP) {
         p2PaddleY -= time * paddleVel;
-        if (p2PaddleY < 0)
+        if (p2PaddleY < 0) {
           p2PaddleY = 0;
+        }
       }
     }
   }
@@ -447,7 +465,7 @@ public class PongGame implements Cloneable {
     } else {
       // still in CD, just return seconds until we are done
       Instant now = Instant.now();
-      double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
+      double seconds = Duration.between(startTime, now).toNanos() / BILLION;
       System.out.println("Duration between last and now is " + seconds);
       obj.addProperty("cdSecondsLeft", -seconds);
     }
@@ -456,6 +474,7 @@ public class PongGame implements Cloneable {
 
   /**
    * Get the "flipped" state of the game, i.e. the mirrored game for 1v1s
+   *
    * @return state
    */
   public JsonObject getFlippedState() {
@@ -468,7 +487,7 @@ public class PongGame implements Cloneable {
     } else {
       // still in CD
       Instant now = Instant.now();
-      double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
+      double seconds = Duration.between(startTime, now).toNanos() / BILLION;
       System.out.println("Duration between last and now is " + seconds);
       obj.addProperty("cdSecondsLeft", -seconds);
     }
@@ -516,6 +535,12 @@ public class PongGame implements Cloneable {
     UP,
     DOWN;
 
+    /**
+     * Gets input type from int.
+     *
+     * @param t int of input type
+     * @return the InputType
+     */
     public static InputType fromInt(int t) {
       switch (t) {
         case -1:
@@ -524,8 +549,9 @@ public class PongGame implements Cloneable {
           return NONE;
         case 1:
           return UP;
+        default:
+          return null;
       }
-      return null;
     }
   }
 
@@ -544,7 +570,7 @@ public class PongGame implements Cloneable {
    * Collision of ball and borders or paddle.
    */
   private class Collision {
-    public double time;
-    public CollisionType type;
+    double time;
+    CollisionType type;
   }
 }

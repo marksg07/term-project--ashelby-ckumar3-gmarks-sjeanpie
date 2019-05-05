@@ -16,17 +16,20 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- * Manages user login, updating player information, and 
- * handling user accounts
+ * Manages user login, updating player information, and
+ * handling user accounts.
  */
 public class PongDatabase {
+  private static final Integer RADIX_CONSANT = 16;
+  private static final Integer SALT_CONSTANT_FIRST = 0xff;
+  private static final Integer SALT_CONSTANT_SECOND = 0x100;
   private Connection conn;
   private String path;
   private static final Random RANDOM = new SecureRandom();
 
 
   /**
-   * Constructor for PongDatabase
+   * Constructor for PongDatabase.
    *
    * @param dbPath the path to the database
    */
@@ -41,13 +44,15 @@ public class PongDatabase {
   }
 
   /**
-   * Establishes connection to sqldatabase
+   * Establishes connection to sqldatabase.
+   *
    * @param dbPath the path to the database
    * @return 1 for good status
    * @throws ClassNotFoundException if sqlite class not found
-   * @throws SQLException if sql fails
+   * @throws SQLException           if sql fails
    */
-  public int establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
+  public int establishConnection(String dbPath)
+          throws ClassNotFoundException, SQLException {
     Class.forName("org.sqlite.JDBC");
     String url = "jdbc:sqlite:" + dbPath;
     conn = DriverManager.getConnection(url);
@@ -60,29 +65,32 @@ public class PongDatabase {
   }
 
   /**
-   * Sets up initial tables
+   * Sets up initial tables.
+   *
    * @return 1 for good status, 0 otherwise
    */
   public int setupTables() {
-    try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_stats" +
-            "(" +
-            "usr TEXT," +
-            "total_games INTEGER," +
-            "elo REAL," +
-            "wins INTEGER" +
-            ")")) {
+    try (PreparedStatement prep = conn.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS usr_stats"
+                    + "("
+                    + "usr TEXT,"
+                    + "total_games INTEGER,"
+                    + "elo REAL,"
+                    + "wins INTEGER"
+                    + ")")) {
       prep.execute();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
       return 0;
     }
-    try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_pass" +
-            "(" +
-            "usr TEXT," +
-            "pass TEXT," +
-            "salt TEXT" +
-            ")")) {
+    try (PreparedStatement prep = conn.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS usr_pass"
+                    + "("
+                    + "usr TEXT,"
+                    + "pass TEXT,"
+                    + "salt TEXT"
+                    + ")")) {
       prep.execute();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
@@ -94,6 +102,7 @@ public class PongDatabase {
 
   /**
    * Validates user from username.
+   *
    * @param username username of potential user
    * @return true if user exists, false otherwise
    * @throws SQLException if sql fails
@@ -120,12 +129,14 @@ public class PongDatabase {
 
   /**
    * Validates username-password pair.
+   *
    * @param username username of potential user
    * @param password password of potential user
    * @return true if user and password match, false otherwise
    * @throws SQLException if sql fails
    */
-  public Boolean validatePassword(String username, String password) throws SQLException {
+  public Boolean validatePassword(String username, String password)
+          throws SQLException {
     boolean valid = false;
     try (PreparedStatement prep = conn
             .prepareStatement("SELECT salt, pass FROM usr_pass "
@@ -135,7 +146,8 @@ public class PongDatabase {
       ResultSet rs = prep.executeQuery();
 
       while (rs.next()) {
-        if (this.hashPassword(password, rs.getString(1)).equals(rs.getString(2))) {
+        if (this.hashPassword(password,
+                rs.getString(1)).equals(rs.getString(2))) {
           valid = true;
         }
       }
@@ -150,13 +162,16 @@ public class PongDatabase {
 
   /**
    * Stores username and hashed password in database.
+   *
    * @param username username of new user
    * @param password password of new user
    * @throws SQLException if sql fails
    */
-  public void createAccount(String username, String password) throws SQLException {
+  public void createAccount(String username, String password)
+          throws SQLException {
     try (PreparedStatement prep = conn
-            .prepareStatement("INSERT INTO usr_pass (usr, pass, salt) VALUES "
+            .prepareStatement("INSERT INTO usr_pass " +
+                    "(usr, pass, salt) VALUES "
                     + "(?, ?, ?)")) {
       String salt = this.generateSalt();
       prep.setString(1, username);
@@ -171,7 +186,8 @@ public class PongDatabase {
     }
 
     try (PreparedStatement prep = conn.prepareStatement(
-            "INSERT INTO usr_stats (usr, total_games, elo, wins) VALUES (?, 0, 0, 0);")) {
+            "INSERT INTO usr_stats (usr, total_games, elo, wins) " +
+                    "VALUES (?, 0, 0, 0);")) {
       prep.setString(1, username);
       prep.addBatch();
       prep.executeBatch();
@@ -183,16 +199,19 @@ public class PongDatabase {
 
   /**
    * Gets leaderboard data.
+   *
    * @return list of LeaderboardEntry objects to show
    */
   public List<LeaderboardEntry> getLeaderboardData() {
     List<LeaderboardEntry> leaderboardData = new ArrayList<>();
-    try(PreparedStatement prep = conn.prepareStatement(
-            "SELECT usr, total_games, elo, wins from usr_stats ORDER BY wins * 1.0 / total_games DESC;")) {
+    try (PreparedStatement prep = conn.prepareStatement(
+            "SELECT usr, total_games, elo, wins from usr_stats " +
+                    "ORDER BY wins * 1.0 / total_games DESC;")) {
       ResultSet rs = prep.executeQuery();
       int i = 0;
       while (rs.next() && i < 5) {
-        leaderboardData.add(new LeaderboardEntry(rs.getString(1), rs.getInt(2), rs.getInt(4), rs.getDouble(3)));
+        leaderboardData.add(new LeaderboardEntry(rs.getString(1),
+                rs.getInt(2), rs.getInt(4), rs.getDouble(3)));
         i++;
       }
     } catch (SQLException e) {
@@ -206,11 +225,13 @@ public class PongDatabase {
 
   /**
    * Increments total games for a user.
+   *
    * @param usr username
    */
   public void incrementTotalGames(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
-            "UPDATE usr_stats SET total_games = total_games + 1 WHERE usr = ?")){
+            "UPDATE usr_stats SET total_games = " +
+                    "total_games + 1 WHERE usr = ?")) {
       prep.setString(1, usr);
       prep.executeUpdate();
     } catch (Exception e) {
@@ -221,11 +242,12 @@ public class PongDatabase {
 
   /**
    * Increments total wins for a user.
+   *
    * @param usr username
    */
   public void incrementWins(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
-            "UPDATE usr_stats SET wins = wins + 1 WHERE usr = ?")){
+            "UPDATE usr_stats SET wins = wins + 1 WHERE usr = ?")) {
       prep.setString(1, usr);
       prep.executeUpdate();
     } catch (Exception e) {
@@ -236,9 +258,13 @@ public class PongDatabase {
 
 
   /**
-   * Hashes the password, implementation from:
-   * https://stackoverflow.com/questions/33085493/
-   * how-to-hash-a-password-with-sha-512-in-java
+   * Hashes the password, implementation found online.
+   * Please note that https://stackoverflow.com/questions/33085493/
+   * how-to-hash-a-password-with-sha-512-in-java is the source.
+   *
+   * @param password the password
+   * @param salt     the salt base
+   * @return the hashed password
    */
   public String hashPassword(String password, String salt) {
     String generatedPassword = null;
@@ -248,7 +274,7 @@ public class PongDatabase {
       byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < bytes.length; i++) {
-        sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        sb.append(Integer.toString((bytes[i] & SALT_CONSTANT_FIRST) + SALT_CONSTANT_SECOND, RADIX_CONSANT).substring(1));
       }
       generatedPassword = sb.toString();
     } catch (NoSuchAlgorithmException e) {
@@ -259,10 +285,11 @@ public class PongDatabase {
 
   /**
    * Generates a salt string for encryption.
+   *
    * @return the string for salt
    */
   public String generateSalt() {
-    byte[] salt = new byte[16];
+    byte[] salt = new byte[RADIX_CONSANT];
     RANDOM.nextBytes(salt);
     return new String(salt);
   }
