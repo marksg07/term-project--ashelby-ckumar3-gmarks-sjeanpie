@@ -12,11 +12,19 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
+/**
+ * One battle royale server containing
+ * some number of players in a circle of games.
+ */
 public class BRServer implements Server {
   private static final Gson GSON = new Gson();
   private final List<String> clients;
@@ -24,20 +32,31 @@ public class BRServer implements Server {
   private long myId;
   private final PongDatabase db;
   static final int MINPLAYERS = 3;
-  static final double startSpeed = 100;
-  static final double acceleration = 4;
+  static final double START_SPEED = 100;
+  static final double ACCELERATION = 4;
   private double ballSpeed;
   private Timer ballAccelTimer;
   static final int MAXPLAYERS = 10;
-  static final double startTime = 20;
+  static final double START_TIME = 20;
   private Instant timerStart = null;
+  private static final Double BILLION = 1000000000.;
+  private static final Integer THOUSAND = 1000;
+  private static final Integer DCPENALTY = -20;
 
   private static long idCounter = 0;
 
-  public static synchronized long nextId() {
+  /**
+   * NextID fetcher synchronized.
+   * @return the next id as a long
+   */
+  private static synchronized long nextId() {
+    // get a unique ID for println purposes
     return idCounter++;
   }
 
+  /**
+   * ServerPair class.
+   */
   private class ServerPair {
     PongServer right, left;
   }
@@ -49,8 +68,11 @@ public class BRServer implements Server {
   private boolean ready;
   private boolean starting;
   private Timer startTimer;
-  
 
+  /**
+   * Construct a new BRServer.
+   * @param db Database to read/write to.
+   */
   public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
@@ -60,21 +82,28 @@ public class BRServer implements Server {
     ready = false;
     starting = false;
     myId = nextId();
-    ballSpeed = startSpeed;
+    ballSpeed = START_SPEED;
     this.db = db;
   }
 
+  /**
+   * Get if the server is running a game.
+   * @return if running
+   */
   public boolean ready() {
     return ready;
   }
 
+  /**
+   * Add a new client to the server.
+   * @param id Client ID (username)
+   * @param session WebSocket session object for client
+   */
   public void addClient(String id, Session session) {
     println("Adding client " + id + ".");
     synchronized (clientToServers) {
-      if(clientToServers.containsKey(id)) {
-        return;
-      }
-      if (ready()) {
+      // if we are running a game or already have user, do nothing
+      if (clientToServers.containsKey(id) || ready()) {
         return;
       }
       clients.add(id);
@@ -82,6 +111,7 @@ public class BRServer implements Server {
       updatedElos.put(id, db.getLeaderboardEntry(id).getElo());
       println(clients.size() + " players total.");
       if (clients.size() == MINPLAYERS) {
+        // when we hit min players, start a timer to start the game.
         starting = true;
         startTimer = new Timer();
         timerStart = Instant.now();
@@ -94,9 +124,10 @@ public class BRServer implements Server {
               onFilled();
             }
           }
-        }, (long)(startTime * 1000));
+        }, (long) (START_TIME * THOUSAND));
       }
       if (clients.size() == MAXPLAYERS) {
+        // when we hit max players, start the game immediately.
         assert (starting);
         starting = false;
         startTimer.cancel();
@@ -113,6 +144,7 @@ public class BRServer implements Server {
     for (String cli : clients) {
       clientToServers.put(cli, new ServerPair());
     }
+    // make each client play against each adjacent client
     for (int i = 0; i < clients.size(); i++) {
       int iLeft = (clients.size() - 1 + i) % clients.size();
       String cliLeft = clients.get(iLeft);
@@ -121,9 +153,8 @@ public class BRServer implements Server {
       clientToServers.get(cli).left = serv;
       clientToServers.get(cliLeft).right = serv;
     }
-    // send all clients matchmaking packs?
-    // yes
 
+    // add 1 game to client's total games, tell them game's started
     for (String id : sessions.keySet()) {
       synchronized (db) {
         db.incrementTotalGames(id);
@@ -131,27 +162,30 @@ public class BRServer implements Server {
       sendGameStart(id);
       sendUsernamesUpdate(id);
     }
-    // start speed increase timer
+    // start speed increase timer, will accelerate ball every second
     ballAccelTimer = new Timer();
     ballAccelTimer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        synchronized(clientToServers) {
-          ballSpeed += acceleration;
+        synchronized (clientToServers) {
+          ballSpeed += ACCELERATION;
           for (ServerPair sp : clientToServers.values()) {
-            if(sp.left == null)
+            if (sp.left == null) {
               continue;
+            }
             sp.left.setBallSpeed(ballSpeed);
           }
         }
       }
-    }, 1000, 1000);
+    }, THOUSAND, THOUSAND);
   }
 
-  public void sendGameStart(String id) {
+  private void sendGameStart(String id) {
     Session session = sessions.get(id);
     JsonObject updateObj = new JsonObject();
-    updateObj.add("type", new JsonPrimitive(PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
+    updateObj.add("type",
+            new JsonPrimitive(
+                    PongWebSocketHandler.MESSAGE_TYPE.GAMESTART.ordinal()));
     JsonObject payload = new JsonObject();
     updateObj.add("payload", payload);
     try {
@@ -162,23 +196,24 @@ public class BRServer implements Server {
     }
   }
 
-  public void sendUsernamesUpdate(String id) {
+  private void sendUsernamesUpdate(String id) {
     Session session = sessions.get(id);
     JsonObject usernamesObj = new JsonObject();
-    usernamesObj.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.UPDATEUSERS.ordinal());
+    usernamesObj.addProperty("type",
+            PongWebSocketHandler.MESSAGE_TYPE.UPDATEUSERS.ordinal());
     JsonObject userPayload = new JsonObject();
     ServerPair sp = clientToServers.get(id);
 
-    if(sp.left != null) {
-      userPayload.addProperty("left", sp.left.getID("1"));
+    if (sp.left != null) {
+      userPayload.addProperty("left", sp.left.getID(1));
     } else {
-      userPayload.addProperty("left", sp.right.getID("2"));
+      userPayload.addProperty("left", sp.right.getID(2));
     }
 
-    if(sp.right != null) {
-      userPayload.addProperty("right", sp.right.getID("2"));
+    if (sp.right != null) {
+      userPayload.addProperty("right", sp.right.getID(2));
     } else {
-      userPayload.addProperty("right", sp.left.getID("1"));
+      userPayload.addProperty("right", sp.left.getID(1));
     }
 
     usernamesObj.add("payload", userPayload);
@@ -192,8 +227,6 @@ public class BRServer implements Server {
 
   @Override
   public void update(String id, Object obj) {
-    // XXX assert?
-
     synchronized (clientToServers) {
       if (clientToServers.containsKey(id)) {
         ServerPair sp = clientToServers.get(id);
@@ -215,8 +248,9 @@ public class BRServer implements Server {
   public JsonObject getGameState(String id) {
     synchronized (clientToServers) {
       if (!ready && starting) {
+        // send how long until game will start
         Duration timerValue = Duration.between(Instant.now(), timerStart);
-        double timerValueSeconds = timerValue.toNanos() / 1000000000.0;
+        double timerValueSeconds = timerValue.toNanos() / BILLION;
         JsonObject ret = new JsonObject();
         ret.addProperty("timeUntilStart", timerValueSeconds);
         return ret;
@@ -229,6 +263,7 @@ public class BRServer implements Server {
         }
         JsonObject obj = new JsonObject();
 
+        // this is where we check for dead players in the left and right games
         String leftDeadID = "";
         String leftKillerID = "";
         String rightDeadID = "";
@@ -236,21 +271,21 @@ public class BRServer implements Server {
 
         if (sp.left != null) {
           if (sp.left.getGame().isP1Dead()) {
-            leftDeadID = sp.left.getID("1");
-            leftKillerID = sp.left.getID("2");
+            leftDeadID = sp.left.getID(1);
+            leftKillerID = sp.left.getID(2);
           } else if (sp.left.getGame().isP2Dead()) {
-            leftDeadID = sp.left.getID("2");
-            leftKillerID = sp.left.getID("1");
+            leftDeadID = sp.left.getID(2);
+            leftKillerID = sp.left.getID(1);
           }
         }
 
         if (sp.right != null) {
           if (sp.right.getGame().isP1Dead()) {
-            rightDeadID = sp.right.getID("1");
-            rightKillerID = sp.right.getID("2");
+            rightDeadID = sp.right.getID(1);
+            rightKillerID = sp.right.getID(2);
           } else if (sp.right.getGame().isP2Dead()) {
-            rightDeadID = sp.right.getID("2");
-            rightKillerID = sp.right.getID("1");
+            rightDeadID = sp.right.getID(2);
+            rightKillerID = sp.right.getID(1);
           }
         }
 
@@ -262,7 +297,7 @@ public class BRServer implements Server {
           kill(rightKillerID, rightDeadID);
         }
 
-        if(sp.left == null && sp.right == null) {
+        if (sp.left == null && sp.right == null) {
           return obj;
         }
 
@@ -284,63 +319,73 @@ public class BRServer implements Server {
   }
 
   private void kill(String killer, String killed) {
-    //println("Killing player " + killed);
-    if(clients.size() == 1) {
-      // don't "kill" last client, just leave it as every connection should be closed
+    if (clients.size() == 1) {
+      // don't "kill" last client, just leave it
+      // as every connection should be closed
       return;
     }
     Integer playerIndex = clients.indexOf(killed);
     if (!playerIndex.equals(-1)) {
-      String prevID = clients.get((playerIndex + (clients.size() - 1)) % clients.size());
+      String prevID = clients.get((playerIndex + (clients.size() - 1))
+              % clients.size());
       String nextID = clients.get((playerIndex + 1) % clients.size());
 
       Session deadSession = sessions.get(killed);
       JsonObject deadMsg = new JsonObject();
-      deadMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
+      deadMsg.addProperty("type",
+              PongWebSocketHandler.MESSAGE_TYPE.PLAYERDEAD.ordinal());
       deadMsg.add("payload", new JsonObject());
       try {
         deadSession.getRemote().sendString(GSON.toJson(deadMsg));
       } catch (Exception e) {
-        //println("Failed to send PLAYERDEAD");
+        // println("Failed to send PLAYERDEAD");
+        // this often happens; it's not a real problem
+        // if we don't send a dead client a pack bc
+        // they are already dead
       }
 
       JsonObject killLogMsg = new JsonObject();
-      killLogMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.KILLLOG.ordinal());
+      killLogMsg.addProperty("type",
+              PongWebSocketHandler.MESSAGE_TYPE.KILLLOG.ordinal());
       JsonObject logPayload = new JsonObject();
       logPayload.addProperty("killer", killer == null ? "" : killer);
       logPayload.addProperty("killed", killed);
       killLogMsg.add("payload", logPayload);
       String killLogString = GSON.toJson(killLogMsg);
-      for(Session session : sessions.values()) {
+      for (Session session : sessions.values()) {
         try {
           session.getRemote().sendString(killLogString);
         } catch (Exception e) {
           //println("Failed to send kill log");
+          // same
         }
-      }//update!
-      
+      }
 
-      
       sessions.remove(killed);
       clients.remove(killed);
       // make new server for new neighbors
       if (clients.size() > 2) {
         double p1PaddleY = clientToServers.get(prevID).right.getP1PaddleY();
         double p2PaddleY = clientToServers.get(nextID).left.getP2PaddleY();
-        PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY, ballSpeed);
+        PongServer newServer =
+                new PongServer(prevID, nextID, p1PaddleY, p2PaddleY, ballSpeed);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+        //need to adjust elo's for the player that got a kill, got killed
+        //and the player who outlived the player that got killed 
         updateScore(killer, killed, nextID);
         
       } else if (clients.size() == 2) {
+        // 2-player game, don't make a new game between the two players
         clientToServers.get(prevID).right = null;
         clientToServers.get(nextID).left = null;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
         updateScore(killer, killed, nextID);
       } else {
+        // 1 player left, they win
         assert (clients.size() == 1);
         updateScore(killer, killed, null);
         synchronized (db) {
@@ -349,7 +394,8 @@ public class BRServer implements Server {
         }
         Session winSession = sessions.get(clients.get(0));
         JsonObject winMsg = new JsonObject();
-        winMsg.addProperty("type", PongWebSocketHandler.MESSAGE_TYPE.PLAYERWIN.ordinal());
+        winMsg.addProperty("type",
+                PongWebSocketHandler.MESSAGE_TYPE.PLAYERWIN.ordinal());
         winMsg.add("payload", new JsonObject());
         try {
           winSession.getRemote().sendString(GSON.toJson(winMsg));
@@ -357,33 +403,51 @@ public class BRServer implements Server {
           //println("Failed to send PLAYERWIN");
         }
       }
-
-      // the br server has to know the client used to exist
       clientToServers.remove(killed);
-    } else {
-      //println("Client DNE " + killed + ".");
     }
-
   }
 
+  /**
+   * Remove a client by their ID.
+   * @param id Client ID to kill.
+   */
   public void removeClient(String id) {
     synchronized (clientToServers) {
-      if(ready) { // if the game is running, just kill the player
+      if (ready) { // if the game is running, just kill the player
         kill(null, id);
       } else { // otherwise, remove the player from the clients list
         clients.remove(id);
         sessions.remove(id);
-        if (starting && clients.size() < MINPLAYERS) { // no longer enough players! :(
+        if (starting && clients.size() < MINPLAYERS) {
+          // no longer enough players! :(
           starting = false;
           startTimer.cancel();
           startTimer = null;
+          //no longer need refrence to elo of player not in game
           updatedElos.remove(id);
         }
       }
     }
   }
   
+  /**
+   * Update the elos for the players involved in a kill
+   * 
+   * @param killerID
+   * @param killedID
+   * @param survivorID
+   */
   public void updateScore(String killerID, String killedID, String survivorID) { //with survivor and another w/o
+	  
+	  if (killerID == null) { //the case in which a player disconnects mid-game
+		  double killedELO = updatedElos.get(killedID) + DCPENALTY;
+		  if (killedELO < ELOUpdater.BASE_ELO) {
+			  killedELO = ELOUpdater.BASE_ELO;
+		  } else {
+			  updatedElos.replace(killedID, killedELO + DCPENALTY);
+
+		  }
+	  } else { //general case
 	  double killerELO = updatedElos.get(killerID);
 	  double killedELO = updatedElos.get(killedID);
 	  	  
@@ -411,7 +475,7 @@ public class BRServer implements Server {
 			  survivorELO = ELOUpdater.BASE_ELO;
 		  }
 		  updatedElos.replace(survivorID, survivorELO);
-
+	  }
 	  }
 	  
 	 
