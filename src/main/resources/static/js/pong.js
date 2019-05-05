@@ -19,6 +19,7 @@ let rightGameBegun = false;
 let gameOver;
 const leftSec = $("#leftCountdown");
 const rightSec = $("#rightCountdown");
+const midSec = $("#midCountdown");
 
 let leftBoardState = 'none';
 let rightBoardState = 'none';
@@ -62,7 +63,20 @@ function setRightBoardState(st) {
     }
 }
 
+function displayTimer(seconds) {
+    midSec.show();
+    const secString = "Enough clients to start game. If no more clients join game will start in: " + (seconds+20).toFixed(1) + " seconds";
+    midSec.text(secString);
+}
+
 function updateGame(state) {
+    if (state.hasOwnProperty("timeUntilStart")) {
+        console.log(state.timeUntilStart);
+        displayTimer(state.timeUntilStart);
+        return;
+    } else {
+        midSec.hide();
+    }
     if(gameOver) {
         return;
     }

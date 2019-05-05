@@ -7,6 +7,7 @@
                 </canvas>
                 <p id="leftCountdown"></p>
                 <p id="rightCountdown"></p>
+                <p id="midCountdown"></p>
             </div>
             <div class="nameFlex" style="margin-top: 30px;">
                 <div class="flexText" style="text-align: left;" id="leftName"></div>

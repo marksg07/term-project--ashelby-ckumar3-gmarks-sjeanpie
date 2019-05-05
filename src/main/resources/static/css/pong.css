@@ -255,6 +255,15 @@ body {
     z-index: 500;
 }
 
+#midCountdown {
+    color: #fffcf4;
+    position: relative;
+    text-align: center;
+    top: -280px;
+    left: 0px;
+    z-index: 500;
+}
+
 .leaderboardtitle {
     position: relative;
     font-size: 24px;
