@@ -41,8 +41,8 @@ function wsSetup() {
         switch (data.type) {
             case MESSAGE_TYPE.REQUESTID:
                 console.log('got requestid');
-                // TODO Assign myId
-                const idObj = {type: MESSAGE_TYPE.SENDID, payload: {id: myId, hash: hash}};
+                // Send my ID back to the server
+                const idObj = {type: MESSAGE_TYPE.SENDID, payload: {id: myId, userid: userid}};
                 conn.send(JSON.stringify(idObj));
                 break;
             case MESSAGE_TYPE.GAMESTART:
