@@ -53,5 +53,6 @@
     </div>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/savecookie.js"></script>
+    <script src="js/homepage.js"></script>
 </#assign>
 <#include "main.ftl">

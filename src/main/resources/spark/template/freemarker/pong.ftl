@@ -33,5 +33,7 @@
     </script>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/pong.js"></script>
+    <script src="js/paddle.js"></script>
+    <script src="js/ball.js"></script>
 </#assign>
 <#include "main.ftl">
