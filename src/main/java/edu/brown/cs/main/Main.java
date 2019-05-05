@@ -11,13 +11,13 @@ import spark.Response;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import com.google.gson.Gson;
+import sun.rmi.runtime.Log;
 
 /**
  * Main class of app.
@@ -29,6 +29,7 @@ public final class Main {
   private static final Gson GSON = new Gson();
   private static final PongDatabase DB =
           new PongDatabase("data/pongfolksDB.sqlite3");
+  
   private MainServer server;
 
   /**
@@ -114,10 +115,11 @@ public final class Main {
   }
 
   /**
-   * Get the heroku port.
+   * Get the heroku port.````````
    *
    * @return port
    */
+
   static int getHerokuAssignedPort() {
     ProcessBuilder processBuilder = new ProcessBuilder();
     if (processBuilder.environment().get("PORT") != null) {

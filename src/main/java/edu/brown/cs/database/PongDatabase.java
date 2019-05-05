@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -78,7 +79,7 @@ public class PongDatabase {
                     + "elo REAL,"
                     + "wins INTEGER"
                     + ")")) {
-      prep.execute();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
@@ -91,7 +92,7 @@ public class PongDatabase {
                     + "pass TEXT,"
                     + "salt TEXT"
                     + ")")) {
-      prep.execute();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
@@ -178,8 +179,7 @@ public class PongDatabase {
       prep.setString(2, this.hashPassword(password, salt));
       prep.setString(3, salt);
 
-      prep.addBatch();
-      prep.executeBatch();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();
@@ -187,10 +187,10 @@ public class PongDatabase {
 
     try (PreparedStatement prep = conn.prepareStatement(
             "INSERT INTO usr_stats (usr, total_games, elo, wins) "
-                    + "VALUES (?, 0, 0, 0);")) {
+                    + "VALUES (?, 0, ?, 0);")) {
       prep.setString(1, username);
-      prep.addBatch();
-      prep.executeBatch();
+      prep.setDouble(2, ELOUpdater.BASE_ELO);
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();
@@ -221,6 +221,26 @@ public class PongDatabase {
       leaderboardData.add(null);
     }
     return leaderboardData;
+  }
+  
+  /**
+   * Gets the leaderboard data for a specific user
+   * @param usr
+   * @return The LeaderboardEntry of the specified user
+   */
+  public LeaderboardEntry getLeaderboardEntry(String usr) {
+	  LeaderboardEntry entry = null;
+	  try(PreparedStatement prep = conn.prepareStatement(
+	            "SELECT * from usr_stats WHERE usr = ?;")) {
+		  prep.setString(1,  usr);
+	      ResultSet rs = prep.executeQuery();
+	      while (rs.next()) {
+	        entry = new LeaderboardEntry(rs.getString(1), rs.getInt(2), rs.getInt(4), rs.getDouble(3));
+	      }
+	    } catch (SQLException e) {
+	      return null;
+	    }
+	    return entry;
   }
 
   /**
@@ -254,6 +274,21 @@ public class PongDatabase {
       System.out.println("SQL query failed:");
       e.printStackTrace();
     }
+  }
+  
+  public void updateELOs(Map<String, Double> newElos) {
+	    try (PreparedStatement prep = conn.prepareStatement(
+	            "UPDATE usr_stats SET elo = ? WHERE usr = ?")){
+	      for (String usr : newElos.keySet()) {
+	    	  prep.setDouble(1, newElos.get(usr));
+	    	  prep.setString(2, usr);
+	    	  prep.addBatch();
+	      }
+	      prep.executeBatch();
+	    } catch (Exception e) {
+	      System.out.println("SQL query failed:");
+	      e.printStackTrace();
+	    }
   }
 
 

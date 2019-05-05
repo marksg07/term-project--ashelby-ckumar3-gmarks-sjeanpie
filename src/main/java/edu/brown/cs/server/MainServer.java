@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Representation of a main server which can spawn new BR lobbies
  * (i.e. BR servers) to handle joining users. All requests to update
  * a user's input and for game state go through this class first.
+>>>>>>> 02782948c838da5740e911f990e852d05dae869c
  */
 @WebSocket
 public class MainServer implements Server {
