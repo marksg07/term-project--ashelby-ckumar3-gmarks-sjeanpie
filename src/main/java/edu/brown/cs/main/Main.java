@@ -1,10 +1,8 @@
 package edu.brown.cs.main;
 
 import edu.brown.cs.database.PongDatabase;
-import edu.brown.cs.pong.PongGame;
 import edu.brown.cs.server.MainServer;
 import edu.brown.cs.server.PongWebSocketHandler;
-import edu.brown.cs.server.Server;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -17,9 +15,6 @@ import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
 import java.util.Random;
 
-import java.awt.font.GlyphMetrics;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 

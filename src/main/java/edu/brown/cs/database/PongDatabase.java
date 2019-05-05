@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +42,7 @@ public class PongDatabase {
     }
   }
 
-  public void establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
+  public int establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
     //TODO: validate the database and path entered. favor try/catch
     Class.forName("org.sqlite.JDBC");
     String url = "jdbc:sqlite:" + dbPath;
@@ -53,9 +52,10 @@ public class PongDatabase {
     stat.close();
     dbPath = path;
     setupTables();
+    return 1;
   }
 
-  public void setupTables() {
+  public int setupTables() {
     try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_stats" +
             "(" +
             "usr TEXT," +
@@ -67,6 +67,7 @@ public class PongDatabase {
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
+      return 0;
     }
     try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_pass" +
             "(" +
@@ -78,7 +79,9 @@ public class PongDatabase {
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
+      return 0;
     }
+    return 1;
   }
 
   public Boolean validateUser(String username) throws SQLException {
@@ -91,6 +94,7 @@ public class PongDatabase {
       ResultSet rs = prep.executeQuery();
 
       while (rs.next()) {
+        System.out.println(rs.getString(1));
         return true;
       }
     } catch (Exception e) {
