@@ -45,6 +45,11 @@ first try: background: linear-gradient(to right, #30CFD0 0%, #330867 100%);
     transform: translate(-50%, -50%);
 }
 
+.low-80 {
+    position: center;
+    top: 80%;
+}
+
 .lowest {
     position: center;
     top: 100%;
