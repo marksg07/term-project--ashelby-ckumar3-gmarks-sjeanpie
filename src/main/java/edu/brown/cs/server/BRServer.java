@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import edu.brown.cs.database.PongDatabase;
+import edu.brown.cs.database.ELOUpdater;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public class BRServer implements Server {
   private static final Gson GSON = new Gson();
@@ -39,16 +41,22 @@ public class BRServer implements Server {
   private class ServerPair {
     PongServer right, left;
   }
+  
+  //TODO: get db query of users and elos at beginning of game when all players ready
 
   private final Map<String, ServerPair> clientToServers;
+  private Map<String, Double> updatedElos; //adding to this should b synchro
   private boolean ready;
   private boolean starting;
   private Timer startTimer;
+  
 
   public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
     clientToServers = new ConcurrentHashMap<>();
+    
+    updatedElos = new ConcurrentHashMap<>();
     ready = false;
     starting = false;
     myId = nextId();
@@ -71,6 +79,7 @@ public class BRServer implements Server {
       }
       clients.add(id);
       sessions.put(id, session);
+      updatedElos.put(id, db.getLeaderboardEntry(id).getElo());
       println(clients.size() + " players total.");
       if (clients.size() == MINPLAYERS) {
         starting = true;
@@ -98,7 +107,7 @@ public class BRServer implements Server {
     }
   }
 
-  private void onFilled() {
+  private void onFilled() { //get list of ids to ELOS!!!
     println("Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
     for (String cli : clients) {
@@ -308,8 +317,10 @@ public class BRServer implements Server {
         } catch (Exception e) {
           //println("Failed to send kill log");
         }
-      }
+      }//update!
+      
 
+      
       sessions.remove(killed);
       clients.remove(killed);
       // make new server for new neighbors
@@ -321,15 +332,20 @@ public class BRServer implements Server {
         clientToServers.get(nextID).left = newServer;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+        updateScore(killer, killed, nextID);
+        
       } else if (clients.size() == 2) {
         clientToServers.get(prevID).right = null;
         clientToServers.get(nextID).left = null;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+        updateScore(killer, killed, nextID);
       } else {
         assert (clients.size() == 1);
+        updateScore(killer, killed, null);
         synchronized (db) {
           db.incrementWins(clients.get(0));
+          db.updateELOs(updatedElos);
         }
         Session winSession = sessions.get(clients.get(0));
         JsonObject winMsg = new JsonObject();
@@ -361,11 +377,46 @@ public class BRServer implements Server {
           starting = false;
           startTimer.cancel();
           startTimer = null;
+          updatedElos.remove(id);
         }
       }
     }
   }
+  
+  public void updateScore(String killerID, String killedID, String survivorID) { //with survivor and another w/o
+	  double killerELO = updatedElos.get(killerID);
+	  double killedELO = updatedElos.get(killedID);
+	  	  
+	  //calculation is based on how many players were in the game before
+	  //the killed player is removed
+	  killerELO = killerELO + ELOUpdater.update("WIN", killerELO, killedELO) / (clients.size() + 1);
+	  killedELO =  killedELO + ELOUpdater.update("LOSE", killedELO, killerELO) / (clients.size() + 1);
+	  
+	  if (killerELO < ELOUpdater.BASE_ELO) {
+		  killerELO = ELOUpdater.BASE_ELO;
+		  }
+	  
+	  if (killedELO < ELOUpdater.BASE_ELO) {
+		  killedELO = ELOUpdater.BASE_ELO;
+	  }
+	  updatedElos.replace(killerID, killerELO);
+	  updatedElos.replace(killedID, killedELO);  
+	  
+	  if (survivorID != null) {
+		  double survivorELO = updatedElos.get(survivorID);
+		  survivorELO = survivorELO + ELOUpdater.update
+				  ("WIN", survivorELO, killedELO) / 2 * (clients.size() + 1);
+		  
+		  if (survivorELO < ELOUpdater.BASE_ELO) {
+			  survivorELO = ELOUpdater.BASE_ELO;
+		  }
+		  updatedElos.replace(survivorID, survivorELO);
 
+	  }
+	  
+	 
+	 
+  }
   @Override
   public void println(String msg) {
     System.out.println("BR #" + myId + " :: " + msg);

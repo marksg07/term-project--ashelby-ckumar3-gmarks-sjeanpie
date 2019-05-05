@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -158,8 +159,9 @@ public class PongDatabase {
     }
 
     try (PreparedStatement prep = conn.prepareStatement(
-            "INSERT INTO usr_stats (usr, total_games, elo, wins) VALUES (?, 0, 0, 0);")) {
+            "INSERT INTO usr_stats (usr, total_games, elo, wins) VALUES (?, 0, ?, 0);")) {
       prep.setString(1, username);
+      prep.setDouble(3, ELOUpdater.BASE_ELO);
       prep.addBatch();
       prep.executeBatch();
     } catch (Exception e) {
@@ -186,6 +188,21 @@ public class PongDatabase {
     }
     return leaderboardData;
   }
+  
+  public LeaderboardEntry getLeaderboardEntry(String usr) {
+	  LeaderboardEntry entry = null;
+	  try(PreparedStatement prep = conn.prepareStatement(
+	            "SELECT * from usr_stats WHERE usr = ?;")) {
+		  prep.setString(1,  usr);
+	      ResultSet rs = prep.executeQuery();
+	      while (rs.next()) {
+	        entry = new LeaderboardEntry(rs.getString(1), rs.getInt(2), rs.getInt(4), rs.getDouble(3));
+	      }
+	    } catch (SQLException e) {
+	      return null;
+	    }
+	    return entry;
+  }
 
   public void incrementTotalGames(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
@@ -207,6 +224,21 @@ public class PongDatabase {
       System.out.println("SQL query failed:");
       e.printStackTrace();
     }
+  }
+  
+  public void updateELOs(Map<String, Double> newElos) {
+	    try (PreparedStatement prep = conn.prepareStatement(
+	            "UPDATE usr_stats SET elo = ? WHERE usr = ?")){
+	      for (String usr : newElos.keySet()) {
+	    	  prep.setDouble(1, newElos.get(usr));
+	    	  prep.setString(2, usr);
+	    	  prep.addBatch();
+	      }
+	      prep.executeBatch();
+	    } catch (Exception e) {
+	      System.out.println("SQL query failed:");
+	      e.printStackTrace();
+	    }
   }
 
   //password stuff should probably be put into its own class later...like a pass
