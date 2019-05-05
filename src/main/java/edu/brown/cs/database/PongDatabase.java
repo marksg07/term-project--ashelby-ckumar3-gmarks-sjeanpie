@@ -79,7 +79,7 @@ public class PongDatabase {
                     + "elo REAL,"
                     + "wins INTEGER"
                     + ")")) {
-      prep.execute();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
@@ -92,7 +92,7 @@ public class PongDatabase {
                     + "pass TEXT,"
                     + "salt TEXT"
                     + ")")) {
-      prep.execute();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("Failed to create table:");
       e.printStackTrace();
@@ -179,8 +179,7 @@ public class PongDatabase {
       prep.setString(2, this.hashPassword(password, salt));
       prep.setString(3, salt);
 
-      prep.addBatch();
-      prep.executeBatch();
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();
@@ -188,11 +187,10 @@ public class PongDatabase {
 
     try (PreparedStatement prep = conn.prepareStatement(
             "INSERT INTO usr_stats (usr, total_games, elo, wins) "
-                    + "VALUES (?, 0, 0, 0);")) {
+                    + "VALUES (?, 0, ?, 0);")) {
       prep.setString(1, username);
-      prep.setDouble(3, ELOUpdater.BASE_ELO);
-      prep.addBatch();
-      prep.executeBatch();
+      prep.setDouble(2, ELOUpdater.BASE_ELO);
+      prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
       e.printStackTrace();

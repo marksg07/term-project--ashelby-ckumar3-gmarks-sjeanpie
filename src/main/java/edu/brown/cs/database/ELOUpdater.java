@@ -26,20 +26,18 @@ public class ELOUpdater {
 	}
 	
 	public static double update(String result, double elo1, double elo2) {
-		double gain = 0;
-		
 		switch (result) {
 		case "WIN":
-			gain = (K(elo1) * (1 - expectedResult(elo1, elo2)));
+			return (K(elo1) * (1 - expectedResult(elo1, elo2)));
 			
 		case "LOSE":
-			gain = (K(elo1) * (-1 - expectedResult(elo1, elo2)));
+			return (K(elo1) * (0 - expectedResult(elo1, elo2)));
 			
 		case "DRAW":
-			gain = (K(elo1) * (0.5 - expectedResult(elo1, elo2)));
+			return (K(elo1) * (0.5 - expectedResult(elo1, elo2)));
 		}
 		
-		return gain;
+		return 0;
 	}
 }
 

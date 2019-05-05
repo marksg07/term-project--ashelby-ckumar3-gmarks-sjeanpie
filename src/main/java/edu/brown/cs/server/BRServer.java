@@ -373,6 +373,16 @@ public class BRServer implements Server {
         clientToServers.get(nextID).left = newServer;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+
+        String survivor;
+        if (killer.equals(prevID)) {
+          survivor = nextID;
+        } else {
+          assert (killer.equals(nextID));
+          survivor = prevID;
+        }
+        updateScore(killer, killed, survivor);
+
         //need to adjust elo's for the player that got a kill, got killed
         //and the player who outlived the player that got killed 
         updateScore(killer, killed, nextID);
@@ -383,7 +393,15 @@ public class BRServer implements Server {
         clientToServers.get(nextID).left = null;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
-        updateScore(killer, killed, nextID);
+        
+        String survivor;
+        if (killer.equals(prevID)) {
+          survivor = nextID;
+        } else {
+          assert (killer.equals(nextID));
+          survivor = prevID;
+        }
+        updateScore(killer, killed, survivor);
       } else {
         // 1 player left, they win
         assert (clients.size() == 1);
