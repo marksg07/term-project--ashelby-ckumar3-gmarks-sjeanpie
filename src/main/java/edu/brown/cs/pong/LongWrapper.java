@@ -1,5 +1,7 @@
 package edu.brown.cs.pong;
 
+import java.util.Objects;
+
 /**
  * A class that wraps a long for synchronization on changing the long.
  */
@@ -28,5 +30,25 @@ public class LongWrapper {
    */
   public void setValue(long l) {
     value = l;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    LongWrapper that = (LongWrapper) o;
+    return value == that.value;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
+  }
+
+  @Override
+  public String toString() {
+    return "LongWrapper{" +
+            "value=" + value +
+            '}';
   }
 }
