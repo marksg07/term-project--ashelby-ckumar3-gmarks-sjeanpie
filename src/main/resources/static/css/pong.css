@@ -246,7 +246,7 @@ body {
     position: relative;
     text-align: center;
     top: -280px;
-    left: -200px;
+    left: 100px;
     z-index: 500;
 }
 
@@ -255,7 +255,7 @@ body {
     position: relative;
     text-align: center;
     top: -280px;
-    left: 200px;
+    left: 300px;
     z-index: 500;
 }
 
@@ -264,7 +264,7 @@ body {
     position: relative;
     text-align: center;
     top: -280px;
-    left: 0px;
+    left: 200px;
     z-index: 500;
 }
 
