@@ -9,15 +9,29 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Holds all routes for the server.
+ */
 public class RouteHandler {
   private MainServer server;
   private PongDatabase db;
 
+  /**
+   * Constructor for a RouteHandler.
+   *
+   * @param main the MainServer for which the handler operates
+   * @param pdb  the PongDatabase for which the handler operates
+   */
   public RouteHandler(MainServer main, PongDatabase pdb) {
     server = main;
     db = pdb;
   }
 
+  /**
+   * Adds all routes.
+   *
+   * @param freeMarker the freemarker for the server
+   */
   public void addRoutes(FreeMarkerEngine freeMarker) {
     Spark.post("/game", new GameStartHandler(server), freeMarker);
     Spark.get("/home", new HomePageHandler(server), freeMarker);
@@ -45,11 +59,11 @@ public class RouteHandler {
 
       Map<String, String> cookies = req.cookies();
 
-      /**
-       * homepage loading with cookies, so we just want to check
-       * if the user id matches the stored user id. if so, we log
-       * them in. if not, we don't
-       */
+
+//    homepage loading with cookies, so we just want to check
+//    if the user id matches the stored user id. if so, we log
+//    them in. if not, we don't
+
       if (cookies != null) {
         String usr = cookies.getOrDefault("username", "");
         String clientId = cookies.getOrDefault("userid", "");
@@ -70,7 +84,7 @@ public class RouteHandler {
   }
 
   /**
-   * Leaderboard page.
+   * /leaderboard page request handler.
    */
   private static class LeaderboardHandler implements TemplateViewRoute {
     private PongDatabase db;
@@ -88,7 +102,8 @@ public class RouteHandler {
   }
 
   /**
-   * Handles requests to login. Uses the PongDatabase to validate user's name/pass.
+   * Handles requests to /login.
+   * Uses the PongDatabase to validate user's name/pass.
    */
   private static class LoginHandler implements TemplateViewRoute {
     private MainServer server;
@@ -139,10 +154,10 @@ public class RouteHandler {
       if (successful) {
         String hash = server.getUUID(usr);
         if (hash == null) {
-          /*
-           * based on https://www.baeldung.com/java-random-string
-           * generate new random ID
-           */
+
+//        based on https://www.baeldung.com/java-random-string
+//        generate new random ID
+
           int leftLimit = 97; // letter 'a'
           int rightLimit = 122; // letter 'z'
           int targetStringLength = 32;
@@ -172,13 +187,15 @@ public class RouteHandler {
   }
 
   /**
-   * Handles the initial request to the server.
+   * Handles the /game request page requests.
    */
   private static class GameStartHandler implements TemplateViewRoute {
 
     private MainServer server;
 
-    public GameStartHandler(MainServer main) { server = main; }
+    public GameStartHandler(MainServer main) {
+      server = main;
+    }
 
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {

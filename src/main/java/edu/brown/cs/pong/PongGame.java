@@ -1,15 +1,15 @@
 package edu.brown.cs.pong;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
+/**
+ * The pong game, which performs semi-random bounce physics calculations and
+ * moves player paddles.
+ */
 public class PongGame implements Cloneable {
   private static final LongWrapper seed = new LongWrapper(
           Duration.between(Instant.EPOCH, Instant.now()).toNanos());
@@ -26,6 +26,17 @@ public class PongGame implements Cloneable {
   private double countdown;
   private boolean canUpdateDuringCountdown;
 
+  /**
+   * Constructor for PongGame.
+   * @param sizeX x size of game in px
+   * @param sizeY y size of game in px
+   * @param paddleVel px traveled per second
+   * @param paddleLen length of paddle in px
+   * @param ballRadius radius of ball in px
+   * @param startVel starting velocity of ball in px per second
+   * @param startCountdown starting countdown of game
+   * @param updateCd whether or not paddles can move while counting down
+   */
   public PongGame(double sizeX, double sizeY, double paddleVel, double paddleLen, double ballRadius, double startVel, double startCountdown, boolean updateCd) {
     rand = new Random();
     synchronized (seed) {
@@ -62,10 +73,22 @@ public class PongGame implements Cloneable {
     return super.clone();
   }
 
+  /**
+   * Returns truth of whether or not current time ticked to is equal
+   * to current real time. Is only false before countdown ends.
+   *
+   * @return boolean, true if tick is caught up to real time and
+   * false otherwise
+   */
   public boolean nowIsCurrent() {
     return Duration.between(startTime, Instant.now()).toNanos() >= 0;
   }
 
+  /**
+   * Ticks to current time.
+   *
+   * @return int representing which players have died
+   */
   public synchronized int tickToCurrent() {
     Instant now = Instant.now();
     double seconds = Duration.between(lastUpdate, now).toNanos() / 1000000000.;
@@ -80,6 +103,12 @@ public class PongGame implements Cloneable {
     return 0;
   }
 
+  /**
+   * Ticks through game logic for next requested amount of time.
+   *
+   * @param seconds time frame ticking forward
+   * @return int representing which players have died
+   */
   public int tick(double seconds) {
     assert (ballX >= ballRadius && ballX <= maxX - ballRadius
             && ballY >= ballRadius && ballY <= maxY - ballRadius);
@@ -150,6 +179,11 @@ public class PongGame implements Cloneable {
     return 0;
   }
 
+  /**
+   * Adds constrained randomness to bounces.
+   *
+   * @param frac randomness constant, advised use from 0 to 1
+   */
   private void addRandomness(double frac) {
     boolean invalid = true;
     double newVelX = 0, newVelY = 0;
@@ -171,6 +205,11 @@ public class PongGame implements Cloneable {
     ballVelY = newVelY;
   }
 
+  /**
+   * Moves the paddles over the next time frame.
+   *
+   * @param time the window forward in which paddles will be moved
+   */
   private void movePaddles(double time) {
     if (!p1Dead) {
       if (p1Input == InputType.DOWN) {
@@ -197,6 +236,13 @@ public class PongGame implements Cloneable {
     }
   }
 
+  /**
+   * Gets next collision over time span.
+   *
+   * @param time time window forward in which the collision will be found,
+   *             in seconds
+   * @return the next Collision
+   */
   private Collision getNextCollision(double time) {
     double newBallX = ballX + ballVelX * time;
     double newBallY = ballY + ballVelY * time;
@@ -386,6 +432,11 @@ public class PongGame implements Cloneable {
     return paddleVel;
   }
 
+  /**
+   * Gets the state of the game.
+   *
+   * @return JsonObject state of the game.
+   */
   public JsonObject getState() {
     JsonObject obj = new JsonObject();
     if (nowIsCurrent()) {
@@ -405,6 +456,11 @@ public class PongGame implements Cloneable {
     return obj;
   }
 
+  /**
+   * Gets the flipped state of the game.
+   *
+   * @return JsonObject flipped state of the game for final-two display.
+   */
   public JsonObject getFlippedState() {
     JsonObject obj = new JsonObject();
     if (nowIsCurrent()) {
@@ -442,6 +498,11 @@ public class PongGame implements Cloneable {
     return p1Dead;
   }
 
+  /**
+   * Sets ball speed.
+   *
+   * @param speed speed of ball
+   */
   public void setBallSpeed(double speed) {
     double diff = speed - startVel;
     startVel = speed;
@@ -452,6 +513,9 @@ public class PongGame implements Cloneable {
     ballVelY += unitVelY * diff;
   }
 
+  /**
+   * Type of player input to be processed.
+   */
   public enum InputType {
     NONE,
     UP,
@@ -470,6 +534,9 @@ public class PongGame implements Cloneable {
     }
   }
 
+  /**
+   * Types of collision to be processed.
+   */
   private enum CollisionType {
     NONE,
     UP,
@@ -478,6 +545,9 @@ public class PongGame implements Cloneable {
     RIGHT
   }
 
+  /**
+   * Collision of ball and borders or paddle.
+   */
   private class Collision {
     public double time;
     public CollisionType type;
