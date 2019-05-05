@@ -1,0 +1,48 @@
+.leaderboard {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18pt;
+    padding: 20px;
+    text-align: left;
+    color: whitesmoke;
+}
+
+.leaderboard tr:first-child {
+    background-color: transparent !important;
+}
+
+.leaderboard tr:nth-child(even) {
+    background-color: cornflowerblue;
+}
+
+.leaderboard tr:nth-child(odd) {
+    background-color: steelblue;
+}
+
+.leaderboardtitle {
+    position: relative;
+    font-size: 24px;
+    color: #fff;
+    top: -90%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+}
+
+#leaderboard {
+    position: relative;
+    font-size: 16px;
+    color: #fff;
+    top: -60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Nunito', sans-serif;
+}
+
+#leaderboard td {
+    width: 200px;
+    text-align: center;
+}
+
+#leaderboard th {
+    width: 200px;
+    text-align: center;
+}

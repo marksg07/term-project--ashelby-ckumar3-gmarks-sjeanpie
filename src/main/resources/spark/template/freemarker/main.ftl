@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <head>
     <link href="https://fonts.googleapis.com/css?family=Righteous|Nunito" rel="stylesheet">
     <meta charset="utf-8">
@@ -13,17 +12,20 @@
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap-grid.css">
     <link rel="stylesheet" href="css/bootstrap-reboot.css">
+    <#if header??>
+        ${header}
+    </#if>
 </head>
 <body>
 ${content}
 <!-- Again, we're serving up the unminified source for clarity. -->
 <script src="js/jquery-2.1.1.js"></script>
-<script src="js/websockets.js"> </script>
-<script src="js/homepage.js"> </script>
+<script src="js/websockets.js"></script>
+<script src="js/homepage.js"></script>
 <#--<script src="js/pong.js"> </script>-->
-<script src="js/lobby.js"> </script>
-<script src="js/paddle.js"> </script>
-<script src="js/ball.js"> </script>
+<script src="js/lobby.js"></script>
+<script src="js/paddle.js"></script>
+<script src="js/ball.js"></script>
 
 </body>
 <!-- See http://html5boilerplate.com/ for a good place to start

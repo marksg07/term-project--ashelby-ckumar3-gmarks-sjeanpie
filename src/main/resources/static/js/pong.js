@@ -11,9 +11,7 @@ const ballSize = 20;
 const gameScreenTime = 3.8;
 let up = false;
 let down = false;
-let playersRemaining;
 let upDown = [0, 0];
-let gameReady = false;
 let leftGameBegun = false;
 let rightGameBegun = false;
 let gameOver;
@@ -27,11 +25,10 @@ let killLog = [];
 let logStartPointer = 0;
 let killLogElement;
 
-
-function setGameReady(v) {
-    gameReady = v;
-}
-
+/**
+ * Set left boardstate to dead or not.
+ * @param st the state of the left board
+ */
 function setLeftBoardState(st) {
     if (st === leftBoardState)
         return;
@@ -48,6 +45,10 @@ function setLeftBoardState(st) {
     }
 }
 
+/**
+ * Set right boardstate to dead or not.
+ * @param st the state of the right board
+ */
 function setRightBoardState(st) {
     if (st === rightBoardState)
         return;
@@ -63,35 +64,46 @@ function setRightBoardState(st) {
     }
 }
 
+/**
+ * Displays pre-BR timer before the battle royale begins.
+ * @param seconds time left until game start
+ */
 function displayTimer(seconds) {
     midSec.show();
     const secString = "Enough clients to start game. If no more clients join game will start in: " + (seconds + 20).toFixed(1) + " seconds";
     midSec.text(secString);
 }
 
+/**
+ * Updates the game state to ball and paddle correct positions.
+ * @param state data incoming from servers
+ */
 function updateGame(state) {
     if (state.hasOwnProperty("timeUntilStart")) {
-        console.log(state.timeUntilStart);
+        // if game not yet started
         displayTimer(state.timeUntilStart);
         return;
     } else {
+        // if game started, hide center timer
         midSec.hide();
     }
     if (gameOver) {
+        // if game over, stop
         return;
     }
-    // console.log(state);
     if (!state.hasOwnProperty("left") && !state.hasOwnProperty("right")) {
-        // i am dead :(
+        // if game has no left and no right, stop
         return;
     }
 
     if (state.left === "dead") {
+        // if left player dead, set left board red and hide left ball and paddle
         leftSec.hide();
         oppLeftPaddle.hide();
         ballLeft.hide();
         setLeftBoardState('red');
     } else if (state.left.hasOwnProperty("cdSecondsLeft")) {
+        // if left game starting soon, show red or timer appropriately
         if (state.left.cdSecondsLeft > gameScreenTime && leftGameBegun) {
             setLeftBoardState('red');
         } else {
@@ -104,7 +116,7 @@ function updateGame(state) {
             leftSec.text(secString);
         }
     } else {
-        // console.log("left game live");
+        // the left game is being played as normal
         setLeftBoardState('none');
         leftSec.hide();
         oppLeftPaddle.setPosition(state.left.p1PaddleY);
@@ -113,11 +125,13 @@ function updateGame(state) {
     }
 
     if (state.right === "dead") {
+        // if right player dead, set right board red and hide right ball and paddle
         rightSec.hide();
         oppRightPaddle.hide();
         ballRight.hide();
         setRightBoardState('red');
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
+        // if right game starting soon, show red or timer appropriately
         if (state.right.cdSecondsLeft > gameScreenTime && rightGameBegun) {
             setRightBoardState('red');
         } else {
@@ -130,8 +144,8 @@ function updateGame(state) {
             rightSec.text(secString);
         }
     } else {
+        // the right game is being played as normal
         setRightBoardState('none');
-        // console.log("right game live");
         rightSec.hide();
         oppRightPaddle.setPosition(state.right.p2PaddleY);
         playerPaddle.setPosition(state.right.p1PaddleY);
@@ -140,12 +154,16 @@ function updateGame(state) {
 
 }
 
+/**
+ * Sends input to the server.
+ */
 function sendInput() {
     conn.send(JSON.stringify({"type": MESSAGE_TYPE.INPUT, "payload": {"id": myId, "input": pressState()}}));
 }
 
 /**
- * tracks time when up/down is pressed.
+ * Tracks time when up/down is pressed. Interacts correctly with
+ * holding down buttons simultaneously and in various order.
  * @param e
  */
 function checkPressed(e) {
@@ -167,7 +185,7 @@ function checkPressed(e) {
 }
 
 /**
- * turns off keypress indicator
+ * Turns off keypress indicator.
  */
 function checkUp(e) {
     if ((e.which === 38) || (e.which === 87)) {
@@ -182,7 +200,7 @@ function checkUp(e) {
 }
 
 /**
- * gets pressState
+ * Gets pressState.
  */
 function pressState() {
     if (upDown[0] > upDown[1]) {
@@ -196,7 +214,7 @@ function pressState() {
 
 
 /**
- * checks for inputs and updates paddle coords, will send to back end in future
+ * Checks for inputs and updates paddle coords, will send to back end in future.
  * @param e
  */
 function checkInputs(e) {
@@ -215,8 +233,10 @@ function checkInputs(e) {
 
 let inputHandle;
 
+/**
+ * Handles when player dies.
+ */
 function onPlayerDead() {
-    // XXX
     gameOver = true;
     clearInterval(inputHandle);
     ctx.fillStyle = "red";
@@ -225,6 +245,9 @@ function onPlayerDead() {
     conn.close();
 }
 
+/**
+ * Handles when player wins.
+ */
 function onPlayerWin() {
     gameOver = true;
     clearInterval(inputHandle);
@@ -234,15 +257,30 @@ function onPlayerWin() {
     conn.close();
 }
 
+/**
+ * Sets opponent name fields.
+ * @param left left opponent username
+ * @param right right opponent username
+ */
 function setUsers(left, right) {
     $("#leftName").text(left);
     $("#rightName").text(right);
 }
 
+/**
+ * Returns one appropriate verb for when a player is eliminated.
+ * @returns {string}
+ */
 function getVerb() {
     return "ponged";
 }
 
+/**
+ * Logs the killfeed occurrence of one pong'ing.
+ * @param killer the player who kills
+ * @param killed the player who is killed
+ * @returns {HTMLElement} the element to be displayed
+ */
 function logEntryElement(killer, killed) {
     let newDiv = document.createElement("div");
     let logEnt = document.createElement("div");
@@ -257,14 +295,26 @@ function logEntryElement(killer, killed) {
     return newDiv;
 }
 
+/**
+ * Adds the
+ * @param killer
+ * @param killed
+ */
 function addToKillLog(killer, killed) {
     killLog.push([killer, killed, (new Date()).getTime()]);
     killLogElement.appendChild(logEntryElement(killer, killed));
 }
 
+/**
+ * Params for fade-out of killfeed.
+ * @type {number}
+ */
 const logTime = 5;
 const fadeTime = 3;
 
+/**
+ * Draws killfeed properly, enables fade-out of old kill info.
+ */
 function drawKillLog() {
     const earliestLogTime = (new Date()).getTime() - logTime * 1000;
     const earliestFadeTime = (new Date()).getTime() - fadeTime * 1000;
@@ -276,20 +326,19 @@ function drawKillLog() {
             killLogElement.removeChild(killLogElement.firstChild);
         } else if (log[2] < earliestFadeTime) {
             const opacity = 1 - (log[2] - earliestFadeTime) / (earliestLogTime - earliestFadeTime)
-            console.log(killLogElement.children[i - logStartPointer]);
             killLogElement.children[i - logStartPointer].firstChild.style.opacity = opacity;
         }
     }
 }
 
+/**
+ * Actually sets up and executes the pong game on document load.
+ */
 function executePong() {
     wsSetup();
     // Setting up the canvas.  Already has a width and height.
     canvas = $('#pong-canvas')[0];
     killLogElement = $("#killLog")[0];
-    console.log(canvas.width);
-    // canvas.width = canvas.width + paddleWidth * 3;
-    console.log(canvas.width);
     // Set up the canvas context.
     ctx = canvas.getContext("2d");
     ctx.fillStyle = "black";
@@ -303,10 +352,6 @@ function executePong() {
     oppRightPaddle = new Paddle(canvas.width - (paddleWidth / 2), canvas.height / 2, paddleWidth, paddleHeight, ctx);
     ballLeft = new Ball(ballSize, ctx, (canvas.width / 4) - (ballSize / 2), canvas.height / 2);
     ballRight = new Ball(ballSize, ctx, (3 * canvas.width / 4) - (ballSize / 2), canvas.height / 2);
-    // ctx.font = "50px Futura, sans-serif";
-    // ctx.fillStyle = "white";
-    // ctx.textAlign = "center";
-    // ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
     $(document).keydown(event => {
         checkPressed(event);
     });
@@ -318,12 +363,16 @@ function executePong() {
     $("#name").text(myId);
 }
 
+/**
+ * Removes the waiting text when game starts.
+ */
 function rmWaitingText() {
-    // ctx.fillStyle = "black";
-    // ctx.fillRect(0, 4*canvas.height/5, canvas.width, canvas.height);
     $("#status").text("");
 }
 
+/**
+ * Executes on document load.
+ */
 $(document).ready(() => {
     executePong();
 });
