@@ -163,7 +163,7 @@ public class PongGame implements Cloneable {
             assert (false);
         }
 
-        addRandomness(0.2);
+        addRandomness(0.4);
 
         // once handled, we repeat the collision test with updated X, Y, vX, vY, pX, pY
         collision = getNextCollision(seconds);
@@ -472,5 +472,15 @@ public class PongGame implements Cloneable {
    */
   public void setP1PaddleY(double p1PaddleY) {
     this.p1PaddleY = p1PaddleY;
+  }
+
+  public void setBallSpeed(double speed) {
+    double diff = speed - startVel;
+    startVel = speed;
+    double norm = Math.sqrt(ballVelX * ballVelX + ballVelY * ballVelY);
+    double unitVelX = ballVelX / norm;
+    double unitVelY = ballVelY / norm;
+    ballVelX += unitVelX * diff;
+    ballVelY += unitVelY * diff;
   }
 }
