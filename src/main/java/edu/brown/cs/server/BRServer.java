@@ -63,6 +63,9 @@ public class BRServer implements Server {
   public void addClient(String id, Session session) {
     println("Adding client " + id + ".");
     synchronized (clientToServers) {
+      if(clientToServers.containsKey(id)) {
+        return;
+      }
       if (ready()) {
         return;
       }
