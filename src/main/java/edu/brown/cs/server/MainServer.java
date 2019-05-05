@@ -27,11 +27,13 @@ public class MainServer implements Server {
   private static final Gson GSON = new Gson();
   private final Map<String, Session> sessions;
   private final PongDatabase db;
+  private final Map<String, String> unsToUuids;
 
   public MainServer(PongDatabase db) {
     sessions = new ConcurrentHashMap<>();
     clientToServer = new ConcurrentHashMap<>();
     servers = new CopyOnWriteArrayList<>();
+    unsToUuids = new ConcurrentHashMap<>();
     this.db = db;
   }
 
@@ -104,5 +106,17 @@ public class MainServer implements Server {
 
   public PongDatabase getDatabase() {
     return db;
+  }
+
+  public String getUUID(String name) {
+    return unsToUuids.get(name);
+  }
+
+  public void putUUID(String name, String uuid) {
+    unsToUuids.put(name, uuid);
+  }
+
+  public boolean hasName(String name) {
+    return unsToUuids.containsKey(name);
   }
 }

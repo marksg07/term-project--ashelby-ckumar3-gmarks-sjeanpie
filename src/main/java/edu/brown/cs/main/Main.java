@@ -15,6 +15,7 @@ import spark.Route;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.*;
+
 import java.util.Random;
 
 import java.awt.font.GlyphMetrics;
@@ -32,6 +33,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 
 import com.google.gson.Gson;
+import sun.rmi.runtime.Log;
 
 public final class Main {
 
@@ -39,7 +41,8 @@ public final class Main {
   private static final int DEFAULT_PORT = 4567;
   private static final Gson GSON = new Gson();
   private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
-  private static final Map<String, String> unsToUuids = new HashMap<>();
+  //private static final Map<String, String> unsToUuids = new HashMap<>();
+  private MainServer server;
 
   /**
    * The initial method called when execution begins.
@@ -67,7 +70,7 @@ public final class Main {
       config.setDirectoryForTemplateLoading(templates);
     } catch (IOException ioe) {
       System.out.printf("ERROR: Unable use %s for template loading.%n",
-      templates);
+              templates);
       System.exit(1);
     }
     return new FreeMarkerEngine(config);
@@ -80,18 +83,18 @@ public final class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
-    MainServer serv = new MainServer(db);
-    PongWebSocketHandler.setServer(serv);
-    
+    server = new MainServer(db);
+    PongWebSocketHandler.setServer(server);
+
     // timeout for websockets = 2 seconds in case of badly behaved clients
     Spark.webSocketIdleTimeoutMillis(2000);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
-    Spark.post("/game", new GameStartHandler(), freeMarker);
-    Spark.get("/home", new HomePageHandler(), freeMarker);
-    Spark.post("/login", new LoginHandler(), freeMarker);
+    Spark.post("/game", new GameStartHandler(server), freeMarker);
+    Spark.get("/home", new HomePageHandler(server), freeMarker);
+    Spark.post("/login", new LoginHandler(server), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
 
-    Spark.get("/", new HomePageHandler(), freeMarker);
+    Spark.get("/", new HomePageHandler(server), freeMarker);
 
     // Spark.get("/*", new NotFoundHandler(), freeMarker);
     //Spark.post("/stats", new StatsHandler());
@@ -140,10 +143,16 @@ public final class Main {
    * /home page handler, handles login cookies if they are set.
    */
   private static class HomePageHandler implements TemplateViewRoute {
+    private final MainServer server;
+
+    public HomePageHandler(MainServer main) {
+      server = main;
+    }
+
     @Override
     public ModelAndView handle(Request req, Response res) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-      "P O N G F O L K S", "response", "", "successful", false);
+              "P O N G F O L K S", "response", "", "successful", false);
 
 
       Map<String, String> cookies = req.cookies();
@@ -156,8 +165,7 @@ public final class Main {
       if (cookies != null) {
         String usr = cookies.getOrDefault("username", "");
         String clientId = cookies.getOrDefault("userid", "");
-        if (clientId.equals(unsToUuids.getOrDefault(usr, "DNE"))) {
-
+        if (server.hasName(usr) && clientId.equals(server.getUUID(usr))) {
 
 
 //        String usr = cookies.getOrDefault("username", "");
@@ -172,8 +180,8 @@ public final class Main {
 //            response = "User does not exist. Try creating an account!";
 //          } else { //check password
 //            if (db.validatePassword(usr, pass)) {
-              response = "Successfully logged in!";
-              successful = true;
+          response = "Successfully logged in!";
+          successful = true;
 //            } else {
 //              response = "Username and password do not match.";
 //            }
@@ -201,11 +209,11 @@ public final class Main {
 //              unsToUuids.put(usr, userId);
 //
 //
-            variables = ImmutableMap.<String, Object>builder().put("title",
-                    "P O N G F O L K S").put( "response", response).put(
-                    "successful", successful).put(
-                            "username", usr).put(
-                                    "userid", clientId).build();
+          variables = ImmutableMap.<String, Object>builder().put("title",
+                  "P O N G F O L K S").put("response", response).put(
+                  "successful", successful).put(
+                  "username", usr).put(
+                  "userid", clientId).build();
 //          } else {
 //            variables = ImmutableMap.of("title",
 //                    "P O N G F O L K S", "response", response,
@@ -232,7 +240,7 @@ public final class Main {
 
     public ModelAndView handle(Request request, Response response) throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Leaderboard", "leaderboardData", db.getLeaderboardData());
+              "Leaderboard", "leaderboardData", db.getLeaderboardData());
 
       return new ModelAndView(variables, "leaderboard.ftl");
     }
@@ -242,6 +250,12 @@ public final class Main {
    * Handles requests to login. Uses the PongDatabase to validate user's name/pass.
    */
   private static class LoginHandler implements TemplateViewRoute {
+    private MainServer server;
+
+    public LoginHandler(MainServer main) {
+      server = main;
+    }
+
     @Override
     public ModelAndView handle(Request req, Response res) throws SQLException {
       QueryParamsMap qm = req.queryMap();
@@ -279,26 +293,26 @@ public final class Main {
       }
       // Now we send the user their unique ID for cookie purposes.
       Map<String, Object> variables;
-      if(successful) {
-        String hash = unsToUuids.get(usr);
+      if (successful) {
+        String hash = server.getUUID(usr);
         if (hash == null) {
-            /*
-             * based on https://www.baeldung.com/java-random-string
-             * generate new random ID
-             */
-              int leftLimit = 97; // letter 'a'
-              int rightLimit = 122; // letter 'z'
-              int targetStringLength = 32;
-              Random random = new Random();
-              StringBuilder buffer = new StringBuilder(targetStringLength);
-              for (int i = 0; i < targetStringLength; i++) {
-                int randomLimitedInt = leftLimit + (int)
-                        (random.nextFloat() * (rightLimit - leftLimit + 1));
-                buffer.append((char) randomLimitedInt);
-              }
+          /*
+           * based on https://www.baeldung.com/java-random-string
+           * generate new random ID
+           */
+          int leftLimit = 97; // letter 'a'
+          int rightLimit = 122; // letter 'z'
+          int targetStringLength = 32;
+          Random random = new Random();
+          StringBuilder buffer = new StringBuilder(targetStringLength);
+          for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+          }
           hash = buffer.toString();
 
-              unsToUuids.put(usr, hash);
+          server.putUUID(usr, hash);
         }
         variables = ImmutableMap.of("title",
                 "P O N G F O L K S", "response", response,
@@ -318,20 +332,26 @@ public final class Main {
    * Handles the initial request to the server.
    */
   private static class GameStartHandler implements TemplateViewRoute {
+
+    private MainServer server;
+
+    public GameStartHandler(MainServer main) { server = main; }
+
     @Override
     public ModelAndView handle(Request request, Response response) throws Exception {
       QueryParamsMap map = request.queryMap();
-      if(!(map.hasKey("username") && map.hasKey("userid"))) {
-        return new HomePageHandler().handle(request, response);
+      if (!(map.hasKey("username") && map.hasKey("userid"))) {
+        return new HomePageHandler(server).handle(request, response);
       }
       Map<String, Object> variables = ImmutableMap.of("title",
-      "Game", "username", map.value("username"), "userid", map.value("userid"));
+              "Game", "username", map.value("username"), "userid", map.value("userid"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }
 
   /**
-   * Get the heroku port.
+   * Get the heroku port.````````
+   *
    * @return port
    */
   static int getHerokuAssignedPort() {
