@@ -326,5 +326,4 @@ function rmWaitingText() {
 
 $(document).ready(() => {
     executePong();
-})
-;
+});
