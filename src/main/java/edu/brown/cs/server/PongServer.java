@@ -3,16 +3,33 @@ package edu.brown.cs.server;
 import com.google.gson.JsonObject;
 import edu.brown.cs.pong.PongGame;
 
+/**
+ * Server between two players playing one game.
+ */
 public class PongServer implements Server {
-  private String p1Id, p2Id;
   private final PongGame game;
+  private String p1Id, p2Id;
 
+  /**
+   * Normal constructor on BR game start.
+   * @param p1 P1 ID
+   * @param p2 P2 ID
+   * @param startVel Start velocity of ball
+   */
   public PongServer(String p1, String p2, double startVel) {
     p1Id = p1;
     p2Id = p2;
     game = new PongGame(400, 300, 400, 40, 10, startVel, 5, false);
   }
 
+  /**
+   * Constructor on new game start while BR game is running; must sync paddles correctly.
+   * @param p1 P1 ID
+   * @param p2 P2 ID
+   * @param p1PaddleY P1 paddle position
+   * @param p2PaddleY P2 paddle position
+   * @param startVel Start velocity of ball
+   */
   public PongServer(String p1, String p2, double p1PaddleY, double p2PaddleY, double startVel) {
     p1Id = p1;
     p2Id = p2;
@@ -43,6 +60,11 @@ public class PongServer implements Server {
     }
   }
 
+  /**
+   * Return "flipped" game state; i.e. the mirrored state for 1v1s.
+   * @param id Client's ID (name).
+   * @return State
+   */
   public JsonObject getFlippedGameState(String id) {
     assert (p1Id.equals(id) || p2Id.equals(id));
     synchronized (game) {
@@ -50,21 +72,33 @@ public class PongServer implements Server {
     }
   }
 
-  public String getID(String pNum) {
-    switch (pNum) {
-      case "player1":
-      case "p1":
-      case "1":
-        return p1Id;
-      case "player2":
-      case "p2":
-      case "2":
-        return p2Id;
-      default:
-        println("BAD GETID");
-        return null;
+  /**
+   * Get the ID of a given player (by number).
+   * @param pNum number of player
+   * @return ID
+   */
+  public String getID(int pNum) {
+    if (pNum == 1) {
+      return p1Id;
+    } else {
+      assert (pNum == 2);
+      return p2Id;
     }
   }
+    // adam wrote this
+//    switch (pNum) {
+//      case "player1":
+//      case "p1":
+//      case "1":
+//        return p1Id;
+//      case "player2":
+//      case "p2":
+//      case "2":
+//        return p2Id;
+//      default:
+//        println("BAD GETID");
+//        return null;
+//    }
 
   public PongGame getGame() {
     return game;

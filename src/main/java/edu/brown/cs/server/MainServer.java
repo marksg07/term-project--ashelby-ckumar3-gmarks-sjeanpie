@@ -20,11 +20,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MainServer implements Server {
   private final List<BRServer> servers;
   private final Map<String, BRServer> clientToServer;
-  private static final Gson GSON = new Gson();
   private final Map<String, Session> sessions;
   private final PongDatabase db;
   private final Map<String, String> unsToUuids;
 
+  /**
+   * Constructor for MainServer.
+   * @param db Pong database to write and read.
+   */
   public MainServer(PongDatabase db) {
     sessions = new ConcurrentHashMap<>();
     clientToServer = new ConcurrentHashMap<>();
@@ -33,6 +36,12 @@ public class MainServer implements Server {
     this.db = db;
   }
 
+  /**
+   * Add a new client to this server.
+   * @param id client ID (username)
+   * @param session WebSockets session object
+   * @return If the adding was successful; only returns false when user already in server.
+   */
   public boolean addClient(String id, Session session) {
     println("Adding client " + id);
     synchronized(clientToServer) {
@@ -50,7 +59,7 @@ public class MainServer implements Server {
       if (openServer == null) {
         println("Made new server to accomodate client " + id);
         openServer = new BRServer(db);
-        servers.add(openServer); // XXX actual MM
+        servers.add(openServer);
       }
       openServer.addClient(id, session);
       clientToServer.put(id, openServer);
@@ -58,6 +67,10 @@ public class MainServer implements Server {
     return true;
   }
 
+  /**
+   * Remove a client from this server, keyed by session.
+   * @param session The session of the client to remove.
+   */
   public void removeSession(Session session) {
     synchronized (clientToServer) {
       for(Map.Entry<String, Session> entry : sessions.entrySet()) {
@@ -104,7 +117,7 @@ public class MainServer implements Server {
     return db;
   }
 
-  public String getUUID(String name) {
+  String getUUID(String name) {
     return unsToUuids.get(name);
   }
 

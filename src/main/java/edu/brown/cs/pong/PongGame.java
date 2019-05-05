@@ -386,6 +386,10 @@ public class PongGame implements Cloneable {
     return paddleVel;
   }
 
+  /**
+   * Get the state of the game.
+   * @return state
+   */
   public JsonObject getState() {
     JsonObject obj = new JsonObject();
     if (nowIsCurrent()) {
@@ -396,7 +400,7 @@ public class PongGame implements Cloneable {
       //obj.addProperty("p1Dead", p1Dead);
       //obj.addProperty("p2Dead", p2Dead);
     } else {
-      // still in CD
+      // still in CD, just return seconds until we are done
       Instant now = Instant.now();
       double seconds = Duration.between(startTime, now).toNanos() / 1000000000.;
       System.out.println("Duration between last and now is " + seconds);
@@ -405,6 +409,10 @@ public class PongGame implements Cloneable {
     return obj;
   }
 
+  /**
+   * Get the "flipped" state of the game, i.e. the mirrored game for 1v1s
+   * @return state
+   */
   public JsonObject getFlippedState() {
     JsonObject obj = new JsonObject();
     if (nowIsCurrent()) {
