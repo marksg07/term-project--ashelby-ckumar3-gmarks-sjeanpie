@@ -6,7 +6,11 @@ import com.google.gson.JsonPrimitive;
 import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,12 +21,14 @@ public class BRServer implements Server {
   private final Map<String, Session> sessions;
   private long myId;
   private final PongDatabase db;
-  static final int MAXPLAYERS = 3;
+  static final int MINPLAYERS = 3;
   static final double startSpeed = 100;
   static final double acceleration = 4;
   private double ballSpeed;
   private Timer ballAccelTimer;
-
+  static final int MAXPLAYERS = 10;
+  static final double startTime = 20;
+  private Instant timerStart = null;
 
   private static long idCounter = 0;
 
@@ -36,12 +42,15 @@ public class BRServer implements Server {
 
   private final Map<String, ServerPair> clientToServers;
   private boolean ready;
+  private boolean starting;
+  private Timer startTimer;
 
   public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
     clientToServers = new ConcurrentHashMap<>();
     ready = false;
+    starting = false;
     myId = nextId();
     ballSpeed = startSpeed;
     this.db = db;
@@ -60,7 +69,26 @@ public class BRServer implements Server {
       clients.add(id);
       sessions.put(id, session);
       println(clients.size() + " players total.");
+      if (clients.size() == MINPLAYERS) {
+        starting = true;
+        startTimer = new Timer();
+        timerStart = Instant.now();
+        startTimer.schedule(new TimerTask() {
+          @Override
+          public void run() {
+            synchronized (clientToServers) {
+              starting = false;
+              ready = true;
+              onFilled();
+            }
+          }
+        }, (long)(startTime * 1000));
+      }
       if (clients.size() == MAXPLAYERS) {
+        assert (starting);
+        starting = false;
+        startTimer.cancel();
+        startTimer = null;
         ready = true;
         onFilled();
       }
@@ -174,6 +202,13 @@ public class BRServer implements Server {
   @Override
   public JsonObject getGameState(String id) {
     synchronized (clientToServers) {
+      if (!ready && starting) {
+        Duration timerValue = Duration.between(Instant.now(), timerStart);
+        double timerValueSeconds = timerValue.toNanos() / 1000000000.0;
+        JsonObject ret = new JsonObject();
+        ret.addProperty("timeUntilStart", timerValueSeconds);
+        return ret;
+      }
       if (clientToServers.containsKey(id)) {
         ServerPair sp = clientToServers.get(id);
         if (sp == null) {
@@ -319,6 +354,11 @@ public class BRServer implements Server {
       } else { // otherwise, remove the player from the clients list
         clients.remove(id);
         sessions.remove(id);
+        if (starting && clients.size() < MINPLAYERS) { // no longer enough players! :(
+          starting = false;
+          startTimer.cancel();
+          startTimer = null;
+        }
       }
     }
   }
