@@ -97,7 +97,7 @@ public final class Main {
 
     Spark.get("/", new HomePageHandler(), freeMarker);
 
-    Spark.get("/*", new NotFoundHandler(), freeMarker);
+    // Spark.get("/*", new NotFoundHandler(), freeMarker);
     //Spark.post("/stats", new StatsHandler());
 
     // make everything redirect to HTTPS
