@@ -248,12 +248,15 @@ function getVerb() {
 
 function logEntryElement(killer, killed) {
     let newDiv = document.createElement("div");
-    newDiv.className = "logEntry";
+    let logEnt = document.createElement("div");
+    logEnt.className = "logEntry";
     if(killer !== "") {
-        newDiv.innerHTML = killer + " <strong>" + getVerb() + "</strong> " + killed;
+        logEnt.innerHTML = killer + " <strong>" + getVerb() + "</strong> " + killed;
     } else {
-        newDiv.innerHTML = killed + " <strong>disconnected</strong>"
+        logEnt.innerHTML = killed + " <strong>disconnected</strong>"
     }
+    newDiv.appendChild(logEnt);
+    newDiv.appendChild(document.createElement("br"));
     return newDiv;
 }
 
