@@ -94,6 +94,10 @@ public final class Main {
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
+
+    Spark.get("/", new HomePageHandler(), freeMarker);
+
+    Spark.get("/*", new NotFoundHandler(), freeMarker);
     //Spark.post("/stats", new StatsHandler());
 
     // make everything redirect to HTTPS
@@ -120,6 +124,19 @@ public final class Main {
         pw.println("</pre>");
       }
       res.body(stacktrace.toString());
+    }
+  }
+
+  /**
+   * 404 page
+   */
+  private static class NotFoundHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request request, Response response) throws Exception {
+      response.status(404);
+      Map<String, Object> variables = ImmutableMap.of("title",
+              "P O N G F O L K S", "response", "");
+      return new ModelAndView(variables, "notfound.ftl");
     }
   }
 
