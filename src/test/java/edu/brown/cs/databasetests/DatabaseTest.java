@@ -15,10 +15,9 @@ public class DatabaseTest {
     try {
       assertTrue(db.establishConnection("data/testDB.sqlite3") == 1);
     } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-    } catch (
-      SQLException e) {
-        e.printStackTrace();
+      e.printStackTrace();
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
 
@@ -33,8 +32,7 @@ public class DatabaseTest {
     PongDatabase db = new PongDatabase("data/testDB.sqlite3");
     try {
       assertTrue(db.validateUser("abc"));
-    } catch (
-    SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
   }
@@ -44,8 +42,7 @@ public class DatabaseTest {
     PongDatabase db = new PongDatabase("data/testDB.sqlite3");
     try {
       assertTrue(db.validatePassword("abc", "abc"));
-    } catch (
-    SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
   }

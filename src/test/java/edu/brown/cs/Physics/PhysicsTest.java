@@ -9,7 +9,7 @@ public class PhysicsTest {
 
   @Test
   public void testInitialYRandomness() {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10000; i++) {
       PongGame game = new PongGame(400, 300, 400, 40, 10, 200, 5, true);
       game.tick(0.5);
       double lowest = 0 * Math.PI * 2 / 3 - Math.PI / 3;
@@ -23,7 +23,7 @@ public class PhysicsTest {
 
   @Test
   public void testInitialXRandomness() {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10000; i++) {
       PongGame game = new PongGame(400, 300, 400, 40, 10, 200, 5, true);
       game.tick(0.5);
       double lowest = 0 * Math.PI * 2 / 3 - Math.PI / 3;
