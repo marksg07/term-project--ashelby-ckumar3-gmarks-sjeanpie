@@ -390,7 +390,7 @@ public class BRServer implements Server {
   }
 
   public boolean hasClient(String id) {
-    return clientToServers.containsKey(id);
+    return clients.contains(id);
   }
 
 }
