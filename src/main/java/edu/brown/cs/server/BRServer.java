@@ -22,6 +22,10 @@ public class BRServer implements Server {
   private long myId;
   private final PongDatabase db;
   static final int MINPLAYERS = 3;
+  static final double startSpeed = 100;
+  static final double acceleration = 4;
+  private double ballSpeed;
+  private Timer ballAccelTimer;
   static final int MAXPLAYERS = 10;
   static final double startTime = 20;
   private Instant timerStart = null;
@@ -48,6 +52,7 @@ public class BRServer implements Server {
     ready = false;
     starting = false;
     myId = nextId();
+    ballSpeed = startSpeed;
     this.db = db;
   }
 
@@ -100,7 +105,7 @@ public class BRServer implements Server {
       int iLeft = (clients.size() - 1 + i) % clients.size();
       String cliLeft = clients.get(iLeft);
       String cli = clients.get(i);
-      PongServer serv = new PongServer(cliLeft, cli);
+      PongServer serv = new PongServer(cliLeft, cli, ballSpeed);
       clientToServers.get(cli).left = serv;
       clientToServers.get(cliLeft).right = serv;
     }
@@ -114,6 +119,21 @@ public class BRServer implements Server {
       sendGameStart(id);
       sendUsernamesUpdate(id);
     }
+    // start speed increase timer
+    ballAccelTimer = new Timer();
+    ballAccelTimer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        synchronized(clientToServers) {
+          ballSpeed += acceleration;
+          for (ServerPair sp : clientToServers.values()) {
+            if(sp.left == null)
+              continue;
+            sp.left.setBallSpeed(ballSpeed);
+          }
+        }
+      }
+    }, 1000, 1000);
   }
 
   public void sendGameStart(String id) {
@@ -293,7 +313,7 @@ public class BRServer implements Server {
       if (clients.size() > 2) {
         double p1PaddleY = clientToServers.get(prevID).right.getP1PaddleY();
         double p2PaddleY = clientToServers.get(nextID).left.getP2PaddleY();
-        PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY);
+        PongServer newServer = new PongServer(prevID, nextID, p1PaddleY, p2PaddleY, ballSpeed);
         clientToServers.get(prevID).right = newServer;
         clientToServers.get(nextID).left = newServer;
         sendUsernamesUpdate(prevID);

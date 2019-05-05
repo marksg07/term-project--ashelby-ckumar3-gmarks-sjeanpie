@@ -7,16 +7,16 @@ public class PongServer implements Server {
   private String p1Id, p2Id;
   private final PongGame game;
 
-  public PongServer(String p1, String p2) {
+  public PongServer(String p1, String p2, double startVel) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 400, 40, 10, 150, 5, false);
+    game = new PongGame(400, 300, 400, 40, 10, startVel, 5, false);
   }
 
-  public PongServer(String p1, String p2, double p1PaddleY, double p2PaddleY) {
+  public PongServer(String p1, String p2, double p1PaddleY, double p2PaddleY, double startVel) {
     p1Id = p1;
     p2Id = p2;
-    game = new PongGame(400, 300, 400, 40, 10, 150, 5, true);
+    game = new PongGame(400, 300, 400, 40, 10, startVel, 5, true);
     game.setP1PaddleY(p1PaddleY);
     game.setP2PaddleY(p2PaddleY);
   }
@@ -81,5 +81,9 @@ public class PongServer implements Server {
 
   public double getP2PaddleY() {
     return game.getP2PaddleY();
+  }
+
+  public void setBallSpeed(double speed) {
+    game.setBallSpeed(speed);
   }
 }
