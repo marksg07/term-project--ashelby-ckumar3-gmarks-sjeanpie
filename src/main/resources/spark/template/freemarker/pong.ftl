@@ -24,11 +24,11 @@
                            id="find-game" class="find_game" value="Go Home">
                 </form>
                 <form hidden="true" id="new-game-form" class="lowest horiz-centered" action="/game" method="POST">
-                    <input style="margin-top: 100px;" type="submit" class="lowest btn btn-outline-primary form-control"
+                    <input style="margin-top: 100px;" type="submit" class="more-lowest btn btn-outline-primary form-control"
                            id="find-game" class="find_game" value="Find New Game">
                 </form>
-                <div id="killLog"></div>
             </div>
+            <div id="killLog"></div>
         </div>
     </div>
     <script>

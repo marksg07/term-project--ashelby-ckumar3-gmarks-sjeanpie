@@ -243,7 +243,7 @@ function onPlayerDead() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ded");
     conn.close();
-    $("#new-game-form").show();
+    $("#new-game-form")[0].hidden = false;
 }
 
 /**
@@ -256,7 +256,7 @@ function onPlayerWin() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     $("#status").text("ur winner");
     conn.close();
-    $("#new-game-form").show();
+    $("#new-game-form")[0].hidden = false;
 }
 
 /**
