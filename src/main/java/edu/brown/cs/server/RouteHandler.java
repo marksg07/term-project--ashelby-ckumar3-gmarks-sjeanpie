@@ -2,7 +2,12 @@ package edu.brown.cs.server;
 
 import com.google.common.collect.ImmutableMap;
 import edu.brown.cs.database.PongDatabase;
-import spark.*;
+import spark.ModelAndView;
+import spark.QueryParamsMap;
+import spark.Request;
+import spark.Response;
+import spark.Spark;
+import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
 
 import java.sql.SQLException;
@@ -47,7 +52,7 @@ public class RouteHandler {
   private static class HomePageHandler implements TemplateViewRoute {
     private final MainServer server;
 
-    public HomePageHandler(MainServer main) {
+    HomePageHandler(MainServer main) {
       server = main;
     }
 
@@ -89,11 +94,12 @@ public class RouteHandler {
   private static class LeaderboardHandler implements TemplateViewRoute {
     private PongDatabase db;
 
-    public LeaderboardHandler(PongDatabase pdb) {
+    LeaderboardHandler(PongDatabase pdb) {
       db = pdb;
     }
 
-    public ModelAndView handle(Request request, Response response) throws Exception {
+    public ModelAndView handle(Request request, Response response)
+            throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
               "Leaderboard", "leaderboardData", db.getLeaderboardData());
 
@@ -109,7 +115,7 @@ public class RouteHandler {
     private MainServer server;
     private PongDatabase db;
 
-    public LoginHandler(MainServer main, PongDatabase pdb) {
+    LoginHandler(MainServer main, PongDatabase pdb) {
       server = main;
       db = pdb;
     }
@@ -193,18 +199,20 @@ public class RouteHandler {
 
     private MainServer server;
 
-    public GameStartHandler(MainServer main) {
+    GameStartHandler(MainServer main) {
       server = main;
     }
 
     @Override
-    public ModelAndView handle(Request request, Response response) throws Exception {
+    public ModelAndView handle(Request request, Response response)
+            throws Exception {
       QueryParamsMap map = request.queryMap();
       if (!(map.hasKey("username") && map.hasKey("userid"))) {
         return new HomePageHandler(server).handle(request, response);
       }
       Map<String, Object> variables = ImmutableMap.of("title",
-              "Game", "username", map.value("username"), "userid", map.value("userid"));
+              "Game", "username", map.value("username"),
+              "userid", map.value("userid"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }

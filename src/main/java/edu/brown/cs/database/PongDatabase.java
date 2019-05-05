@@ -170,8 +170,8 @@ public class PongDatabase {
   public void createAccount(String username, String password)
           throws SQLException {
     try (PreparedStatement prep = conn
-            .prepareStatement("INSERT INTO usr_pass " +
-                    "(usr, pass, salt) VALUES "
+            .prepareStatement("INSERT INTO usr_pass "
+                    + "(usr, pass, salt) VALUES "
                     + "(?, ?, ?)")) {
       String salt = this.generateSalt();
       prep.setString(1, username);
@@ -186,8 +186,8 @@ public class PongDatabase {
     }
 
     try (PreparedStatement prep = conn.prepareStatement(
-            "INSERT INTO usr_stats (usr, total_games, elo, wins) " +
-                    "VALUES (?, 0, 0, 0);")) {
+            "INSERT INTO usr_stats (usr, total_games, elo, wins) "
+                    + "VALUES (?, 0, 0, 0);")) {
       prep.setString(1, username);
       prep.addBatch();
       prep.executeBatch();
@@ -205,8 +205,8 @@ public class PongDatabase {
   public List<LeaderboardEntry> getLeaderboardData() {
     List<LeaderboardEntry> leaderboardData = new ArrayList<>();
     try (PreparedStatement prep = conn.prepareStatement(
-            "SELECT usr, total_games, elo, wins from usr_stats " +
-                    "ORDER BY wins * 1.0 / total_games DESC;")) {
+            "SELECT usr, total_games, elo, wins from usr_stats "
+                    + "ORDER BY wins * 1.0 / total_games DESC;")) {
       ResultSet rs = prep.executeQuery();
       int i = 0;
       while (rs.next() && i < 5) {
@@ -230,8 +230,8 @@ public class PongDatabase {
    */
   public void incrementTotalGames(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
-            "UPDATE usr_stats SET total_games = " +
-                    "total_games + 1 WHERE usr = ?")) {
+            "UPDATE usr_stats SET total_games = "
+                    + "total_games + 1 WHERE usr = ?")) {
       prep.setString(1, usr);
       prep.executeUpdate();
     } catch (Exception e) {
@@ -274,7 +274,8 @@ public class PongDatabase {
       byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < bytes.length; i++) {
-        sb.append(Integer.toString((bytes[i] & SALT_CONSTANT_FIRST) + SALT_CONSTANT_SECOND, RADIX_CONSANT).substring(1));
+        sb.append(Integer.toString((bytes[i] & SALT_CONSTANT_FIRST)
+                + SALT_CONSTANT_SECOND, RADIX_CONSANT).substring(1));
       }
       generatedPassword = sb.toString();
     } catch (NoSuchAlgorithmException e) {

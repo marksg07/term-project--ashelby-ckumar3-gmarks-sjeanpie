@@ -13,6 +13,7 @@ public class PongServer implements Server {
   private static final Integer PADDLE_VEL = 400;
   private static final Integer SIZE_Y = 300;
   private static final Integer SIZE_X = 400;
+  private static final Integer BALL_RAD = 10;
 
   /**
    * Normal constructor on BR game start.
@@ -24,7 +25,7 @@ public class PongServer implements Server {
     p1Id = p1;
     p2Id = p2;
     game = new PongGame(SIZE_X, SIZE_Y, PADDLE_VEL, PADDLE_LEN,
-            10, startVel, 5, false);
+            BALL_RAD, startVel, 5, false);
   }
 
   /**
@@ -41,7 +42,7 @@ public class PongServer implements Server {
     p1Id = p1;
     p2Id = p2;
     game = new PongGame(SIZE_X, SIZE_Y, PADDLE_VEL, PADDLE_LEN,
-            10, startVel, 5, true);
+            BALL_RAD, startVel, 5, true);
     game.setP1PaddleY(p1PaddleY);
     game.setP2PaddleY(p2PaddleY);
   }

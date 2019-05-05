@@ -206,10 +206,10 @@ public class PongGame implements Cloneable {
       invalid = false;
       if ((newVelX > 0) != (ballVelX > 0) || (newVelY > 0) != (ballVelY > 0)) {
         invalid = true;
-      } else if (newVelX * newVelX + newVelY * newVelY <
-              (startVel * startVel) * MIN_VEL
-              || newVelX * newVelX + newVelY * newVelY >
-              (startVel * startVel) * MAX_VEL) {
+      } else if (newVelX * newVelX + newVelY * newVelY
+              < (startVel * startVel) * MIN_VEL
+              || newVelX * newVelX + newVelY * newVelY
+              > (startVel * startVel) * MAX_VEL) {
         invalid = true;
       } else if (Math.abs(newVelX) < startVel / 3.) {
         invalid = true;

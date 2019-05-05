@@ -1,37 +1,39 @@
 package edu.brown.cs.server;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 /**
  * Packet descriptions:
  * REQUESTID: Server to client, contains nothing. Prompted by client connect.
- * SENDID: Client to server, sends ID and password hash. Prompted by request ID packet.
+ * SENDID: Client to server, sends ID and password hash.
+ * Prompted by request ID packet.
  * GAMESTART: Server to client, contains nothing. Prompted by
  *  server when matchmaking is ready.
- * INPUT: Client to server, contains value of input and ID. Prompted by client periodically.
- * UPDATE: Server to client, contains ID of server and game data. Prompted by client input (XXX).
+ * INPUT: Client to server, contains value of input and ID.
+ * Prompted by client periodically.
+ * UPDATE: Server to client, contains ID of server and game data.
+ * Prompted by client input (XXX).
  * PLAYERDEAD: Server to client, contains nothing. u dead.
  */
 
 @WebSocket
 public class PongWebSocketHandler {
   private static final Gson GSON = new Gson();
-  private static Integer nextId = 0;
   private static MainServer server = null;
 
+  /**
+   * A message type enumeration.
+   */
   public enum MESSAGE_TYPE {
     REQUESTID,
     SENDID,
@@ -44,8 +46,13 @@ public class PongWebSocketHandler {
     UPDATEUSERS,
     KILLLOG;
 
+    /**
+     * Message types from integers.
+     * @param t the input integer
+     * @return the message type
+     */
     public static MESSAGE_TYPE fromInt(int t) {
-      switch(t) {
+      switch (t) {
         case 0:
           return REQUESTID;
         case 1:
@@ -66,17 +73,27 @@ public class PongWebSocketHandler {
           return UPDATEUSERS;
         case 9:
           return KILLLOG;
+        default:
+          return null;
       }
-      return null;
     }
   }
 
+  /**
+   * Handles websocket errors.
+   * @param cause cause of error
+   */
   @OnWebSocketError
   public void onError(Throwable cause) {
     System.out.println("マッチング状況WebSocketセッションでエラーが起こりました。");
     cause.printStackTrace();
   }
 
+  /**
+   * Connects a session.
+   * @param session session to connect
+   * @throws IOException if io fails
+   */
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
     try {
@@ -94,6 +111,12 @@ public class PongWebSocketHandler {
     }
   }
 
+  /**
+   * Closes a session.
+   * @param session session to close
+   * @param statusCode status code when closing
+   * @param reason reason for closing
+   */
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     // user bad
