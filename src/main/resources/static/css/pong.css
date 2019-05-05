@@ -60,6 +60,10 @@ first try: background: linear-gradient(to right, #30CFD0 0%, #330867 100%);
     top: 130%;
 }
 
+.floating {
+    position: absolute;;
+}
+
 .horiz-centered {
     position: absolute;
     left: 50%;
