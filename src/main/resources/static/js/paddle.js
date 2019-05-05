@@ -1,7 +1,7 @@
-class Paddle{
+class Paddle {
 
     /**
-     *
+     * A constructor for paddle.
      * @param x initial x value of the paddle.
      * @param y initial y value of the paddle.
      * @param width width of the paddle.
@@ -17,15 +17,15 @@ class Paddle{
         this.ctx = ctx;
         this.fillStyle = "white";
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x-(width/2), y-(height/2), width, height);
+        this.ctx.fillRect(x - (width / 2), y - (height / 2), width, height);
     }
 
 
     /**
-     *
+     * Sets position.
      * @param y only y position will change.
      */
-    setPosition(y){
+    setPosition(y) {
         if (!this.hidden) {
             this.ctx.fillStyle = "black";
             this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
@@ -38,7 +38,7 @@ class Paddle{
     }
 
     /**
-     * draws the paddle
+     * Draws the paddle.
      */
     draw() {
         this.ctx.fillStyle = this.fillStyle;
@@ -46,7 +46,7 @@ class Paddle{
     }
 
     /**
-     * hides the paddle
+     * Hides the paddle.
      */
     hide() {
         this.hidden = true;
@@ -54,13 +54,16 @@ class Paddle{
         this.ctx.fillRect(this.x - (this.width / 2) - 1, this.y - (this.height / 2) - 1, this.width + 2, this.height + 2);
     }
 
+    /**
+     * Shows the paddle.
+     */
     show() {
         this.hidden = false;
         this.ctx.fillStyle = "white";
     }
 
     /**
-     * Change fill of paddle
+     * Change fill of paddle.
      * @param fill
      */
     setFillStyle(fill) {

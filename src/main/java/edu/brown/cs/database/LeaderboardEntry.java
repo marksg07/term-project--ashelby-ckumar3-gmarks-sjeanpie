@@ -1,17 +1,26 @@
 package edu.brown.cs.database;
 
+/**
+ * A class to store data for a leaderboard entry.
+ */
 public class LeaderboardEntry {
   private String usr;
-  private int total_games, wins;
+  private int totalGames, wins;
   private double elo;
 
+  /**
+   * A constructor for a LeaderboardEntry.
+   * @param u username
+   * @param t total games
+   * @param w wins
+   * @param e elo
+   */
   public LeaderboardEntry(String u, int t, int w, double e) {
     usr = u;
-    total_games = t;
+    totalGames = t;
     wins = w;
     elo = e;
   }
-
 
   /**
    * Gets elo.
@@ -46,6 +55,6 @@ public class LeaderboardEntry {
    * @return Value of total_games.
    */
   public int getTotalGames() {
-    return total_games;
+    return totalGames;
   }
 }

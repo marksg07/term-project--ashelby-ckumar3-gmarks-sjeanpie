@@ -2,22 +2,41 @@ package edu.brown.cs.server;
 
 import com.google.common.collect.ImmutableMap;
 import edu.brown.cs.database.PongDatabase;
-import spark.*;
+import spark.ModelAndView;
+import spark.QueryParamsMap;
+import spark.Request;
+import spark.Response;
+import spark.Spark;
+import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
 
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Holds all routes for the server.
+ */
 public class RouteHandler {
   private MainServer server;
   private PongDatabase db;
 
+  /**
+   * Constructor for a RouteHandler.
+   *
+   * @param main the MainServer for which the handler operates
+   * @param pdb  the PongDatabase for which the handler operates
+   */
   public RouteHandler(MainServer main, PongDatabase pdb) {
     server = main;
     db = pdb;
   }
 
+  /**
+   * Adds all routes.
+   *
+   * @param freeMarker the freemarker for the server
+   */
   public void addRoutes(FreeMarkerEngine freeMarker) {
     Spark.post("/game", new GameStartHandler(server), freeMarker);
     Spark.get("/home", new HomePageHandler(server), freeMarker);
@@ -33,7 +52,7 @@ public class RouteHandler {
   private static class HomePageHandler implements TemplateViewRoute {
     private final MainServer server;
 
-    public HomePageHandler(MainServer main) {
+    HomePageHandler(MainServer main) {
       server = main;
     }
 
@@ -45,11 +64,11 @@ public class RouteHandler {
 
       Map<String, String> cookies = req.cookies();
 
-      /**
-       * homepage loading with cookies, so we just want to check
-       * if the user id matches the stored user id. if so, we log
-       * them in. if not, we don't
-       */
+
+//    homepage loading with cookies, so we just want to check
+//    if the user id matches the stored user id. if so, we log
+//    them in. if not, we don't
+
       if (cookies != null) {
         String usr = cookies.getOrDefault("username", "");
         String clientId = cookies.getOrDefault("userid", "");
@@ -70,16 +89,17 @@ public class RouteHandler {
   }
 
   /**
-   * Leaderboard page.
+   * /leaderboard page request handler.
    */
   private static class LeaderboardHandler implements TemplateViewRoute {
     private PongDatabase db;
 
-    public LeaderboardHandler(PongDatabase pdb) {
+    LeaderboardHandler(PongDatabase pdb) {
       db = pdb;
     }
 
-    public ModelAndView handle(Request request, Response response) throws Exception {
+    public ModelAndView handle(Request request, Response response)
+            throws Exception {
       Map<String, Object> variables = ImmutableMap.of("title",
               "Leaderboard", "leaderboardData", db.getLeaderboardData());
 
@@ -88,13 +108,14 @@ public class RouteHandler {
   }
 
   /**
-   * Handles requests to login. Uses the PongDatabase to validate user's name/pass.
+   * Handles requests to /login.
+   * Uses the PongDatabase to validate user's name/pass.
    */
   private static class LoginHandler implements TemplateViewRoute {
     private MainServer server;
     private PongDatabase db;
 
-    public LoginHandler(MainServer main, PongDatabase pdb) {
+    LoginHandler(MainServer main, PongDatabase pdb) {
       server = main;
       db = pdb;
     }
@@ -139,10 +160,10 @@ public class RouteHandler {
       if (successful) {
         String hash = server.getUUID(usr);
         if (hash == null) {
-          /*
-           * based on https://www.baeldung.com/java-random-string
-           * generate new random ID
-           */
+
+//        based on https://www.baeldung.com/java-random-string
+//        generate new random ID
+
           int leftLimit = 97; // letter 'a'
           int rightLimit = 122; // letter 'z'
           int targetStringLength = 32;
@@ -172,22 +193,26 @@ public class RouteHandler {
   }
 
   /**
-   * Handles the initial request to the server.
+   * Handles the /game request page requests.
    */
   private static class GameStartHandler implements TemplateViewRoute {
 
     private MainServer server;
 
-    public GameStartHandler(MainServer main) { server = main; }
+    GameStartHandler(MainServer main) {
+      server = main;
+    }
 
     @Override
-    public ModelAndView handle(Request request, Response response) throws Exception {
+    public ModelAndView handle(Request request, Response response)
+            throws Exception {
       QueryParamsMap map = request.queryMap();
       if (!(map.hasKey("username") && map.hasKey("userid"))) {
         return new HomePageHandler(server).handle(request, response);
       }
       Map<String, Object> variables = ImmutableMap.of("title",
-              "Game", "username", map.value("username"), "userid", map.value("userid"));
+              "Game", "username", map.value("username"),
+              "userid", map.value("userid"));
       return new ModelAndView(variables, "pong.ftl");
     }
   }

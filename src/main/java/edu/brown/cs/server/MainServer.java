@@ -1,30 +1,32 @@
 package edu.brown.cs.server;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Representation of a main server which can spawn new BR lobbies (i.e. BR servers)
- * to handle joining users. All requests to update a user's input and for game state go
- * through this class first.
+ * Representation of a main server which can spawn new BR lobbies
+ * (i.e. BR servers) to handle joining users. All requests to update
+ * a user's input and for game state go through this class first.
  */
 @WebSocket
 public class MainServer implements Server {
   private final List<BRServer> servers;
   private final Map<String, BRServer> clientToServer;
-  private static final Gson GSON = new Gson();
   private final Map<String, Session> sessions;
   private final PongDatabase db;
   private final Map<String, String> unsToUuids;
 
+  /**
+   * Constructor for MainServer.
+   * @param db Pong database to write and read.
+   */
   public MainServer(PongDatabase db) {
     sessions = new ConcurrentHashMap<>();
     clientToServer = new ConcurrentHashMap<>();
@@ -33,10 +35,17 @@ public class MainServer implements Server {
     this.db = db;
   }
 
+  /**
+   * Add a new client to this server.
+   * @param id client ID (username)
+   * @param session WebSockets session object
+   * @return If the adding was successful;
+   * only returns false when user already in server.
+   */
   public boolean addClient(String id, Session session) {
     println("Adding client " + id);
-    synchronized(clientToServer) {
-      if(clientToServer.containsKey(id)) {
+    synchronized (clientToServer) {
+      if (clientToServer.containsKey(id)) {
         return false;
       }
       sessions.put(id, session);
@@ -50,7 +59,7 @@ public class MainServer implements Server {
       if (openServer == null) {
         println("Made new server to accomodate client " + id);
         openServer = new BRServer(db);
-        servers.add(openServer); // XXX actual MM
+        servers.add(openServer);
       }
       openServer.addClient(id, session);
       clientToServer.put(id, openServer);
@@ -58,9 +67,13 @@ public class MainServer implements Server {
     return true;
   }
 
+  /**
+   * Remove a client from this server, keyed by session.
+   * @param session The session of the client to remove.
+   */
   public void removeSession(Session session) {
     synchronized (clientToServer) {
-      for(Map.Entry<String, Session> entry : sessions.entrySet()) {
+      for (Map.Entry<String, Session> entry : sessions.entrySet()) {
         if (session.equals(entry.getValue())) {
           String id = entry.getKey();
           println("Disconnect: found ID =." + id);
@@ -100,18 +113,29 @@ public class MainServer implements Server {
     System.out.println("Main :: " + msg);
   }
 
-  public PongDatabase getDatabase() {
-    return db;
-  }
-
-  public String getUUID(String name) {
+  /**
+   * Get gets uuid from username.
+   * @param name username
+   * @return uuid for the name
+   */
+  String getUUID(String name) {
     return unsToUuids.get(name);
   }
 
+  /**
+   * Puts name and uuid together.
+   * @param name username
+   * @param uuid uuid
+   */
   public void putUUID(String name, String uuid) {
     unsToUuids.put(name, uuid);
   }
 
+  /**
+   * Says if name exists.
+   * @param name name to find
+   * @return true if name exists
+   */
   public boolean hasName(String name) {
     return unsToUuids.containsKey(name);
   }

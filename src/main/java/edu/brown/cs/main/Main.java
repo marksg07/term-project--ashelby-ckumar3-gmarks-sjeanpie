@@ -5,39 +5,30 @@ import edu.brown.cs.server.MainServer;
 import edu.brown.cs.server.PongWebSocketHandler;
 import edu.brown.cs.server.RouteHandler;
 import freemarker.template.Configuration;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
-import spark.Route;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
-import spark.*;
 
-import java.util.Random;
-
-import java.util.Map;
-import java.util.HashMap;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.SQLException;
 
 import com.google.gson.Gson;
-import sun.rmi.runtime.Log;
 
+/**
+ * Main class of app.
+ */
 public final class Main {
 
-
   private static final int DEFAULT_PORT = 4567;
+  private static final int TIMEOUT_MILIS = 2000;
   private static final Gson GSON = new Gson();
-  private static final PongDatabase db = new PongDatabase("data/pongfolksDB.sqlite3");
-  //private static final Map<String, String> unsToUuids = new HashMap<>();
+  private static final PongDatabase DB =
+          new PongDatabase("data/pongfolksDB.sqlite3");
   private MainServer server;
 
   /**
@@ -59,9 +50,15 @@ public final class Main {
     runSparkServer();
   }
 
+  /**
+   * Creates freemarker engine for the spark server.
+   *
+   * @return the FreeMarkerEngine
+   */
   private static FreeMarkerEngine createEngine() {
     Configuration config = new Configuration();
-    File templates = new File("src/main/resources/spark/template/freemarker");
+    File templates =
+            new File("src/main/resources/spark/template/freemarker");
     try {
       config.setDirectoryForTemplateLoading(templates);
     } catch (IOException ioe) {
@@ -72,6 +69,9 @@ public final class Main {
     return new FreeMarkerEngine(config);
   }
 
+  /**
+   * Runs the spark server with redirecting to https and all urls enabled.
+   */
   private void runSparkServer() {
     Spark.port(getHerokuAssignedPort());
     Spark.externalStaticFileLocation("src/main/resources/static");
@@ -79,13 +79,13 @@ public final class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
-    server = new MainServer(db);
+    server = new MainServer(DB);
     PongWebSocketHandler.setServer(server);
 
     // timeout for websockets = 2 seconds in case of badly behaved clients
-    Spark.webSocketIdleTimeoutMillis(2000);
+    Spark.webSocketIdleTimeoutMillis(TIMEOUT_MILIS);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
-    (new RouteHandler(server, db)).addRoutes(freeMarker);
+    (new RouteHandler(server, DB)).addRoutes(freeMarker);
     // make everything redirect to HTTPS
     Spark.before(((request, response) -> {
       final String url = request.url();
@@ -123,7 +123,8 @@ public final class Main {
     if (processBuilder.environment().get("PORT") != null) {
       return Integer.parseInt(processBuilder.environment().get("PORT"));
     }
-    return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
+    //return default port if heroku-port isn't set (i.e. on localhost)
+    return DEFAULT_PORT;
 
   }
 }

@@ -48,4 +48,7 @@
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/leaderboard.js"></script>
 </#assign>
+<#assign header>
+    <link rel="stylesheet" href="css/leaderboard.css">
+</#assign>
 <#include "main.ftl">

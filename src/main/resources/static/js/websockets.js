@@ -29,55 +29,44 @@ function wsSetup() {
     };
 
     conn.onclose = evt => {
-        if(!gameOver) {
+        if (!gameOver) {
             console.log("connection closed, restarting...");
             wsSetup();
         }
-    }
+    };
 
     conn.onmessage = msg => {
         const data = JSON.parse(msg.data);
-        // console.log(data);
         switch (data.type) {
             case MESSAGE_TYPE.REQUESTID:
-                console.log('got requestid');
                 // Send my ID back to the server
                 const idObj = {type: MESSAGE_TYPE.SENDID, payload: {id: myId, userid: userid}};
                 conn.send(JSON.stringify(idObj));
                 break;
             case MESSAGE_TYPE.GAMESTART:
-                console.log('got gamestart');
-                setGameReady(true);
                 rmWaitingText();
                 midSec.hide();
                 break;
             case MESSAGE_TYPE.UPDATE:
-                // console.log('got update');
                 updateGame(data.payload.state);
                 break;
             case MESSAGE_TYPE.PLAYERDEAD:
-                console.log('got dead');
                 onPlayerDead();
                 break;
             case MESSAGE_TYPE.PLAYERWIN:
-                console.log('got win epic victory royale #1');
                 onPlayerWin();
                 break;
             case MESSAGE_TYPE.BADID:
-                console.log('got badid, redirect inc');
                 window.location.pathname = "/home";
                 break;
             case MESSAGE_TYPE.UPDATEUSERS:
-                console.log('got user update!');
                 setUsers(data.payload.left, data.payload.right);
                 break;
             case MESSAGE_TYPE.KILLLOG:
-                console.log('got kill log update!');
-                console.log(data);
                 addToKillLog(data.payload.killer, data.payload.killed);
                 break;
             default:
-                console.log('Unknown message type!', data.type);
+                console.log("bad packet");
                 break;
         }
     };
