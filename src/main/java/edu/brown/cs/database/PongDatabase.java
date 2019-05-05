@@ -1,6 +1,3 @@
-/**
- *
- */
 package edu.brown.cs.database;
 
 
@@ -22,7 +19,6 @@ import java.security.SecureRandom;
  * Manages user login, updating player information, and 
  * handling user accounts
  */
-
 public class PongDatabase {
   private Connection conn;
   private String path;
@@ -30,7 +26,9 @@ public class PongDatabase {
 
 
   /**
+   * Constructor for PongDatabase
    *
+   * @param dbPath the path to the database
    */
   public PongDatabase(String dbPath) {
     try {
@@ -42,8 +40,14 @@ public class PongDatabase {
     }
   }
 
+  /**
+   * Establishes connection to sqldatabase
+   * @param dbPath the path to the database
+   * @return 1 for good status
+   * @throws ClassNotFoundException if sqlite class not found
+   * @throws SQLException if sql fails
+   */
   public int establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
-    //TODO: validate the database and path entered. favor try/catch
     Class.forName("org.sqlite.JDBC");
     String url = "jdbc:sqlite:" + dbPath;
     conn = DriverManager.getConnection(url);
@@ -55,6 +59,10 @@ public class PongDatabase {
     return 1;
   }
 
+  /**
+   * Sets up initial tables
+   * @return 1 for good status, 0 otherwise
+   */
   public int setupTables() {
     try (PreparedStatement prep = conn.prepareStatement("CREATE TABLE IF NOT EXISTS usr_stats" +
             "(" +
@@ -84,6 +92,12 @@ public class PongDatabase {
     return 1;
   }
 
+  /**
+   * Validates user from username.
+   * @param username username of potential user
+   * @return true if user exists, false otherwise
+   * @throws SQLException if sql fails
+   */
   public Boolean validateUser(String username) throws SQLException {
 
     try (PreparedStatement prep = conn
@@ -104,6 +118,13 @@ public class PongDatabase {
     return false;
   }
 
+  /**
+   * Validates username-password pair.
+   * @param username username of potential user
+   * @param password password of potential user
+   * @return true if user and password match, false otherwise
+   * @throws SQLException if sql fails
+   */
   public Boolean validatePassword(String username, String password) throws SQLException {
     boolean valid = false;
     try (PreparedStatement prep = conn
@@ -127,24 +148,12 @@ public class PongDatabase {
     return valid;
   }
 
-  public Boolean validateHash(String username, String hash) {
-    try (PreparedStatement prep = conn.prepareStatement("SELECT usr FROM usr_pass WHERE usr = ? AND pass = ?")) {
-      prep.setString(1, username);
-      prep.setString(2, hash);
-      ResultSet rs = prep.executeQuery();
-
-      while (rs.next()) {
-        return true; // it matched
-      }
-      return false;
-    } catch (Exception e) {
-      System.out.println("SQL query failed:");
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  //password will be hashed in the present
+  /**
+   * Stores username and hashed password in database.
+   * @param username username of new user
+   * @param password password of new user
+   * @throws SQLException if sql fails
+   */
   public void createAccount(String username, String password) throws SQLException {
     try (PreparedStatement prep = conn
             .prepareStatement("INSERT INTO usr_pass (usr, pass, salt) VALUES "
@@ -172,6 +181,10 @@ public class PongDatabase {
     }
   }
 
+  /**
+   * Gets leaderboard data.
+   * @return list of LeaderboardEntry objects to show
+   */
   public List<LeaderboardEntry> getLeaderboardData() {
     List<LeaderboardEntry> leaderboardData = new ArrayList<>();
     try(PreparedStatement prep = conn.prepareStatement(
@@ -191,6 +204,10 @@ public class PongDatabase {
     return leaderboardData;
   }
 
+  /**
+   * Increments total games for a user.
+   * @param usr username
+   */
   public void incrementTotalGames(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
             "UPDATE usr_stats SET total_games = total_games + 1 WHERE usr = ?")){
@@ -202,6 +219,10 @@ public class PongDatabase {
     }
   }
 
+  /**
+   * Increments total wins for a user.
+   * @param usr username
+   */
   public void incrementWins(String usr) {
     try (PreparedStatement prep = conn.prepareStatement(
             "UPDATE usr_stats SET wins = wins + 1 WHERE usr = ?")){
@@ -213,9 +234,12 @@ public class PongDatabase {
     }
   }
 
-  //password stuff should probably be put into its own class later...like a pass
-  //manager or w/e
-  //https://stackoverflow.com/questions/33085493/how-to-hash-a-password-with-sha-512-in-java
+
+  /**
+   * Hashes the password, implementation from:
+   * https://stackoverflow.com/questions/33085493/
+   * how-to-hash-a-password-with-sha-512-in-java
+   */
   public String hashPassword(String password, String salt) {
     String generatedPassword = null;
     try {
@@ -233,21 +257,10 @@ public class PongDatabase {
     return generatedPassword;
   }
 
-  public String getHash(String usr) {
-    try (PreparedStatement prep = conn.prepareStatement("SELECT pass FROM usr_pass WHERE usr = ?")) {
-      prep.setString(1, usr);
-      ResultSet rs = prep.executeQuery();
-      while (rs.next()) {
-        return rs.getString(1);
-      }
-      return null;
-    } catch (SQLException e) {
-      System.out.println("SQL query failed:");
-      e.printStackTrace();
-      return null;
-    }
-  }
-
+  /**
+   * Generates a salt string for encryption.
+   * @return the string for salt
+   */
   public String generateSalt() {
     byte[] salt = new byte[16];
     RANDOM.nextBytes(salt);
