@@ -1,5 +1,7 @@
 package edu.brown.cs.database;
 
+import java.util.Objects;
+
 /**
  * A class to store data for a leaderboard entry.
  */
@@ -56,5 +58,31 @@ public class LeaderboardEntry {
    */
   public int getTotalGames() {
     return totalGames;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    LeaderboardEntry that = (LeaderboardEntry) o;
+    return totalGames == that.totalGames &&
+            wins == that.wins &&
+            Double.compare(that.elo, elo) == 0 &&
+            usr.equals(that.usr);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(usr, totalGames, wins, elo);
+  }
+
+  @Override
+  public String toString() {
+    return "LeaderboardEntry{" +
+            "usr='" + usr + '\'' +
+            ", totalGames=" + totalGames +
+            ", wins=" + wins +
+            ", elo=" + elo +
+            '}';
   }
 }
