@@ -48,7 +48,6 @@ public class MainServer implements Server {
       if(clientToServer.containsKey(id) && clientToServer.get(id).hasClient(id)) {
         return false;
       }
-      sessions.put(id, session);
       BRServer openServer = null;
       for (BRServer server : servers) {
         if (!server.ready()) {
@@ -61,8 +60,11 @@ public class MainServer implements Server {
         openServer = new BRServer(db);
         servers.add(openServer);
       }
-      openServer.addClient(id, session);
+      if(!openServer.addClient(id, session)) {
+        return false;
+      }
       clientToServer.put(id, openServer);
+      sessions.put(id, session);
     }
     return true;
   }
@@ -76,7 +78,7 @@ public class MainServer implements Server {
       for(Map.Entry<String, Session> entry : sessions.entrySet()) {
         if (session.equals(entry.getValue())) {
           String id = entry.getKey();
-          println("Disconnect: found ID =." + id);
+          println("Disconnect: found ID = " + id);
           if (clientToServer.containsKey(id)) {
             clientToServer.get(id).removeClient(id);
             clientToServer.remove(id);

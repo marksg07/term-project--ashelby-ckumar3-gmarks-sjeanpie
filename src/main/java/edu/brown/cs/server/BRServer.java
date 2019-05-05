@@ -75,12 +75,15 @@ public class BRServer implements Server {
    * @param id Client ID (username)
    * @param session WebSocket session object for client
    */
-  public void addClient(String id, Session session) {
+  public boolean addClient(String id, Session session) {
     println("Adding client " + id + ".");
     synchronized (clientToServers) {
       // if we are running a game or already have user, do nothing
-      if(clientToServers.containsKey(id) || ready()) {
-        return;
+      if(clients.contains(id) || clientToServers.containsKey(id)) {
+        return false;
+      }
+      if (ready()) {
+        return true;
       }
       clients.add(id);
       sessions.put(id, session);
@@ -111,6 +114,7 @@ public class BRServer implements Server {
         onFilled();
       }
     }
+    return true;
   }
 
   private void onFilled() {
