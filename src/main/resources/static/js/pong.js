@@ -12,7 +12,7 @@ const gameScreenTime = 3.8;
 let up = false;
 let down = false;
 let playersRemaining;
-let upDown = [0,0];
+let upDown = [0, 0];
 let gameReady = false;
 let leftGameBegun = false;
 let rightGameBegun = false;
@@ -54,10 +54,10 @@ function setRightBoardState(st) {
     rightBoardState = st;
     if (st === 'red') {
         ctx.fillStyle = 'red';
-        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+        ctx.fillRect(canvas.width / 2 + 20, 0, canvas.width, canvas.height);
     } else if (st === 'none') {
         ctx.fillStyle = 'black';
-        ctx.fillRect(canvas.width/2 + 20, 0, canvas.width, canvas.height);
+        ctx.fillRect(canvas.width / 2 + 20, 0, canvas.width, canvas.height);
         oppRightPaddle.draw();
         ballRight.draw();
     }
@@ -65,7 +65,7 @@ function setRightBoardState(st) {
 
 function displayTimer(seconds) {
     midSec.show();
-    const secString = "Enough clients to start game. If no more clients join game will start in: " + (seconds+20).toFixed(1) + " seconds";
+    const secString = "Enough clients to start game. If no more clients join game will start in: " + (seconds + 20).toFixed(1) + " seconds";
     midSec.text(secString);
 }
 
@@ -77,11 +77,11 @@ function updateGame(state) {
     } else {
         midSec.hide();
     }
-    if(gameOver) {
+    if (gameOver) {
         return;
     }
     // console.log(state);
-    if(!state.hasOwnProperty("left") && !state.hasOwnProperty("right")) {
+    if (!state.hasOwnProperty("left") && !state.hasOwnProperty("right")) {
         // i am dead :(
         return;
     }
@@ -91,13 +91,11 @@ function updateGame(state) {
         oppLeftPaddle.hide();
         ballLeft.hide();
         setLeftBoardState('red');
-    }
-    else if (state.left.hasOwnProperty("cdSecondsLeft")) {
-        if(state.left.cdSecondsLeft > gameScreenTime && leftGameBegun) {
+    } else if (state.left.hasOwnProperty("cdSecondsLeft")) {
+        if (state.left.cdSecondsLeft > gameScreenTime && leftGameBegun) {
             setLeftBoardState('red');
-        }
-        else {
-            if(state.left.cdSecondsLeft <= gameScreenTime) {
+        } else {
+            if (state.left.cdSecondsLeft <= gameScreenTime) {
                 leftGameBegun = true;
             }
             setLeftBoardState('none')
@@ -120,10 +118,9 @@ function updateGame(state) {
         ballRight.hide();
         setRightBoardState('red');
     } else if (state.right.hasOwnProperty("cdSecondsLeft")) {
-        if(state.right.cdSecondsLeft > gameScreenTime && rightGameBegun) {
+        if (state.right.cdSecondsLeft > gameScreenTime && rightGameBegun) {
             setRightBoardState('red');
-        }
-        else {
+        } else {
             if (state.right.cdSecondsLeft <= gameScreenTime) {
                 rightGameBegun = true;
             }
@@ -154,14 +151,14 @@ function sendInput() {
 function checkPressed(e) {
     if ((e.which === 38) || (e.which === 87)) {
         upDown[0] = 2;
-        if (upDown[1] === 2){
+        if (upDown[1] === 2) {
             upDown[1] = 1;
         }
         return;
     }
     if ((e.which === 40) || (e.which === 83)) {
         upDown[1] = 2;
-        if (upDown[0] === 2){
+        if (upDown[0] === 2) {
             upDown[0] = 1;
         }
         return;
@@ -204,12 +201,12 @@ function pressState() {
  */
 function checkInputs(e) {
     if (up) {
-        playerPaddle.setPosition(y-1);
+        playerPaddle.setPosition(y - 1);
         up = false;
         return;
     }
     if (down) {
-        playerPaddle.setPosition(y+1);
+        playerPaddle.setPosition(y + 1);
         down = false;
         return;
     }
@@ -250,7 +247,7 @@ function logEntryElement(killer, killed) {
     let newDiv = document.createElement("div");
     let logEnt = document.createElement("div");
     logEnt.className = "logEntry";
-    if(killer !== "") {
+    if (killer !== "") {
         logEnt.innerHTML = killer + " <strong>" + getVerb() + "</strong> " + killed;
     } else {
         logEnt.innerHTML = killed + " <strong>disconnected</strong>"
@@ -266,17 +263,22 @@ function addToKillLog(killer, killed) {
 }
 
 const logTime = 5;
+const fadeTime = 3;
 
 function drawKillLog() {
     const earliestLogTime = (new Date()).getTime() - logTime * 1000;
-    for(let i = logStartPointer; i < killLog.length; i++) {
+    const earliestFadeTime = (new Date()).getTime() - fadeTime * 1000;
+    for (let i = logStartPointer; i < killLog.length; i++) {
         const log = killLog[i];
-        if(log[2] < earliestLogTime) {
+        if (log[2] < earliestLogTime) {
             logStartPointer = i + 1;
             // Was in the log, must be deleted
             killLogElement.removeChild(killLogElement.firstChild);
+        } else if (log[2] < earliestFadeTime) {
+            const opacity = 1 - (log[2] - earliestFadeTime) / (earliestLogTime - earliestFadeTime)
+            console.log(killLogElement.children[i - logStartPointer]);
+            killLogElement.children[i - logStartPointer].firstChild.style.opacity = opacity;
         }
-
     }
 }
 
@@ -296,17 +298,21 @@ function executePong() {
     //initialize 5 entities.
     up = false;
     down = false;
-    playerPaddle = new Paddle(canvas.width/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
-    oppLeftPaddle = new Paddle(paddleWidth/2, canvas.height/2, paddleWidth, paddleHeight, ctx);
-    oppRightPaddle = new Paddle(canvas.width-(paddleWidth/2), canvas.height/2, paddleWidth, paddleHeight, ctx);
-    ballLeft = new Ball(ballSize, ctx, (canvas.width/4)-(ballSize/2), canvas.height/2);
-    ballRight = new Ball(ballSize, ctx, (3*canvas.width/4)-(ballSize/2), canvas.height/2);
+    playerPaddle = new Paddle(canvas.width / 2, canvas.height / 2, paddleWidth, paddleHeight, ctx);
+    oppLeftPaddle = new Paddle(paddleWidth / 2, canvas.height / 2, paddleWidth, paddleHeight, ctx);
+    oppRightPaddle = new Paddle(canvas.width - (paddleWidth / 2), canvas.height / 2, paddleWidth, paddleHeight, ctx);
+    ballLeft = new Ball(ballSize, ctx, (canvas.width / 4) - (ballSize / 2), canvas.height / 2);
+    ballRight = new Ball(ballSize, ctx, (3 * canvas.width / 4) - (ballSize / 2), canvas.height / 2);
     // ctx.font = "50px Futura, sans-serif";
     // ctx.fillStyle = "white";
     // ctx.textAlign = "center";
     // ctx.fillText("Finding Players.....", canvas.width /2, 4*canvas.height/5);
-    $(document).keydown(event => {checkPressed(event);});
-    $(document).keyup(event => {checkUp(event);});
+    $(document).keydown(event => {checkPressed(event);
+})
+    ;
+    $(document).keyup(event => {checkUp(event);
+})
+    ;
     inputHandle = setInterval(sendInput, 20);
     setInterval(drawKillLog, 20);
     $("#name").text(myId);
@@ -320,4 +326,5 @@ function rmWaitingText() {
 
 $(document).ready(() => {
     executePong();
-});
+})
+;
