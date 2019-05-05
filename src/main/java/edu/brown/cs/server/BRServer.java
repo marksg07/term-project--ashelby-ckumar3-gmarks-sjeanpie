@@ -272,7 +272,7 @@ public class BRServer implements Server {
   }
 
   private void kill(String killer, String killed) {
-    println("Killing player " + killed);
+    //println("Killing player " + killed);
     if(clients.size() == 1) {
       // don't "kill" last client, just leave it as every connection should be closed
       return;
@@ -289,7 +289,7 @@ public class BRServer implements Server {
       try {
         deadSession.getRemote().sendString(GSON.toJson(deadMsg));
       } catch (Exception e) {
-        println("Failed to send PLAYERDEAD");
+        //println("Failed to send PLAYERDEAD");
       }
 
       JsonObject killLogMsg = new JsonObject();
@@ -303,7 +303,7 @@ public class BRServer implements Server {
         try {
           session.getRemote().sendString(killLogString);
         } catch (Exception e) {
-          println("Failed to send kill log");
+          //println("Failed to send kill log");
         }
       }
 
@@ -335,14 +335,14 @@ public class BRServer implements Server {
         try {
           winSession.getRemote().sendString(GSON.toJson(winMsg));
         } catch (Exception e) {
-          println("Failed to send PLAYERWIN");
+          //println("Failed to send PLAYERWIN");
         }
       }
 
       // the br server has to know the client used to exist
       clientToServers.remove(killed);
     } else {
-      println("Client DNE " + killed + ".");
+      //println("Client DNE " + killed + ".");
     }
 
   }
