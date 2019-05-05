@@ -91,7 +91,6 @@ public final class Main {
     // timeout for websockets = 2 seconds in case of badly behaved clients
     Spark.webSocketIdleTimeoutMillis(2000);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
-
     Spark.post("/game", new GameStartHandler(), freeMarker);
     Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
@@ -100,7 +99,7 @@ public final class Main {
 
     Spark.get("/", new HomePageHandler(), freeMarker);
 
-    Spark.get("/*", new NotFoundHandler(), freeMarker);
+    // Spark.get("/*", new NotFoundHandler(), freeMarker);
     //Spark.post("/stats", new StatsHandler());
 
     // make everything redirect to HTTPS

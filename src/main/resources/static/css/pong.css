@@ -237,12 +237,16 @@ body {
     left: 600px;
 }
 
+.flex-container {
+    display: flex;
+}
+
 #leftCountdown {
     color: #fffcf4;
     position: relative;
     text-align: center;
-    top: -250px;
-    left: -200px;
+    top: -280px;
+    left: 195px;
     z-index: 500;
 }
 
@@ -251,7 +255,16 @@ body {
     position: relative;
     text-align: center;
     top: -280px;
-    left: 200px;
+    left: 590px;
+    z-index: 500;
+}
+
+#midCountdown {
+    color: #fffcf4;
+    position: relative;
+    text-align: center;
+    top: -280px;
+    left: 150px;
     z-index: 500;
 }
 
@@ -296,4 +309,14 @@ body {
 
 .flexText {
     flex: 0 0 283px;
+}
+
+.logEntry {
+    display: inline-block;
+    font-size: 24px;
+    background-color: lightgray;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    padding-left: 7px;
+    padding-right: 7px;
 }

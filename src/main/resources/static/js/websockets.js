@@ -9,7 +9,8 @@ const MESSAGE_TYPE = {
     PLAYERDEAD: 5,
     PLAYERWIN: 6,
     BADID: 7,
-    UPDATEUSERS: 8
+    UPDATEUSERS: 8,
+    KILLLOG: 9
 };
 
 function wsSetup() {
@@ -48,6 +49,7 @@ function wsSetup() {
                 console.log('got gamestart');
                 setGameReady(true);
                 rmWaitingText();
+                midSec.hide();
                 break;
             case MESSAGE_TYPE.UPDATE:
                 // console.log('got update');
@@ -68,6 +70,12 @@ function wsSetup() {
             case MESSAGE_TYPE.UPDATEUSERS:
                 console.log('got user update!');
                 setUsers(data.payload.left, data.payload.right);
+                break;
+            case MESSAGE_TYPE.KILLLOG:
+                console.log('got kill log update!');
+                console.log(data);
+                addToKillLog(data.payload.killer, data.payload.killed);
+                break;
             default:
                 console.log('Unknown message type!', data.type);
                 break;
