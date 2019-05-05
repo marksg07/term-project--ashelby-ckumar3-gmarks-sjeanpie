@@ -267,12 +267,13 @@ function setUsers(left, right) {
     $("#rightName").text(right);
 }
 
+const verbs = ["ponged", "yote", "vanquished", "has slain", "terminated", "erased", "balled", "smote", "bonked", "sank", "trounced", "trampled", "got"];
 /**
  * Returns one appropriate verb for when a player is eliminated.
  * @returns {string}
  */
 function getVerb() {
-    return "ponged";
+    return verbs[Math.floor(Math.random() * verbs.length)];
 }
 
 /**
