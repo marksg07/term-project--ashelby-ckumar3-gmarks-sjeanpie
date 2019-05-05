@@ -104,7 +104,6 @@ public class PongGame implements Cloneable {
     assert (seconds >= 0);
     lastUpdate = now;
     if (nowIsCurrent()) { // countdown over
-      System.out.println("Ticking " + seconds + " sec forwards");
       return tick(seconds);
     } else if (canUpdateDuringCountdown) {
       movePaddles(seconds);
@@ -466,7 +465,6 @@ public class PongGame implements Cloneable {
       // still in CD, just return seconds until we are done
       Instant now = Instant.now();
       double seconds = Duration.between(startTime, now).toNanos() / BILLION;
-      System.out.println("Duration between last and now is " + seconds);
       obj.addProperty("cdSecondsLeft", -seconds);
     }
     return obj;
@@ -488,7 +486,6 @@ public class PongGame implements Cloneable {
       // still in CD
       Instant now = Instant.now();
       double seconds = Duration.between(startTime, now).toNanos() / BILLION;
-      System.out.println("Duration between last and now is " + seconds);
       obj.addProperty("cdSecondsLeft", -seconds);
     }
     return obj;
