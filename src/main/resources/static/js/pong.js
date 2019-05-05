@@ -65,7 +65,7 @@ function setRightBoardState(st) {
 
 function displayTimer(seconds) {
     midSec.show();
-    const secString = "Game will start in: " + (seconds+20).toFixed(1) + " seconds";
+    const secString = "Enough clients to start game. If no more clients join game will start in: " + (seconds+20).toFixed(1) + " seconds";
     midSec.text(secString);
 }
 
@@ -74,6 +74,8 @@ function updateGame(state) {
         console.log(state.timeUntilStart);
         displayTimer(state.timeUntilStart);
         return;
+    } else {
+        midSec.hide();
     }
     if(gameOver) {
         return;
