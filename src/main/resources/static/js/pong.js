@@ -228,12 +228,17 @@ function setUsers(left, right) {
     $("#rightName").text(right);
 }
 
+function getVerb() {
+    return "ponged";
+}
+
 function logEntryElement(killer, killed) {
     let newDiv = document.createElement("div");
+    newDiv.className = "logEntry";
     if(killer !== "") {
-        newDiv.innerText = killer + " ponged " + killed;
+        newDiv.innerHTML = killer + " <strong>" + getVerb() + "</strong> " + killed;
     } else {
-        newDiv.innerText = killed + " disconnected"
+        newDiv.innerHTML = killed + " <strong>disconnected</strong>"
     }
     return newDiv;
 }
@@ -243,7 +248,7 @@ function addToKillLog(killer, killed) {
     killLogElement.appendChild(logEntryElement(killer, killed));
 }
 
-const logTime = 4;
+const logTime = 5;
 
 function drawKillLog() {
     const earliestLogTime = (new Date()).getTime() - logTime * 1000;
