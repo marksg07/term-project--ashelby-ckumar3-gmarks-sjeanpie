@@ -5,9 +5,11 @@
             <div style="width: 800px; height: 300px;">
                 <canvas id="pong-canvas" width="830" height="300" style="border:10px solid #164751;">
                 </canvas>
-                <p id="leftCountdown"></p>
-                <p id="rightCountdown"></p>
-                <p id="midCountdown"></p>
+                <div class="flex-container">
+                    <p id="leftCountdown"></p>
+                    <p id="rightCountdown"></p>
+                    <p id="midCountdown"></p>
+                </div>
             </div>
             <div class="nameFlex" style="margin-top: 30px;">
                 <div class="flexText" style="text-align: left;" id="leftName"></div>
