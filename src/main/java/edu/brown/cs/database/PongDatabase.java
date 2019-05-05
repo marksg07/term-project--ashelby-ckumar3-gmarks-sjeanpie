@@ -45,7 +45,6 @@ public class PongDatabase {
   }
 
   public void establishConnection(String dbPath) throws ClassNotFoundException, SQLException {
-    //TODO: validate the database and path entered. favor try/catch
     Class.forName("org.sqlite.JDBC");
     String url = "jdbc:sqlite:" + dbPath;
     conn = DriverManager.getConnection(url);
