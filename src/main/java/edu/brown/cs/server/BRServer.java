@@ -19,7 +19,7 @@ public class BRServer implements Server {
   private final PongDatabase db;
   static final int MAXPLAYERS = 4;
   static final double startSpeed = 100;
-  static final double acceleration = 20;
+  static final double acceleration = 4;
   private double ballSpeed;
   private Timer ballAccelTimer;
 
