@@ -9,7 +9,11 @@ import org.eclipse.jetty.websocket.api.Session;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -396,8 +400,8 @@ public class BRServer implements Server {
       } else { // otherwise, remove the player from the clients list
         clients.remove(id);
         sessions.remove(id);
-        if (starting && clients.size() < MINPLAYERS)
-        { // no longer enough players! :(
+        if (starting && clients.size() < MINPLAYERS) {
+          // no longer enough players! :(
           starting = false;
           startTimer.cancel();
           startTimer = null;
