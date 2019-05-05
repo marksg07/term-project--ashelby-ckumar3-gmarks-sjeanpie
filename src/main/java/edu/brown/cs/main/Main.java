@@ -57,12 +57,7 @@ public final class Main {
   }
 
   private void run() {
-    // Parse command line arguments
-    OptionParser parser = new OptionParser();
-    parser.accepts("port").withRequiredArg().ofType(Integer.class)
-    .defaultsTo(DEFAULT_PORT);
-    OptionSet options = parser.parse(args);
-    runSparkServer((int) options.valueOf("port"));
+    runSparkServer();
   }
 
   private static FreeMarkerEngine createEngine() {
@@ -78,7 +73,7 @@ public final class Main {
     return new FreeMarkerEngine(config);
   }
 
-  private void runSparkServer(int port) {
+  private void runSparkServer() {
     Spark.port(getHerokuAssignedPort());
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
@@ -92,7 +87,6 @@ public final class Main {
     Spark.webSocketIdleTimeoutMillis(2000);
     Spark.webSocket("/gamesocket", PongWebSocketHandler.class);
     Spark.post("/game", new GameStartHandler(), freeMarker);
-    Spark.get("/lobby", new LobbyHandler(), freeMarker);
     Spark.get("/home", new HomePageHandler(), freeMarker);
     Spark.post("/login", new LoginHandler(), freeMarker);
     Spark.get("/lb", new LeaderboardHandler(), freeMarker);
@@ -107,7 +101,7 @@ public final class Main {
       final String url = request.url();
       if (url.startsWith("http://")) {
         final String[] split = url.split("http://");
-        //response.redirect("https://" + split[1]);
+        response.redirect("https://" + split[1]);
       }
     }));
   }
@@ -142,6 +136,9 @@ public final class Main {
     }
   }
 
+  /**
+   * /home page handler, handles login cookies if they are set.
+   */
   private static class HomePageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws Exception {
@@ -228,6 +225,9 @@ public final class Main {
     }
   }
 
+  /**
+   * Leaderboard page.
+   */
   private static class LeaderboardHandler implements TemplateViewRoute {
 
     public ModelAndView handle(Request request, Response response) throws Exception {
@@ -238,6 +238,9 @@ public final class Main {
     }
   }
 
+  /**
+   * Handles requests to login. Uses the PongDatabase to validate user's name/pass.
+   */
   private static class LoginHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws SQLException {
@@ -274,13 +277,14 @@ public final class Main {
           successful = true;
         }
       }
-      //TODO: get password and hash it
+      // Now we send the user their unique ID for cookie purposes.
       Map<String, Object> variables;
       if(successful) {
         String hash = unsToUuids.get(usr);
         if (hash == null) {
-                      /**
+            /*
              * based on https://www.baeldung.com/java-random-string
+             * generate new random ID
              */
               int leftLimit = 97; // letter 'a'
               int rightLimit = 122; // letter 'z'
@@ -310,16 +314,6 @@ public final class Main {
 
   }
 
-
-  private static class LobbyHandler implements TemplateViewRoute {
-    @Override
-    public ModelAndView handle(Request request, Response response) throws Exception {
-      Map<String, Object> variables = ImmutableMap.of("title",
-      "Battle Royale");
-      return new ModelAndView(variables, "lobby.ftl");
-    }
-  }
-
   /**
    * Handles the initial request to the server.
    */
@@ -336,22 +330,16 @@ public final class Main {
     }
   }
 
-  private static class StatsHandler implements Route {
-    @Override
-    public String handle(Request req, Response res) {
-
-      Map<String, Object> variables =
-      ImmutableMap.of("userData", db.getLeaderboardData());
-      return GSON.toJson(variables);
+  /**
+   * Get the heroku port.
+   * @return port
+   */
+  static int getHerokuAssignedPort() {
+    ProcessBuilder processBuilder = new ProcessBuilder();
+    if (processBuilder.environment().get("PORT") != null) {
+      return Integer.parseInt(processBuilder.environment().get("PORT"));
     }
-  }
+    return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
 
-    static int getHerokuAssignedPort() {
-      ProcessBuilder processBuilder = new ProcessBuilder();
-      if (processBuilder.environment().get("PORT") != null) {
-        return Integer.parseInt(processBuilder.environment().get("PORT"));
-      }
-      return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
-
-    }
   }
+}
