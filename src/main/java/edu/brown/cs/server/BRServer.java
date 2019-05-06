@@ -394,6 +394,10 @@ public class BRServer implements Server {
         updateScore(killer, killed, null);
         synchronized (db) {
           db.incrementWins(clients.get(0));
+          /*we only update the database with updated elos at 
+           *the end of the game to avoid computation lag
+           *mid-game
+           **/
           db.updateELOs(updatedElos);
         }
         Session winSession = sessions.get(clients.get(0));
@@ -428,7 +432,7 @@ public class BRServer implements Server {
           starting = false;
           startTimer.cancel();
           startTimer = null;
-          //no longer need refrence to elo of player not in game
+          //no longer need reference to elo of player not in game
           updatedElos.remove(id);
         }
       }
@@ -445,7 +449,10 @@ public class BRServer implements Server {
   public void updateScore(String killerID, String killedID, String survivorID) { //with survivor and another w/o
     if (killerID == null) { //the case in which a player disconnects mid-game
       double killedELO = updatedElos.get(killedID) + DCPENALTY;
-      if (killedELO < 1) {
+    /*if the new elo would cause the player to drop below the elo floor, 
+     * set it to the elo floor. Also applied in all other cases
+     */
+      if (killedELO < 1) { 
         killedELO = 1;
       }
       updatedElos.replace(killedID, killedELO);
@@ -453,31 +460,39 @@ public class BRServer implements Server {
       double killerELO = updatedElos.get(killerID);
       double killedELO = updatedElos.get(killedID);
 
-      //calculation is based on how many players were in the game before
-      //the killed player is removed
-      killerELO = killerELO + ELOUpdater.update("WIN", killerELO, killedELO) / (clients.size() + 1);
-      killedELO = killedELO + ELOUpdater.update("LOSE", killedELO, killerELO) / (clients.size() + 1);
+      /*
+       * Calculation is based on how many players were in the game before
+       * the killed player is removed. This also gives more weight for eliminations
+       * that occur later in the game/when there are fewer players
+       */
+      double[] eloUpdates = ELOUpdater.update("WIN", killerELO, killedELO);
+      killerELO = killerELO + eloUpdates[0] / (clients.size() + 1);
+      killedELO = killedELO + eloUpdates[1] / (clients.size() + 1);
 
       if (killerELO < 1) {
         killerELO = 1;
       }
 
       if (killedELO < 1) {
-        killedELO = 1;
+    	  killedELO = 1;
       }
       updatedElos.replace(killerID, killerELO);
       updatedElos.replace(killedID, killedELO);
 
-      if (survivorID != null) {
+      /*if (survivorID != null) {
         double survivorELO = updatedElos.get(survivorID);
-        survivorELO = survivorELO + ELOUpdater.update
-                ("WIN", survivorELO, killedELO) / (3 * (clients.size() + 1));
+        /*
+         *Although a survivor "WIN"s against it's opponent, the division by 3
+         *ensures gain is valued less than actually getting the elimination
+         */
+        /*survivorELO = survivorELO + ELOUpdater.update
+                ("WIN", survivorELO, killedELO)[0] / (3 * (clients.size() + 1));
 
         if (survivorELO < 1) {
-          survivorELO = 1;
+        	survivorELO = 1;
         }
         updatedElos.replace(survivorID, survivorELO);
-      }
+      }*/
     }
 
 

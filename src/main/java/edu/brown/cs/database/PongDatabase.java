@@ -189,7 +189,7 @@ public class PongDatabase {
             "INSERT INTO usr_stats (usr, total_games, elo, wins) "
                     + "VALUES (?, 0, ?, 0);")) {
       prep.setString(1, username);
-      prep.setDouble(2, ELOUpdater.BASE_ELO);
+      prep.setDouble(2, ELOUpdater.START_ELO);
       prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
@@ -206,7 +206,7 @@ public class PongDatabase {
     List<LeaderboardEntry> leaderboardData = new ArrayList<>();
     try (PreparedStatement prep = conn.prepareStatement(
             "SELECT usr, total_games, elo, wins from usr_stats "
-                    + "ORDER BY wins * 1.0 / total_games DESC;")) {
+                    + "ORDER BY elo DESC;")) {
       ResultSet rs = prep.executeQuery();
       int i = 0;
       while (rs.next() && i < 5) {
