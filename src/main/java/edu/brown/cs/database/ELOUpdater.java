@@ -41,7 +41,7 @@ public class ELOUpdater {
 		else
 			return 32;
 		}
-	
+
 	/**
 	 * Generates a ratio which represents the expected win ratio of 
 	 * a elo1 against elo2. This function models a logistic curve
