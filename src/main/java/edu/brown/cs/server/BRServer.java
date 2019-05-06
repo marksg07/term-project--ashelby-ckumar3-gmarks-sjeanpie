@@ -3,17 +3,14 @@ package edu.brown.cs.server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import edu.brown.cs.database.ELOUpdater;
 import edu.brown.cs.database.PongDatabase;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -22,53 +19,41 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * some number of players in a circle of games.
  */
 public class BRServer implements Server {
-  private static final Gson GSON = new Gson();
-  private final List<String> clients;
-  private final Map<String, Session> sessions;
-  private long myId;
-  private final PongDatabase db;
   static final int MINPLAYERS = 3;
   static final double START_SPEED = 100;
   static final double ACCELERATION = 4;
-  private double ballSpeed;
-  private Timer ballAccelTimer;
   static final int MAXPLAYERS = 10;
   static final double START_TIME = 20;
-  private Instant timerStart = null;
+  private static final Gson GSON = new Gson();
   private static final Double BILLION = 1000000000.;
   private static final Integer THOUSAND = 1000;
-
+  private static final Integer DCPENALTY = -20;
   private static long idCounter = 0;
-
-  /**
-   * NextID fetcher synchronized.
-   * @return the next id as a long
-   */
-  private static synchronized long nextId() {
-    // get a unique ID for println purposes
-    return idCounter++;
-  }
-
-  /**
-   * ServerPair class.
-   */
-  private class ServerPair {
-    PongServer right, left;
-  }
-
+  private final List<String> clients;
+  private final Map<String, Session> sessions;
+  private final PongDatabase db;
   private final Map<String, ServerPair> clientToServers;
+  private long myId;
+  private double ballSpeed;
+  private Timer ballAccelTimer;
+  private Instant timerStart = null;
+  private Map<String, Double> updatedElos; //adding to this should b synchro
+
+  //TODO: get db query of users and elos at beginning of game when all players ready
   private boolean ready;
   private boolean starting;
   private Timer startTimer;
-
   /**
    * Construct a new BRServer.
+   *
    * @param db Database to read/write to.
    */
   public BRServer(PongDatabase db) {
     clients = new CopyOnWriteArrayList<>();
     sessions = new ConcurrentHashMap<>();
     clientToServers = new ConcurrentHashMap<>();
+
+    updatedElos = new ConcurrentHashMap<>();
     ready = false;
     starting = false;
     myId = nextId();
@@ -77,7 +62,18 @@ public class BRServer implements Server {
   }
 
   /**
+   * NextID fetcher synchronized.
+   *
+   * @return the next id as a long
+   */
+  private static synchronized long nextId() {
+    // get a unique ID for println purposes
+    return idCounter++;
+  }
+
+  /**
    * Get if the server is running a game.
+   *
    * @return if running
    */
   public boolean ready() {
@@ -86,7 +82,8 @@ public class BRServer implements Server {
 
   /**
    * Add a new client to the server.
-   * @param id Client ID (username)
+   *
+   * @param id      Client ID (username)
    * @param session WebSocket session object for client
    */
   public void addClient(String id, Session session) {
@@ -98,6 +95,7 @@ public class BRServer implements Server {
       }
       clients.add(id);
       sessions.put(id, session);
+      updatedElos.put(id, db.getLeaderboardEntry(id).getElo());
       println(clients.size() + " players total.");
       if (clients.size() == MINPLAYERS) {
         // when we hit min players, start a timer to start the game.
@@ -127,7 +125,7 @@ public class BRServer implements Server {
     }
   }
 
-  private void onFilled() {
+  private void onFilled() { //get list of ids to ELOS!!!
     println("Game filled with " + clients.size() + " players, starting.");
     Collections.shuffle(clients);
     for (String cli : clients) {
@@ -362,17 +360,41 @@ public class BRServer implements Server {
         clientToServers.get(nextID).left = newServer;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+
+        String survivor;
+        if (killer.equals(prevID)) {
+          survivor = nextID;
+        } else {
+          assert (killer.equals(nextID));
+          survivor = prevID;
+        }
+
+        //need to adjust elo's for the player that got a kill, got killed
+        //and the player who outlived the player that got killed
+        updateScore(killer, killed, survivor);
+
       } else if (clients.size() == 2) {
         // 2-player game, don't make a new game between the two players
         clientToServers.get(prevID).right = null;
         clientToServers.get(nextID).left = null;
         sendUsernamesUpdate(prevID);
         sendUsernamesUpdate(nextID);
+
+        String survivor;
+        if (killer.equals(prevID)) {
+          survivor = nextID;
+        } else {
+          assert (killer.equals(nextID));
+          survivor = prevID;
+        }
+        updateScore(killer, killed, survivor);
       } else {
         // 1 player left, they win
         assert (clients.size() == 1);
+        updateScore(killer, killed, null);
         synchronized (db) {
           db.incrementWins(clients.get(0));
+          db.updateELOs(updatedElos);
         }
         Session winSession = sessions.get(clients.get(0));
         JsonObject winMsg = new JsonObject();
@@ -391,6 +413,7 @@ public class BRServer implements Server {
 
   /**
    * Remove a client by their ID.
+   *
    * @param id Client ID to kill.
    */
   public void removeClient(String id) {
@@ -405,14 +428,71 @@ public class BRServer implements Server {
           starting = false;
           startTimer.cancel();
           startTimer = null;
+          //no longer need refrence to elo of player not in game
+          updatedElos.remove(id);
         }
       }
     }
   }
 
+  /**
+   * Update the elos for the players involved in a kill
+   *
+   * @param killerID killer ID
+   * @param killedID killed ID
+   * @param survivorID survivor's ID, if oone exists
+   */
+  public void updateScore(String killerID, String killedID, String survivorID) { //with survivor and another w/o
+    if (killerID == null) { //the case in which a player disconnects mid-game
+      double killedELO = updatedElos.get(killedID) + DCPENALTY;
+      if (killedELO < 1) {
+        killedELO = 1;
+      }
+      updatedElos.replace(killedID, killedELO);
+    } else { //general case
+      double killerELO = updatedElos.get(killerID);
+      double killedELO = updatedElos.get(killedID);
+
+      //calculation is based on how many players were in the game before
+      //the killed player is removed
+      killerELO = killerELO + ELOUpdater.update("WIN", killerELO, killedELO) / (clients.size() + 1);
+      killedELO = killedELO + ELOUpdater.update("LOSE", killedELO, killerELO) / (clients.size() + 1);
+
+      if (killerELO < 1) {
+        killerELO = 1;
+      }
+
+      if (killedELO < 1) {
+        killedELO = 1;
+      }
+      updatedElos.replace(killerID, killerELO);
+      updatedElos.replace(killedID, killedELO);
+
+      if (survivorID != null) {
+        double survivorELO = updatedElos.get(survivorID);
+        survivorELO = survivorELO + ELOUpdater.update
+                ("WIN", survivorELO, killedELO) / (3 * (clients.size() + 1));
+
+        if (survivorELO < 1) {
+          survivorELO = 1;
+        }
+        updatedElos.replace(survivorID, survivorELO);
+      }
+    }
+
+
+  }
+
   @Override
   public void println(String msg) {
     System.out.println("BR #" + myId + " :: " + msg);
+  }
+
+  /**
+   * ServerPair class.
+   */
+  private class ServerPair {
+    PongServer right, left;
   }
 
 }

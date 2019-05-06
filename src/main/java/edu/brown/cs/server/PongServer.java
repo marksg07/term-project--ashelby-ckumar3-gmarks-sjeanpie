@@ -137,7 +137,7 @@ public class PongServer implements Server {
   public double getP2PaddleY() {
     return game.getP2PaddleY();
   }
-
+  
   /**
    * Sets ball speed.
    * @param speed speed in px per second
