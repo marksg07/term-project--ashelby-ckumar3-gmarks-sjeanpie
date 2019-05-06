@@ -206,7 +206,7 @@ public class PongDatabase {
     List<LeaderboardEntry> leaderboardData = new ArrayList<>();
     try (PreparedStatement prep = conn.prepareStatement(
             "SELECT usr, total_games, elo, wins from usr_stats "
-                    + "ORDER BY wins * 1.0 / total_games DESC;")) {
+                    + "ORDER BY elo DESC;")) {
       ResultSet rs = prep.executeQuery();
       int i = 0;
       while (rs.next() && i < 5) {
