@@ -452,8 +452,8 @@ public class BRServer implements Server {
     /*if the new elo would cause the player to drop below the elo floor, 
      * set it to the elo floor. Also applied in all other cases
      */
-      if (killedELO < ELOUpdater.ELOFLOOR) { 
-        killedELO = ELOUpdater.ELOFLOOR;
+      if (killedELO < 1) { 
+        killedELO = 1;
       }
       updatedElos.replace(killedID, killedELO);
     } else { //general case
@@ -469,12 +469,12 @@ public class BRServer implements Server {
       killerELO = killerELO + eloUpdates[0] / (clients.size() + 1);
       killedELO = killedELO + eloUpdates[1] / (clients.size() + 1);
 
-      if (killerELO < ELOUpdater.ELOFLOOR) {
-        killerELO = ELOUpdater.ELOFLOOR;
+      if (killerELO < 1) {
+        killerELO = 1;
       }
 
-      if (killedELO < ELOUpdater.ELOFLOOR) {
-    	  killedELO = ELOUpdater.ELOFLOOR;
+      if (killedELO < 1) {
+    	  killedELO = 1;
       }
       updatedElos.replace(killerID, killerELO);
       updatedElos.replace(killedID, killedELO);
@@ -488,8 +488,8 @@ public class BRServer implements Server {
         survivorELO = survivorELO + ELOUpdater.update
                 ("WIN", survivorELO, killedELO)[0] / (3 * (clients.size() + 1));
 
-        if (survivorELO < ELOUpdater.ELOFLOOR) {
-        	survivorELO = ELOUpdater.ELOFLOOR;
+        if (survivorELO < 1) {
+        	survivorELO = 1;
         }
         updatedElos.replace(survivorID, survivorELO);
       }

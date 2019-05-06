@@ -17,7 +17,7 @@ public class ELOUpdater {
 	 *that a player would have fallen below the initial elo
 	 * 
 	 */	 
-	public static final double ELOFLOOR = 1000;
+	public static final double START_ELO = 1000;
 	
 	/**
 	 * A factor that determines how much overall weight to give

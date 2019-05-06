@@ -189,7 +189,7 @@ public class PongDatabase {
             "INSERT INTO usr_stats (usr, total_games, elo, wins) "
                     + "VALUES (?, 0, ?, 0);")) {
       prep.setString(1, username);
-      prep.setDouble(2, ELOUpdater.ELOFLOOR);
+      prep.setDouble(2, ELOUpdater.START_ELO);
       prep.executeUpdate();
     } catch (Exception e) {
       System.out.println("SQL query failed:");
