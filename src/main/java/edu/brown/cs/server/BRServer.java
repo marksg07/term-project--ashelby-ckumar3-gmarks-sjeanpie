@@ -479,20 +479,20 @@ public class BRServer implements Server {
       updatedElos.replace(killerID, killerELO);
       updatedElos.replace(killedID, killedELO);
 
-      if (survivorID != null) {
+      /*if (survivorID != null) {
         double survivorELO = updatedElos.get(survivorID);
         /*
          *Although a survivor "WIN"s against it's opponent, the division by 3
          *ensures gain is valued less than actually getting the elimination
          */
-        survivorELO = survivorELO + ELOUpdater.update
+        /*survivorELO = survivorELO + ELOUpdater.update
                 ("WIN", survivorELO, killedELO)[0] / (3 * (clients.size() + 1));
 
         if (survivorELO < 1) {
         	survivorELO = 1;
         }
         updatedElos.replace(survivorID, survivorELO);
-      }
+      }*/
     }
 
 
