@@ -16,7 +16,7 @@ $(".login-push").submit(function () {
  * When logout is submitted, deletes username and userid cookie data.
  */
 $("#logout").submit(function () {
-    document.cookie = "username=; expires Thu, 21 Aug 2010 20:00:00 UTC";
-    document.cookie = "userid=; expires Thu, 21 Aug 2010 20:00:00 UTC";
+    document.cookie = "username=; expires= Thu, 21 Aug 2010 20:00:00 UTC";
+    document.cookie = "userid=; expires= Thu, 21 Aug 2010 20:00:00 UTC";
 
 });

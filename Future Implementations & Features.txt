@@ -1,0 +1,15 @@
+Stuff that can be added to P O N G F O L K S
+in the future:
+
+- change password / delete account
+- look up a user's stats
+- display change in ELO after game
+- powerups
+- skins / colors
+- particle effects
+- music & sounds
+- logo
+- public domain name
+- ranked / casual mode
+- ELO decay for higher ranked players
+- add total kills column to db
