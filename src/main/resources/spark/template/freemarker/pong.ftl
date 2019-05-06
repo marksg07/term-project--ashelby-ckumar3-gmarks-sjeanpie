@@ -19,7 +19,7 @@
                 <p id="status" class="horiz-centered" style="font-size: 48px; margin-top: 24px; bold: true;">Waiting for
                     players...</p> <br>
                 <br>
-                <form class="lowest  horiz-centered" action="/home" method="GET">
+                <form style="margin-top: 30px;" class="lowest  horiz-centered" action="/home" method="GET">
                     <input style="margin-top: 100px;" type="submit" class="lowest btn btn-outline-primary form-control"
                            id="find-game" class="find_game" value="Go Home">
                 </form>
