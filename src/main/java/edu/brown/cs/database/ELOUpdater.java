@@ -71,14 +71,17 @@ public class ELOUpdater {
 		case "WIN":
 			changes[0] = (K(elo1) * (1 - expectedResult(elo1, elo2)));
 			changes[1] = (K(elo2) * (0 - expectedResult(elo2, elo1)));
+			break;
 
 		case "LOSE":
 			changes[0] = (K(elo1) * (0 - expectedResult(elo1, elo2)));
 			changes[1] = (K(elo2) * (1 - expectedResult(elo2, elo1)));
+			break;
 			
 		case "DRAW":
 			changes[0] =  (K(elo1) * (0.5 - expectedResult(elo1, elo2)));
 			changes[1] =  (K(elo2) * (0.5 - expectedResult(elo2, elo1)));
+			break;
 		}
 		
 		return changes;
