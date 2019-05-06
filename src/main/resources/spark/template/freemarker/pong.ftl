@@ -19,11 +19,11 @@
                 <p id="status" class="horiz-centered" style="font-size: 48px; margin-top: 24px; bold: true;">Waiting for
                     players...</p> <br>
                 <br>
-                <form style="margin-top: 30px;" class="lowest  horiz-centered" action="/home" method="GET">
+                <form class="lowest  horiz-centered" action="/home" method="GET">
                     <input style="margin-top: 100px;" type="submit" class="lowest btn btn-outline-primary form-control"
                            id="find-game" class="find_game" value="Go Home">
                 </form>
-                <form hidden="true" id="new-game-form" class="more-lowest horiz-centered" action="/game" method="POST">
+                <form style="margin-top: 30px;" hidden="true" id="new-game-form" class="more-lowest horiz-centered" action="/game" method="POST">
                     <input type="hidden" name="username" value="${username}">
                     <input type="hidden" id="userid" name="userid" value="${userid}">
                     <input style="margin-top: 100px;" type="submit" class="more-lowest btn btn-outline-primary form-control"
